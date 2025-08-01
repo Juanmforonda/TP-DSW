@@ -1,0 +1,40 @@
+### Obtener todas las amarras
+GET http://localhost:3000/api/amarras
+Accept: application/json
+
+###
+
+### Obtener una amarra por ID
+GET http://localhost:3000/api/amarras/{id}
+Accept: application/json
+
+###
+
+### Crear una nueva amarra
+POST http://localhost:3000/api/amarras
+Content-Type: application/json
+
+{
+  "estado": "libre",
+  "precioMensualBase": 5000,
+  "longitudMax": 12,
+  "zona": "A",
+  "nroPilon": 1
+}
+
+###
+
+### Modificar una amarra existente
+PUT http://localhost:3000/api/amarras/{id}
+Content-Type: application/json
+
+{
+  "estado": "ocupado",
+  "precioMensualBase": 5500
+}
+
+###
+
+### Eliminar una amarra por ID
+DELETE http://localhost:3000/api/amarras/{idToDelete}
+Accept: application/json

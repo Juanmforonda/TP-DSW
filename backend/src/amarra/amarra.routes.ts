@@ -1,12 +1,11 @@
 import { Router } from 'express';
-import { sanitizeAmarraInput, findAll, findOne, add, update, remove  } from './amarra.controller.js';
+import { findAll, findOne, add, update, remove  } from './amarra.controller.js';
 
 
 export const amarraRouter = Router()
 
 amarraRouter.get('/', findAll)
 amarraRouter.get('/:id', findOne)
-amarraRouter.post('/', sanitizeAmarraInput, add)
-amarraRouter.put('/:id', sanitizeAmarraInput, update)
-amarraRouter.patch('/:id', sanitizeAmarraInput, update)
+amarraRouter.post('/', add)
+amarraRouter.put('/:id', update)
 amarraRouter.delete('/:id', remove)
