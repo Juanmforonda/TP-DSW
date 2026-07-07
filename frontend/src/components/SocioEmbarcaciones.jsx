@@ -47,7 +47,7 @@ export function SocioEmbarcaciones({ idSocio }) {
               <h5 className="mb-2">{embarcacion.nombre}</h5>
               <p className="mb-1"><strong>Matrícula:</strong> {embarcacion.matricula}</p>
               <p className="mb-1"><strong>Eslora:</strong> {embarcacion.eslora} m</p>
-              <p className="mb-0"><strong>Tipo:</strong> {embarcacion.tipoEmbarcacion?.nombre}</p>
+              <p className="mb-0"><strong>Tipo:</strong> {embarcacion.tipoEmbarcacion.nombre}</p>
             </div>
           </div>
         ))}
