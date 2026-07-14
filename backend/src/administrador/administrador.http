@@ -11,6 +11,7 @@ Content-Type: application/json
   "apellido": "Infantino",
   "dni": "10000000",
   "email":"gianni.infantino@gmail.com",
+  "password": "123456"
 }
 
 ### ID

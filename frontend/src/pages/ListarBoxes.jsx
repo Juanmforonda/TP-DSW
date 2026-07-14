@@ -14,10 +14,20 @@ export default function ListarBoxes() {
 
   useEffect(() => {
     if (boxes) {
+      const conEmbarcacion = boxes.map((box) => {
+        const embarcacion = box.embarcacion;
+        const socio = embarcacion?.socio;
+        return {
+          ...box,
+          embarcacionTexto: embarcacion ? `${embarcacion.id} - ${embarcacion.nombre}` : '-',
+          socioTexto: !embarcacion ? '-' : socio ? `${socio.id} - ${socio.nombre} ${socio.apellido}` : 'Club Náutico'
+        };
+      });
+
       if (filtroEstado === 'todos') {
-        setBoxesFiltrados(boxes);
+        setBoxesFiltrados(conEmbarcacion);
       } else {
-        setBoxesFiltrados(boxes.filter(box => box.estado === filtroEstado));
+        setBoxesFiltrados(conEmbarcacion.filter(box => box.estado === filtroEstado));
       }
     }
   }, [boxes, filtroEstado]);
@@ -104,10 +114,11 @@ export default function ListarBoxes() {
               { key: 'id', label: 'ID' },
               { key: 'nroBox', label: 'Número de Box' },
               { key: 'estado', label: 'Estado' },
-              { key: 'precioMensualBase', label: 'Precio Mensual' }
+              { key: 'precioMensualBase', label: 'Precio Mensual' },
+              { key: 'embarcacionTexto', label: 'Embarcacion' },
+              { key: 'socioTexto', label: 'Socio' }
             ]}
             data={boxesFiltrados}
-            readOnly={true}
             className="tabla-boxes"
           />
         </>

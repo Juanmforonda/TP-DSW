@@ -21,6 +21,8 @@ import {
 } from '../api/embarcaciones.js'
 import { getSocios } from '../api/socios.js'
 import { getTiposEmbarcacion } from '../api/tiposEmbarcacion.js'
+import { getAmarras } from '../api/amarras.js'
+import { getBoxes } from '../api/boxes.js'
 
 const AdministrarEmbarcacionesSocios = () => {
   const [socios, setSocios] = useState([])
@@ -39,6 +41,17 @@ const AdministrarEmbarcacionesSocios = () => {
     tipoEmbarcacion: '',
   })
   const [tiposEmbarcacion, setTiposEmbarcacion] = useState([])
+
+  // 🔹 Ubicación (amarra o box) para la embarcación nueva. Son mutuamente
+  // excluyentes: solo se puede elegir una de las dos, o ninguna.
+  const [tipoUbicacion, setTipoUbicacion] = useState('ninguna') // 'ninguna' | 'amarra' | 'box'
+  const [ubicacionId, setUbicacionId] = useState('')
+  const [amarrasDisponibles, setAmarrasDisponibles] = useState([])
+  const [boxesDisponibles, setBoxesDisponibles] = useState([])
+
+  // 🔹 Confirmación antes de eliminar una embarcación
+  const [modalEliminarVisible, setModalEliminarVisible] = useState(false)
+  const [embarcacionAEliminar, setEmbarcacionAEliminar] = useState(null) // { id, socioId }
 
   // 🔹 Cargar socios
   useEffect(() => {
@@ -88,6 +101,25 @@ const AdministrarEmbarcacionesSocios = () => {
     cargarEmbarcacionesClub()
   }, [])
 
+  // 🔹 Cargar amarras y boxes disponibles cada vez que se abre el modal de creación
+  useEffect(() => {
+    if (modalNuevaVisible) {
+      getAmarras()
+        .then((resp) => {
+          const todas = resp?.data?.data ?? []
+          setAmarrasDisponibles(todas.filter((a) => a.estado === 'libre'))
+        })
+        .catch((error) => console.error('Error al cargar amarras:', error))
+
+      getBoxes()
+        .then((resp) => {
+          const todos = resp?.data?.data ?? []
+          setBoxesDisponibles(todos.filter((b) => b.estado === 'disponible'))
+        })
+        .catch((error) => console.error('Error al cargar boxes:', error))
+    }
+  }, [modalNuevaVisible])
+
   // 🔹 Mostrar embarcaciones del socio
   const toggleDetails = async (idSocio) => {
     const isOpen = details.includes(idSocio)
@@ -123,7 +155,21 @@ const AdministrarEmbarcacionesSocios = () => {
       }
     } catch (error) {
       console.error('Error al eliminar embarcación:', error)
+      const mensaje = error.response?.data?.message || 'Error al eliminar la embarcación'
+      alert(mensaje)
     }
+  }
+
+  const abrirConfirmarEliminar = (idEmbarcacion, socioId = null) => {
+    setEmbarcacionAEliminar({ id: idEmbarcacion, socioId })
+    setModalEliminarVisible(true)
+  }
+
+  const confirmarEliminar = async () => {
+    if (!embarcacionAEliminar) return
+    await borrarEmbarcacion(embarcacionAEliminar.id, embarcacionAEliminar.socioId)
+    setModalEliminarVisible(false)
+    setEmbarcacionAEliminar(null)
   }
 
   // 🔹 Modal nueva embarcación
@@ -135,6 +181,8 @@ const AdministrarEmbarcacionesSocios = () => {
       eslora: '',
       tipoEmbarcacion: '',
     })
+    setTipoUbicacion('ninguna')
+    setUbicacionId('')
     setModalNuevaVisible(true)
   }
 
@@ -150,6 +198,13 @@ const AdministrarEmbarcacionesSocios = () => {
       eslora: Number(formData.eslora),
       tipoEmbarcacion: formData.tipoEmbarcacion,
       socio: socioSeleccionado, // puede ser null para el club
+    }
+
+    // La embarcación puede ir en una amarra O en un box, nunca en ambos.
+    if (tipoUbicacion === 'amarra' && ubicacionId) {
+      payload.amarra = Number(ubicacionId)
+    } else if (tipoUbicacion === 'box' && ubicacionId) {
+      payload.box = Number(ubicacionId)
     }
 
     try {
@@ -169,6 +224,9 @@ const AdministrarEmbarcacionesSocios = () => {
       setSocioSeleccionado(null)
     } catch (error) {
       console.error('Error al crear embarcación:', error)
+      const data = error.response?.data
+      const mensaje = data?.errors?.join('\n') || data?.message || 'Error al crear la embarcación'
+      alert(mensaje)
     }
   }
 
@@ -228,7 +286,7 @@ const AdministrarEmbarcacionesSocios = () => {
                   <td>{e.eslora}</td>
                   <td>{e.tipoEmbarcacion?.nombre ?? '---'}</td>
                   <td>
-                    <CButton color="danger" size="sm" onClick={() => borrarEmbarcacion(e.id)}>
+                    <CButton color="danger" size="sm" onClick={() => abrirConfirmarEliminar(e.id)}>
                       Eliminar
                     </CButton>
                   </td>
@@ -298,7 +356,7 @@ const AdministrarEmbarcacionesSocios = () => {
                               <CButton
                                 color="danger"
                                 size="sm"
-                                onClick={() => borrarEmbarcacion(e.id, item.id)}
+                                onClick={() => abrirConfirmarEliminar(e.id, item.id)}
                               >
                                 Eliminar
                               </CButton>
@@ -342,6 +400,7 @@ const AdministrarEmbarcacionesSocios = () => {
             label="Tipo de embarcación"
             value={formData.tipoEmbarcacion}
             onChange={(e) => setFormData((prev) => ({ ...prev, tipoEmbarcacion: e.target.value }))}
+            className="mb-3"
           >
             <option value="">Seleccione un tipo</option>
             {tiposEmbarcacion.map((t) => (
@@ -350,6 +409,52 @@ const AdministrarEmbarcacionesSocios = () => {
               </option>
             ))}
           </CFormSelect>
+
+          <CFormSelect
+            label="Ubicación"
+            value={tipoUbicacion}
+            onChange={(e) => {
+              setTipoUbicacion(e.target.value)
+              setUbicacionId('')
+            }}
+            className="mb-3"
+          >
+            <option value="ninguna">Sin asignar</option>
+            <option value="amarra">Amarra</option>
+            <option value="box">Box</option>
+          </CFormSelect>
+
+          {tipoUbicacion === 'amarra' && (
+            <CFormSelect
+              label="Amarra disponible"
+              value={ubicacionId}
+              onChange={(e) => setUbicacionId(e.target.value)}
+              className="mb-3"
+            >
+              <option value="">Seleccione una amarra</option>
+              {amarrasDisponibles.map((a) => (
+                <option key={a.id} value={a.id}>
+                  #{a.id} — Zona {a.zona}, pilón {a.nroPilon} — ${a.precioMensualBase}/mes
+                </option>
+              ))}
+            </CFormSelect>
+          )}
+
+          {tipoUbicacion === 'box' && (
+            <CFormSelect
+              label="Box disponible"
+              value={ubicacionId}
+              onChange={(e) => setUbicacionId(e.target.value)}
+              className="mb-3"
+            >
+              <option value="">Seleccione un box</option>
+              {boxesDisponibles.map((b) => (
+                <option key={b.id} value={b.id}>
+                  Box {b.nroBox} — ${b.precioMensualBase}/mes
+                </option>
+              ))}
+            </CFormSelect>
+          )}
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setModalNuevaVisible(false)}>
@@ -357,6 +462,22 @@ const AdministrarEmbarcacionesSocios = () => {
           </CButton>
           <CButton color="success" onClick={guardarNueva}>
             Crear
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
+      {/* 🔹 Confirmación de borrado de embarcación */}
+      <CModal visible={modalEliminarVisible} onClose={() => setModalEliminarVisible(false)}>
+        <CModalHeader closeButton>Confirmar eliminación</CModalHeader>
+        <CModalBody>
+          ¿Estás seguro de que querés eliminar esta embarcación? Esta acción no se puede deshacer.
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setModalEliminarVisible(false)}>
+            Cancelar
+          </CButton>
+          <CButton color="danger" onClick={confirmarEliminar}>
+            Eliminar
           </CButton>
         </CModalFooter>
       </CModal>

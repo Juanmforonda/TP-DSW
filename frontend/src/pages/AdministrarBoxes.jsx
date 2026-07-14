@@ -14,7 +14,6 @@ import {
 
 export default function AdministrarBoxes(){
   const [boxes, setBoxes] = useState([]);
-  const [estado, setEstado] = useState('disponible');
   const [precioMensualBase, setPrecioMensualBase] = useState('');
   const [nroBox, setNroBox] = useState('');
 
@@ -34,9 +33,9 @@ export default function AdministrarBoxes(){
   const handleCrear = async (e) => {
     e.preventDefault();
     try {
-      await crearBox({ estado, precioMensualBase, nroBox });
+      // Todo box nuevo arranca disponible; se ocupa recién cuando se le asigna una embarcación.
+      await crearBox({ estado: 'disponible', precioMensualBase, nroBox });
       await cargarBoxes();
-      setEstado('disponible');
       setPrecioMensualBase('');
       setNroBox('');
     } catch (error) {
@@ -79,7 +78,7 @@ export default function AdministrarBoxes(){
         <CCardBody>
           <CForm onSubmit={handleCrear}>
             <CRow className="mb-3">
-              <CCol md={4}>
+              <CCol md={6}>
                 <div className="mb-3">
                   <label className="form-label">Número de Box</label>
                   <CFormInput
@@ -90,7 +89,7 @@ export default function AdministrarBoxes(){
                   />
                 </div>
               </CCol>
-              <CCol md={4}>
+              <CCol md={6}>
                 <div className="mb-3">
                   <label className="form-label">Precio Mensual</label>
                   <CFormInput
@@ -100,21 +99,6 @@ export default function AdministrarBoxes(){
                     required
                     type="number"
                   />
-                </div>
-              </CCol>
-              <CCol md={4}>
-                <div className="mb-3">
-                  <label className="form-label">Estado</label>
-                  <select
-                    className="form-select"
-                    value={estado}
-                    onChange={(e) => setEstado(e.target.value)}
-                    required
-                  >
-                    <option value="disponible">Disponible</option>
-                    <option value="ocupado">Ocupado</option>
-                    <option value="mantenimiento">Mantenimiento</option>
-                  </select>
                 </div>
               </CCol>
             </CRow>

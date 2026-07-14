@@ -16,7 +16,6 @@ import {
 export default function AdministrarAmarras(){
 
   const [amarras, setAmarras] = useState([]);
-  const [estado, setEstado] = useState('');
   const [precioMensualBase, setPrecioMensualBase] = useState('');
   const [longitudMax, setLongitudMax] = useState('');
   const [zona, setZona] = useState('');
@@ -34,9 +33,9 @@ export default function AdministrarAmarras(){
 
   const handleCrear = async (e) => {
       e.preventDefault();
-      await crearAmarra({ estado, precioMensualBase, longitudMax, zona, nroPilon });
+      // Toda amarra nueva arranca libre; se ocupa recién cuando se le asigna una embarcación.
+      await crearAmarra({ estado: 'libre', precioMensualBase, longitudMax, zona, nroPilon });
       await cargarAmarras();
-      setEstado('');
       setPrecioMensualBase('');
       setLongitudMax('');
       setZona('');
@@ -73,21 +72,6 @@ export default function AdministrarAmarras(){
         <CCardBody>
           <CForm onSubmit={handleCrear}>
             <CRow className="mb-3">
-              <CCol md={3}>
-                <div className="mb-3">
-                  <label className="form-label">Estado</label>
-                  <select
-                    className="form-select"
-                    value={estado}
-                    onChange={(e) => setEstado(e.target.value)}
-                    required
-                  >
-                    <option value="">Seleccione un estado</option>
-                    <option value="libre">Libre</option>
-                    <option value="ocupado">Ocupado</option>
-                  </select>
-                </div>
-              </CCol>
               <CCol md={3}>
                 <div className="mb-3">
                   <label className="form-label">Precio Mensual</label>

@@ -1,6 +1,6 @@
-import { Entity, PrimaryKey, Property, OneToMany, Enum } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, OneToOne, Enum, Rel } from '@mikro-orm/core';
 import { IsNotEmpty, IsString, IsNumber, IsEnum} from 'class-validator';
-
+import { Embarcacion } from '../embarcacion/embarcacion.entity.js';
 export enum Estado {
   LIBRE = 'libre',
   OCUPADO = 'ocupado'
@@ -32,4 +32,9 @@ export class Amarra {
     @Property()
     @IsNumber({}, { message: 'El número de pilón debe ser un número' })
     nroPilon!: number;
+
+    // Lado inverso de la relación 1:1. La FK real vive en Embarcacion (embarcacion.amarra).
+    // No hay columna acá; MikroORM resuelve esto con una query cuando se popula.
+    @OneToOne(() => Embarcacion, (embarcacion) => embarcacion.amarra)
+    embarcacion?: Rel<Embarcacion> | null;
 }

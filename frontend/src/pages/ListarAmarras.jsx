@@ -105,19 +105,30 @@ export default function ListarAmarras() {
                   <CTableHeaderCell>Longitud Maxima</CTableHeaderCell>
                   <CTableHeaderCell>Zona</CTableHeaderCell>
                   <CTableHeaderCell>Nro Pilon</CTableHeaderCell>
+                  <CTableHeaderCell>Embarcación</CTableHeaderCell>
+                  <CTableHeaderCell>Socio</CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
               <CTableBody>
-                {amarrasFiltradas.map((amarra) => (
-                  <CTableRow key={amarra.id}>
-                    <CTableDataCell>{amarra.id}</CTableDataCell>
-                    <CTableDataCell>{amarra.estado}</CTableDataCell>
-                    <CTableDataCell>${amarra.precioMensualBase}</CTableDataCell>
-                    <CTableDataCell>{amarra.longitudMax}</CTableDataCell>
-                    <CTableDataCell>{amarra.zona}</CTableDataCell>
-                    <CTableDataCell>{amarra.nroPilon}</CTableDataCell>
-                  </CTableRow>
-                ))}
+                {amarrasFiltradas.map((amarra) => {
+                  const embarcacion = amarra.embarcacion;
+                  const socio = embarcacion?.socio;
+                  const socioTexto = !embarcacion ? '-' : socio ? `${socio.id} - ${socio.nombre} ${socio.apellido}` : 'Club Náutico';
+                  return (
+                    <CTableRow key={amarra.id}>
+                      <CTableDataCell>{amarra.id}</CTableDataCell>
+                      <CTableDataCell>{amarra.estado}</CTableDataCell>
+                      <CTableDataCell>${amarra.precioMensualBase}</CTableDataCell>
+                      <CTableDataCell>{amarra.longitudMax}</CTableDataCell>
+                      <CTableDataCell>{amarra.zona}</CTableDataCell>
+                      <CTableDataCell>{amarra.nroPilon}</CTableDataCell>
+                      <CTableDataCell>
+                        {embarcacion ? `${embarcacion.id} - ${embarcacion.nombre}` : '-'}
+                      </CTableDataCell>
+                      <CTableDataCell>{socioTexto}</CTableDataCell>
+                    </CTableRow>
+                  );
+                })}
               </CTableBody>
             </CTable>
           )}
