@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './tablaSocios.css';
-import { getEmbarcaciones } from '../api/embarcaciones.js';
 
 import {
   CTable,
@@ -17,21 +16,17 @@ import {
   CFormInput,
 } from '@coreui/react';
 
-export function EntityTable({ columns, data, entityName, onDelete, onEdit }) {
+export function EntityTable({
+  columns,
+  data,
+  entityName,
+  onDelete,
+  onEdit,
+  extraActions,
+}) {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalEditOpen, setModalEditOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [embarcaciones, setEmbarcaciones] = useState([]);
-
-  // Para "amarra" y "box" el modal de edición necesita la lista de
-  // embarcaciones disponibles para poder asignarlas/desasignarlas.
-  useEffect(() => {
-    if ((entityName === 'amarra' || entityName === 'box') && modalEditOpen) {
-      getEmbarcaciones()
-        .then((res) => setEmbarcaciones(res.data.data || []))
-        .catch((error) => console.error('Error al cargar embarcaciones:', error));
-    }
-  }, [entityName, modalEditOpen]);
 
   const abrirEliminar = (item) => {
     setSelected(item);
@@ -41,28 +36,6 @@ export function EntityTable({ columns, data, entityName, onDelete, onEdit }) {
   const abrirEditar = (item) => {
     setSelected(item);
     setModalEditOpen(true);
-  };
-
-  // Id de la embarcación actualmente asignada a la amarra seleccionada
-  // (puede venir como objeto populado o como id plano).
-  const embarcacionSeleccionadaId = (() => {
-    const emb = selected?.embarcacion;
-    if (emb === null || emb === undefined) return '';
-    return typeof emb === 'object' ? emb.id : emb;
-  })();
-
-  // Campo de la embarcación que apunta a esta entidad ('amarra' o 'box'),
-  // usado para saber qué embarcaciones ya están ocupadas por otra fila.
-  const campoRelacionInverso = entityName === 'box' ? 'box' : 'amarra';
-
-  const handleEmbarcacionChange = (value) => {
-    const embarcacionId = value === '' ? null : Number(value);
-    const estadoSinEmbarcacion = entityName === 'box' ? 'disponible' : 'libre';
-    setSelected({
-      ...selected,
-      embarcacion: embarcacionId,
-      estado: embarcacionId ? 'ocupado' : estadoSinEmbarcacion,
-    });
   };
 
   const confirmarEliminar = () => {
@@ -75,19 +48,22 @@ export function EntityTable({ columns, data, entityName, onDelete, onEdit }) {
   };
 
   const guardarCambios = () => {
-    // Convertir campos numéricos a números
     const datosActualizados = { ...selected };
-    if (datosActualizados.precioMensualBase) {
-      datosActualizados.precioMensualBase = Number(datosActualizados.precioMensualBase);
+    columns.forEach((col) => {
+    if (col.readonly) {
+      delete datosActualizados[col.key];
+    }});
+
+    if (datosActualizados.precioMensualBase !== undefined) {
+      datosActualizados.precioMensualBase = Number(
+        datosActualizados.precioMensualBase,
+      );
     }
-    if (datosActualizados.longitudMax) {
+    if (datosActualizados.longitudMax !== undefined) {
       datosActualizados.longitudMax = Number(datosActualizados.longitudMax);
     }
-    if (datosActualizados.nroPilon) {
+    if (datosActualizados.nroPilon !== undefined) {
       datosActualizados.nroPilon = Number(datosActualizados.nroPilon);
-    }
-    if ((entityName === 'amarra' || entityName === 'box') && typeof datosActualizados.embarcacion === 'object') {
-      datosActualizados.embarcacion = datosActualizados.embarcacion?.id ?? null;
     }
     onEdit(selected.id, datosActualizados);
     setModalEditOpen(false);
@@ -95,14 +71,23 @@ export function EntityTable({ columns, data, entityName, onDelete, onEdit }) {
 
   return (
     <div className="table-container">
-      <CTable striped hover bordered borderColor="primary" responsive className='c-table-custom'>
+      <CTable
+        striped
+        hover
+        bordered
+        borderColor="primary"
+        responsive
+        className="c-table-custom"
+      >
         <CTableHead>
           <CTableRow>
             {columns.map((col) => (
+              
               <CTableHeaderCell key={col.key}>{col.label}</CTableHeaderCell>
             ))}
             {onEdit && <CTableHeaderCell></CTableHeaderCell>}
             {onDelete && <CTableHeaderCell></CTableHeaderCell>}
+            {extraActions && <CTableHeaderCell></CTableHeaderCell>}
           </CTableRow>
         </CTableHead>
         <CTableBody>
@@ -133,12 +118,14 @@ export function EntityTable({ columns, data, entityName, onDelete, onEdit }) {
                   </CButton>
                 </CTableDataCell>
               )}
+              {extraActions && (
+                <CTableDataCell>{extraActions(item)}</CTableDataCell>
+              )}
             </CTableRow>
           ))}
         </CTableBody>
       </CTable>
 
-      {/* Modal Eliminar */}
       <CModal visible={modalOpen} onClose={() => setModalOpen(false)}>
         <CModalHeader>Confirmar eliminación</CModalHeader>
         <CModalBody>
@@ -154,49 +141,18 @@ export function EntityTable({ columns, data, entityName, onDelete, onEdit }) {
         </CModalFooter>
       </CModal>
 
-      {/* Modal Editar */}
       <CModal visible={modalEditOpen} onClose={() => setModalEditOpen(false)}>
         <CModalHeader>Editar {entityName}</CModalHeader>
         <CModalBody>
           {columns.map((col) => {
-            // El ID nunca es editable, en ningún formulario.
-            if (col.key === 'id') {
-              return null;
-            }
-            // En "amarra" el estado se calcula automáticamente según si
-            // tiene o no una embarcación asignada, así que no se edita a mano.
-            if (col.key === 'estado' && entityName === 'amarra') {
-              return null;
-            }
-            // En "box" el estado también se deriva de la embarcación asignada
-            // (ocupado/disponible), salvo que se lo ponga manualmente en
-            // "mantenimiento" cuando no tiene ninguna embarcación asignada.
-            if (col.key === 'estado' && entityName === 'box') {
-              const tieneEmbarcacion = !!embarcacionSeleccionadaId;
-              return (
-                <div key={col.key} className="mb-3">
-                  <label className="form-label">{col.label}</label>
-                  {tieneEmbarcacion ? (
-                    <>
-                      <CFormInput value="Ocupado" disabled />
-                      <small className="text-muted">
-                        El box está ocupado porque tiene una embarcación asignada. Quitala para poder ponerlo en mantenimiento.
-                      </small>
-                    </>
-                  ) : (
-                    <select
-                      className="form-select"
-                      value={selected?.estado === 'mantenimiento' ? 'mantenimiento' : 'disponible'}
-                      onChange={(e) => handleChange('estado', e.target.value)}
-                    >
-                      <option value="disponible">Disponible</option>
-                      <option value="mantenimiento">Mantenimiento</option>
-                    </select>
-                  )}
-                </div>
-              );
-            }
+            if (col.key === 'id') return null;
+            if (col.readonly) return null;
+
             if (col.key === 'estado') {
+              const opciones =
+                entityName === 'box'
+                  ? ['disponible', 'ocupado', 'mantenimiento']
+                  : ['libre', 'ocupado', 'mantenimiento'];
               return (
                 <div key={col.key} className="mb-3">
                   <label className="form-label">{col.label}</label>
@@ -206,22 +162,16 @@ export function EntityTable({ columns, data, entityName, onDelete, onEdit }) {
                     onChange={(e) => handleChange(col.key, e.target.value)}
                   >
                     <option value="">Seleccione un estado</option>
-                    {entityName === 'box' ? (
-                      <>
-                        <option value="disponible">Disponible</option>
-                        <option value="ocupado">Ocupado</option>
-                        <option value="mantenimiento">Mantenimiento</option>
-                      </>
-                    ) : (
-                      <>
-                        <option value="libre">Libre</option>
-                        <option value="ocupado">Ocupado</option>
-                      </>
-                    )}
+                    {opciones.map((op) => (
+                      <option key={op} value={op}>
+                        {op.charAt(0).toUpperCase() + op.slice(1)}
+                      </option>
+                    ))}
                   </select>
                 </div>
               );
             }
+
             if (col.key === 'zona') {
               return (
                 <div key={col.key} className="mb-3">
@@ -240,18 +190,26 @@ export function EntityTable({ columns, data, entityName, onDelete, onEdit }) {
                 </div>
               );
             }
-            if (col.key === 'precioMensualBase' || col.key === 'longitudMax' || col.key === 'nroPilon') {
+
+            if (
+              col.key === 'precioMensualBase' ||
+              col.key === 'longitudMax' ||
+              col.key === 'nroPilon'
+            ) {
               return (
                 <div key={col.key} className="mb-3">
                   <label className="form-label">{col.label}</label>
                   <CFormInput
                     type="number"
                     value={selected?.[col.key] || ''}
-                    onChange={(e) => handleChange(col.key, Number(e.target.value))}
+                    onChange={(e) =>
+                      handleChange(col.key, Number(e.target.value))
+                    }
                   />
                 </div>
               );
             }
+
             return (
               <div key={col.key} className="mb-3">
                 <label className="form-label">{col.label}</label>
@@ -262,35 +220,6 @@ export function EntityTable({ columns, data, entityName, onDelete, onEdit }) {
               </div>
             );
           })}
-
-          {(entityName === 'amarra' || entityName === 'box') && (
-            <div className="mb-3">
-              <label className="form-label">Embarcación</label>
-              <select
-                className="form-select"
-                value={embarcacionSeleccionadaId}
-                onChange={(e) => handleEmbarcacionChange(e.target.value)}
-              >
-                <option value="">
-                  {entityName === 'box' ? 'Sin embarcación (disponible)' : 'Sin embarcación (libre)'}
-                </option>
-                {embarcaciones
-                  .filter(
-                    (e) => !e[campoRelacionInverso] || e.id === embarcacionSeleccionadaId
-                  )
-                  .map((e) => (
-                    <option key={e.id} value={e.id}>
-                      {e.nombre} — {e.matricula}
-                    </option>
-                  ))}
-              </select>
-              <small className="text-muted">
-                {entityName === 'box'
-                  ? 'El estado se actualiza automáticamente: "ocupado" si tiene una embarcación asignada, "disponible" si no (salvo que lo pongas en mantenimiento).'
-                  : 'El estado de la amarra se actualiza automáticamente: "ocupado" si tiene una embarcación asignada, "libre" si no.'}
-              </small>
-            </div>
-          )}
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setModalEditOpen(false)}>

@@ -68,7 +68,6 @@ export default function AdministrarBoxes(){
       console.error('Error al editar box:', error);
     }
   };
-
   return (
     <div className="p-4">
       <CCard>

@@ -11,6 +11,7 @@ import { CuotaMensual } from '../cuotaMensual/cuotaMensual.entity.js';
 import { BaseEntity } from '../shared/baseEntity.entity.js';
 import bcrypt from 'bcrypt';
 import { ReservaEmbarcacionClub } from '../reservaEmbarcacionClub/reservaEmbarcacionClub.entity.js';
+import { ReservaInfraestructura } from '../reservaInfraestructura/reservaInfraestructura.entity.js';
 import {
   IsEmail,
   IsNotEmpty,
@@ -62,6 +63,9 @@ export class Socio extends BaseEntity {
 
   @OneToMany(() => ReservaEmbarcacionClub, (reserva) => reserva.socio)
   reservasEmbarcacion = new Collection<ReservaEmbarcacionClub>(this);
+
+  @OneToMany(() => ReservaInfraestructura, (reserva) => reserva.socio)
+  reservasInfraestructura = new Collection<ReservaInfraestructura>(this);
 
   @BeforeCreate()
   async hashPassword() {

@@ -1,7 +1,7 @@
 import { BaseEntity } from '../shared/baseEntity.entity.js';
-import { Entity, PrimaryKey, Property, OneToOne, Enum, Rel } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, Enum, OneToMany, Collection } from '@mikro-orm/core';
 import { IsNotEmpty, IsNumber, IsPositive, Min, IsEnum } from 'class-validator';
-import { Embarcacion } from '../embarcacion/embarcacion.entity.js';
+import { ReservaInfraestructura } from '../reservaInfraestructura/reservaInfraestructura.entity.js';
 
 export enum Estado {
   DISPONIBLE = 'disponible',
@@ -30,6 +30,6 @@ export class Box extends BaseEntity {
   @Min(0, { message: 'El precio mensual no puede ser negativo' })
   precioMensualBase!: number;
 
-  @OneToOne(() => Embarcacion, (embarcacion) => embarcacion.box)
-  embarcacion?: Rel<Embarcacion> | null;
+  @OneToMany(() => ReservaInfraestructura, (reserva) => reserva.box)
+  reservasInfraestructura = new Collection<ReservaInfraestructura>(this);
 }

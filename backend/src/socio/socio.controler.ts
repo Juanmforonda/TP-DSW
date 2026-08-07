@@ -179,5 +179,10 @@ async function bajaLogica(req: Request, res: Response) {
   }
 }
 
+async function getSociosActivos(req: Request, res: Response){
+  
+
+}
+
 
 export { sanitizeSocioInput, findAll, findOne, add, update, remove, bajaLogica };
