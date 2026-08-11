@@ -16,8 +16,8 @@ Content-Type: application/json
 {
   "nombre": "Juan",
   "apellido":"Perez",
-  "dni": "20123456",
-  "email":"juan.perez@gmail.com",
+  "dni": "20000000",
+  "email":"lionelmessi@gmail.com",
   "telefono": "3412837598"
 }
 
@@ -37,11 +37,11 @@ Content-Type: application/json
 
 
 ### PUT
-PUT http://localhost:3000/api/socios/3
+PUT http://localhost:3000/api/socios/1
 Content-Type: application/json
 
 {
-  "password":"123456789"
+  "embarcaciones":1
 }
 
 

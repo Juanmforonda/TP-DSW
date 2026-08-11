@@ -13,19 +13,17 @@ GET http://localhost:3000/api/boxes/{{id}}
 POST http://localhost:3000/api/boxes
 Content-Type: application/json
 
-{
+{ "nroBox": "B001",
   "estado": "disponible",
-  "precioMensualBase": 1500,
-  "nroBox": "B001"
+  "precioMensualBase": 1500
 }
 
 ### Actualizar un box existente
-PUT http://localhost:3000/api/boxes/{{id}}
+PUT http://localhost:3000/api/boxes/1
 Content-Type: application/json
 
 {
-  "estado": "ocupado",
-  "precioMensualBase": 1800
+  "embarcacion": 2
 }
 
 

@@ -1,10 +1,13 @@
 
-import { Entity, Property, ManyToOne, Cascade, Rel, OneToMany, Collection,  } from '@mikro-orm/core';
+import { Entity, Property, ManyToOne, Cascade, Rel, OneToMany, Collection } from '@mikro-orm/core';
+
+import { Type } from 'class-transformer';
 import { TipoEmbarcacion } from '../tipoEmbarcacion/tipoEmbarcacion.entity.js';
 import { BaseEntity } from '../shared/baseEntity.entity.js';
 import { Socio } from '../socio/socio.entity.js';
 import { ReservaEmbarcacionClub } from '../reservaEmbarcacionClub/reservaEmbarcacionClub.entity.js';
-import { IsNotEmpty, IsString, IsNumber, Min, Max, IsPositive, Length } from 'class-validator';
+import { ReservaInfraestructura } from '../reservaInfraestructura/reservaInfraestructura.entity.js';
+import { IsNotEmpty, IsString, IsNumber, Min, Max, IsPositive, Length, IsDate, IsOptional } from 'class-validator';
 
 
 @Entity()
@@ -39,5 +42,15 @@ export class Embarcacion extends BaseEntity {
 
   @ManyToOne(() => Socio, { nullable: true })
   socio!: Rel<Socio>;
-}
 
+  @OneToMany(() => ReservaInfraestructura, (reserva) => reserva.embarcacion, {
+    cascade: [Cascade.ALL],
+  })
+  reservasInfraestructura = new Collection<ReservaInfraestructura>(this);
+
+  @Property({ nullable: true }) // Cuando es null significa que la afiliacion esta activa
+  @Type(() => Date)
+  @IsOptional()
+  @IsDate({ message: 'La fecha de fin debe ser una fecha válida' })
+  fechaFin?: Date;
+}

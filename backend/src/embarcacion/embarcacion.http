@@ -11,26 +11,21 @@ Content-Type: application/json
   "nombre": "Mancebo",
   "eslora": 10,
   "matricula": "ABC123",
-  "tipoEmbarcacion": 1,
-  "socio": 1
+  "tipoEmbarcacion": 1
 }
 
 ###ID
 @id = {{CreateEmbarcacion.response.body.data.id}}
 
 ###GET ONE
-GET http://localhost:3000/api/embarcaciones/{{id}}
+GET http://localhost:3000/api/embarcaciones/2
 
 ### PUT
-PUT http://localhost:3000/api/embarcaciones/{{id}}
+PUT http://localhost:3000/api/embarcaciones/1
 Content-Type: application/json
 
 {
-  "nombre": "Gran Charrua",
-  "eslora": 10,
-  "matricula": "ABC123",
-  "tipoEmbarcacion": 1,
-  "socio": 1
+  "box": 1
 }
 
 ###POST Embarcacion to delete

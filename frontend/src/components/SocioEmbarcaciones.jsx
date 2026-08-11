@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getEmbarcacionesPorSocio } from '../api/embarcaciones';
+import { getEmbarcacionesActivasPorSocio } from '../api/embarcaciones';
 import './socioHome.css'; 
 
 export function SocioEmbarcaciones({ idSocio }) {
@@ -14,7 +14,7 @@ export function SocioEmbarcaciones({ idSocio }) {
       return;
     }
 
-    getEmbarcacionesPorSocio(idSocio)
+    getEmbarcacionesActivasPorSocio(idSocio)
       .then(res => {
         const embarcaciones = res.data?.data;
         if (!Array.isArray(embarcaciones)) throw new Error('Formato inesperado');

@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from 'react'
 import { getCuotasPorSocio } from '../api/cuotas'
 import { getAfiliaciones } from '../api/afiliaciones'
-import { getEmbarcacionesPorSocio } from '../api/embarcaciones'
+import { getEmbarcacionesActivasPorSocio } from '../api/embarcaciones'
 
 export default function SocioHome({ idSocio, onSeleccion }) {
   const [cuotas, setCuotas] = useState([])
@@ -27,7 +27,7 @@ export default function SocioHome({ idSocio, onSeleccion }) {
         const [cuotasRes, afiliacionesRes, embarcacionesRes] = await Promise.all([
           safe(getCuotasPorSocio(idSocio)),
           safe(getAfiliaciones()),
-          safe(getEmbarcacionesPorSocio(idSocio)),
+          safe(getEmbarcacionesActivasPorSocio(idSocio)),
         ])
 
         setCuotas(cuotasRes.data?.data || [])

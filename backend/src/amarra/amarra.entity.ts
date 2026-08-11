@@ -1,9 +1,10 @@
-import { Entity, PrimaryKey, Property, OneToMany, Enum } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, Enum, OneToMany, Collection } from '@mikro-orm/core';
 import { IsNotEmpty, IsString, IsNumber, IsEnum} from 'class-validator';
-
+import { ReservaInfraestructura } from '../reservaInfraestructura/reservaInfraestructura.entity.js';
 export enum Estado {
   LIBRE = 'libre',
-  OCUPADO = 'ocupado'
+  OCUPADO = 'ocupado',
+  MANTENIMIENTO = 'mantenimiento',
 }
 
 @Entity()
@@ -12,7 +13,7 @@ export class Amarra {
     id?: number;
 
     @Enum(() => Estado)
-    @IsEnum(Estado, { message: 'El estado debe ser: libre u ocupado' })
+    @IsEnum(Estado, { message: 'El estado debe ser: libre, ocupado o mantenimiento' })
     @IsNotEmpty({ message: 'El estado es obligatorio' })
     estado!: Estado;
 
@@ -32,4 +33,7 @@ export class Amarra {
     @Property()
     @IsNumber({}, { message: 'El número de pilón debe ser un número' })
     nroPilon!: number;
+
+    @OneToMany(() => ReservaInfraestructura, (reserva) => reserva.amarra)
+    reservasInfraestructura = new Collection<ReservaInfraestructura>(this);
 }

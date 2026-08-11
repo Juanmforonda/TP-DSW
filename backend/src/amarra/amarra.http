@@ -37,12 +37,11 @@ Content-Type: application/json
 
 
 ### PUT
-PUT http://localhost:3000/api/amarras/{{id}}
+PUT http://localhost:3000/api/amarras/2
 Content-Type: application/json
 
 {
-  "estado": "ocupado",
-  "precioMensualBase": 5500
+  "embarcacion": 2
 }
 
 
