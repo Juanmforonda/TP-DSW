@@ -1,21 +1,14 @@
 ### FIND ALL
 GET http://localhost:3000/api/cuotasMensuales
 
-### CREATE Cuota Mensual
-# @name CreateCuotaMensual
-POST http://localhost:3000/api/cuotasMensuales
-Content-Type: application/json
+###Generar todas las cuotas
 
-{
-  "socio": 1,
-  "fechaVencimiento": "2025-9-10",
-  "monto": 25000,
-  "pagada": null,
-  "fechaPago": null
-}
+POST http://localhost:3000/api/cuotasMensuales/generar
+
+
 
 ### ID
-@id = {{CreateCuotaMensual.response.body.data.id}}
+@id = 13
 
 ### GET ONE
 GET http://localhost:3000/api/cuotasMensuales/{{id}}
@@ -29,24 +22,8 @@ Content-Type: application/json
   "fechaPago": "2025-09-04"
 }
 
-
-### CREATE Cuota mensual to delete
-# @name createCuotaMensualToDelete
-POST http://localhost:3000/api/cuotasMensuales
-Content-Type: application/json
-
-{
-  "socio": 21,
-  "fechaVencimiento": "2025-08-31",
-  "monto": 25000,
-  "pagada": null,
-  "fechaPago": null
-}
-
 ### DELETE
-@idToDelete = {{createCuotaMensualToDelete.response.body.data.id}}
-
-DELETE http://localhost:3000/api/cuotasMensuales/{{idToDelete}}
+DELETE http://localhost:3000/api/cuotasMensuales/13
 
 
 ### Listado de cuotas mensuales impagas por socio
