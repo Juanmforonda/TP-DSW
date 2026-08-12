@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import {sanitizeCuotaMensualInput, findAll, findOne, update, remove, findBySocio, generarCuotasDelMes} from './cuotaMensual.controller.js';
+import {sanitizeCuotaMensualInput, findAll, findOne, update, remove, findBySocio, generarCuotasDelMes, registrarPago} from './cuotaMensual.controller.js';
 
 export const cuotaMensualRouter = Router();
 
@@ -9,4 +9,5 @@ cuotaMensualRouter.post('/generar', generarCuotasDelMes); // trigger manual, des
 cuotaMensualRouter.put('/:id', sanitizeCuotaMensualInput, update);
 cuotaMensualRouter.delete('/:id', remove);
 cuotaMensualRouter.get('/socio/:id', findBySocio);
+cuotaMensualRouter.post('/:id/pago', registrarPago);
 

@@ -8,19 +8,12 @@ import { CUOTA_BASE_CLUB } from '../config/cuotas.config.js';
 const em = orm.em;
 
 function sanitizeCuotaMensualInput(req: Request, res: Response, next: NextFunction) {
-  const body = req.body || {};
-  const input: any = {};
-
-  if (body.fechaVencimiento) {
-    input.fechaVencimiento = new Date(body.fechaVencimiento); // validar en handler si hace falta
-  }
-
-
-  if (body.socio !== undefined && body.socio !== null && body.socio !== '') {
-    input.socio = Number(body.socio); // dejo solo el id numérico aquí
-  }
-
-  req.body.sanitizedInput = input;
+  req.body.sanitizedInput = {
+    fechaVencimiento: req.body.fechaVencimiento,
+  };
+  Object.keys(req.body.sanitizedInput).forEach((key) => {
+    if (req.body.sanitizedInput[key] === undefined) delete req.body.sanitizedInput[key];
+  });
   next();
 }
 
@@ -105,6 +98,35 @@ async function generarCuotasDelMes(req: Request, res: Response) {
   }
 }
 
+async function registrarPago(req: Request, res: Response){
+
+  try {
+    const id = Number.parseInt(req.params.id);
+    const cuota = await em.findOneOrFail(CuotaMensual, {id},);
+    const {pagada} = req.body;
+
+    if (pagada){
+      if (cuota.pagada){
+        return res.status(409).json({message: 'La cuota ya esta pagada'})
+      }
+      cuota.pagada = true;
+      cuota.metodoPago = req.body.metodoPago === MetodoPago.MERCADO_PAGO ? MetodoPago.MERCADO_PAGO : MetodoPago.EFECTIVO;
+      cuota.fechaPago = req.body.fechaPago ? new Date(req.body.fechaPago) : new Date();
+    }
+    else{
+      cuota.pagada = false;
+      cuota.metodoPago = undefined;
+      cuota.fechaPago = undefined;
+    }
+    await em.flush();
+    res.status(200).json({message: pagada ? 'La cuota fue marcada como pagada con exito' : 'Se saco el dato de la cuota pagada', data: cuota})
+    
+  } catch (error: any) {
+    if (error.name === 'NotFoundError') return res.status(404).json({ message: 'Cuota no encontrada' });
+    res.status(500).json({ message: error.message });
+  }
+
+}
 
 
 async function findAll(req: Request, res: Response) {
@@ -176,4 +198,4 @@ async function findBySocio(req: Request, res: Response) {
 }
 
 
-export { sanitizeCuotaMensualInput, findAll, findOne, update, remove, findBySocio, generarCuotasDelMes };
+export { sanitizeCuotaMensualInput, findAll, findOne, update, remove, findBySocio, generarCuotasDelMes, registrarPago };
