@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import {sanitizeCuotaMensualInput, findAll, findOne, update, remove, findBySocio, generarCuotasDelMes, registrarPago} from './cuotaMensual.controller.js';
+import {sanitizeCuotaMensualInput, findAll, findOne, update, remove, findBySocio, generarCuotasDelMes, registrarPago, crearPreferenciaMP, confirmarPagoMP } from './cuotaMensual.controller.js';
 
 export const cuotaMensualRouter = Router();
 
+cuotaMensualRouter.post('/:id/mercadopago/preferencia', crearPreferenciaMP);
+cuotaMensualRouter.post('/mercadopago/confirmar', confirmarPagoMP);
 cuotaMensualRouter.get('/', findAll);
 cuotaMensualRouter.get('/:id', findOne);
 cuotaMensualRouter.post('/generar', generarCuotasDelMes); // trigger manual, después  cronearlo

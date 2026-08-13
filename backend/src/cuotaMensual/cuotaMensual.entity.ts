@@ -48,4 +48,10 @@ export class CuotaMensual extends BaseEntity {
 
   @OneToMany(() => DetalleCuota, (d) => d.cuota, { cascade: [Cascade.ALL] })
   detalles = new Collection<DetalleCuota>(this);
+
+  @Property({ nullable: true })
+  mercadoPagoPreferenceId?: string;
+
+  @Property({ nullable: true })
+  mercadoPagoPaymentId?: string;
 }
