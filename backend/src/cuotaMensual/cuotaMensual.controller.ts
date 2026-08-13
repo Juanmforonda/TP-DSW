@@ -115,7 +115,6 @@ async function crearPreferenciaMP(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
     const cuota = await em.findOneOrFail(CuotaMensual, { id }, { populate: ['socio', 'detalles'] });
-
     if (cuota.pagada) {
       return res.status(409).json({ message: 'Esta cuota ya está pagada' });
     }
@@ -141,12 +140,9 @@ async function crearPreferenciaMP(req: Request, res: Response) {
           ];
 
     const preference = new Preference(mpClient);
-    const backUrls = {
-      success: `${process.env.FRONTEND_URL}/socio/cuotas`,
-      failure: `${process.env.FRONTEND_URL}/socio/cuotas`,
-      pending: `${process.env.FRONTEND_URL}/socio/cuotas`,
-    };
-    console.log('back_urls a enviar:', backUrls);
+    const notificationUrl =`${process.env.BACKEND_URL}/api/webhooks/mercadopago`;
+
+    console.log('WEBHOOK URL:', notificationUrl); 
     const resultado = await preference.create({
       body: {
         items,
@@ -160,16 +156,24 @@ async function crearPreferenciaMP(req: Request, res: Response) {
           failure: `${process.env.FRONTEND_URL}/socio`,
           pending: `${process.env.FRONTEND_URL}/socio`,
         },
-        
-        notification_url: `${process.env.BACKEND_URL}/api/webhooks/mercadopago`,  //la webhook solo sirve en produccion
+        auto_return: 'approved',
+
+        notification_url: notificationUrl, //la webhook solo sirve en produccion
       },
     });
 
     cuota.mercadoPagoPreferenceId = resultado.id;
+    console.log('Preference ID:', resultado.id);
+    console.log('Init point:', resultado.init_point);
+    console.log('Sandbox init point:', resultado.sandbox_init_point);
+    console.log('Webhook URL:', notificationUrl);
+    console.log('CUOTA:', cuota.id);
     await em.flush();
 
-    // Con credenciales de testeo hay que usar sandbox_init_point, no init_point
-    const checkoutUrl = resultado.init_point ?? resultado.sandbox_init_point;
+    // Con credenciales de testeo hay que usar sandbox_init_point, no init_point -------> Lo cambie porque es sandbox es lo peor que se invento en la historia
+    //a ver que tal
+    const checkoutUrl =
+      resultado.sandbox_init_point ?? resultado.init_point;
 
     res.status(200).json({ message: 'Preferencia creada', data: { checkoutUrl } });
   } catch (error: any) {

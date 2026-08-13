@@ -12,6 +12,7 @@ import {
 const em = orm.em;
 
 async function webhookMercadoPago(req: Request, res: Response) {
+
   try {
     const paymentId = (req.query['data.id'] as string) || req.body?.data?.id;
     const topic = (req.query['type'] as string) || req.body?.type;
