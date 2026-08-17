@@ -14,8 +14,24 @@ const em = orm.em;
 async function webhookMercadoPago(req: Request, res: Response) {
 
   try {
-    const paymentId = (req.query['data.id'] as string) || req.body?.data?.id;
-    const topic = (req.query['type'] as string) || req.body?.type;
+    console.log('ENTRASYTE AL WEBHOOOOOOOOOOK');
+    let paymentId = (req.query['data.id'] as string) || req.body?.data?.id;
+    let topic = (req.query['type'] as string) || req.body?.type;
+
+    // formato viejo, cuando llega por notification_url de la preferencia
+    if (!paymentId) {
+      topic = topic || (req.query['topic'] as string) || req.body?.topic;
+      const resource = (req.query['id'] as string) || req.body?.resource;
+      // Para topic 'payment', resource es directamente el id (string numérico).
+
+      if (
+        topic === 'payment' &&
+        resource &&
+        !String(resource).startsWith('http') //por si el topic es merchant_order (no se porque tira eso)
+      ) {
+        paymentId = resource;
+      }
+    }
 
     if (topic !== 'payment' || !paymentId) {
       return res.status(200).send(); // no es un evento de pago, igual respondemos 200

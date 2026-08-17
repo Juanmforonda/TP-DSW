@@ -1,9 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  getCuotasPorSocio,
-  crearPreferenciaMP,
-  confirmarPagoMP,
-} from '../api/cuotas';
+import { getCuotasPorSocio, crearPreferenciaMP } from '../api/cuotas';
 import './socioHome.css';
 import {
   CCard,
@@ -25,7 +21,6 @@ export function SocioCuotas({ idSocio }) {
   const [soloPendientes, setSoloPendientes] = useState(false);
   const [detalleAbierto, setDetalleAbierto] = useState({});
   const [pagando, setPagando] = useState({});
-  const [mensajeRetorno, setMensajeRetorno] = useState(null);
 
   const cargarCuotas = () => {
     if (!idSocio) return;
@@ -47,39 +42,6 @@ export function SocioCuotas({ idSocio }) {
     cargarCuotas();
   }, [idSocio]);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const paymentId = params.get('payment_id');
-    const status = params.get('status');
-
-    if (!paymentId) return;
-
-    confirmarPagoMP(paymentId)
-      .then(() => {
-        setMensajeRetorno(
-          status === 'approved'
-            ? { color: 'success', texto: 'Pago confirmado correctamente.' }
-            : {
-                color: 'warning',
-                texto:
-                  'El pago quedó pendiente o no se aprobó. Verificá más tarde.',
-              },
-        );
-        cargarCuotas();
-      })
-      .catch((err) => {
-        console.error('Error al confirmar el pago:', err);
-        setMensajeRetorno({
-          color: 'danger',
-          texto: 'No pudimos confirmar el pago. Contactá al club.',
-        });
-      })
-      .finally(() => {
-        // limpia los query params para no redisparar la confirmacion si el socio refresca la pagina
-        window.history.replaceState({}, '', window.location.pathname);
-      });
-  }, []);
-
   const handlePagarMP = async (cuota) => {
     setPagando((prev) => ({ ...prev, [cuota.id]: true }));
     try {
@@ -91,8 +53,6 @@ export function SocioCuotas({ idSocio }) {
       setPagando((prev) => ({ ...prev, [cuota.id]: false }));
     }
   };
-
-
 
   const toggleDetalle = (id) => {
     setDetalleAbierto((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -130,12 +90,6 @@ export function SocioCuotas({ idSocio }) {
     <div className="socio-container">
       <h2 className="socio-title">Mis cuotas</h2>
       <p className="socio-subtitle">Historial de pagos mensuales</p>
-
-      {mensajeRetorno && (
-        <CAlert color={mensajeRetorno.color} dismissible onClose={() => setMensajeRetorno(null)}>
-          {mensajeRetorno.texto}
-        </CAlert>
-      )}
 
       {loading && (
         <div className="text-center p-4">
@@ -211,7 +165,11 @@ export function SocioCuotas({ idSocio }) {
                           disabled={pagando[cuota.id]}
                           onClick={() => handlePagarMP(cuota)}
                         >
-                          {pagando[cuota.id] ? <CSpinner size="sm" /> : 'Pagar con Mercado Pago'}
+                          {pagando[cuota.id] ? (
+                            <CSpinner size="sm" />
+                          ) : (
+                            'Pagar con Mercado Pago'
+                          )}
                         </CButton>
                       </div>
                     )}

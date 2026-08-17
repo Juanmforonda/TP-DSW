@@ -152,12 +152,10 @@ async function crearPreferenciaMP(req: Request, res: Response) {
           surname: cuota.socio.apellido,
         },
         back_urls: {
-          success: `${process.env.FRONTEND_URL}/socio`,
-          failure: `${process.env.FRONTEND_URL}/socio`,
-          pending: `${process.env.FRONTEND_URL}/socio`,
+          success: `${process.env.FRONTEND_URL}/pago/exito`,
+          failure: `${process.env.FRONTEND_URL}/pago/error`,
+          pending: `${process.env.FRONTEND_URL}/pago/pendiente`,
         },
-        auto_return: 'approved',
-
         notification_url: notificationUrl, //la webhook solo sirve en produccion
       },
     });
