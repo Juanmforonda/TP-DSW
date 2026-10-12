@@ -15,6 +15,7 @@ import { AdministrarReservasEmbarcacionClub } from './AdministrarReservasEmbarca
 import ListarAmarras from './ListarAmarras.jsx';
 import ListarBoxes from './ListarBoxes.jsx';
 import AdministrarEmbarcacionesSocios from './AdministrarEmbarcacionesSocios.jsx';
+import IngresarEmbarcaciones from './IngresarEmbarcaciones.jsx';
 import { MenuAdminEmbarcaciones } from '../components/MenuAdminEmbarcaciones.jsx';
 import AdministrarTiposEmbarcacion from './AdministrarTiposEmbarcacion.jsx';
 import { AdministrarReservasTravelLift } from './AdministrarReservasTravelLift.jsx';
@@ -62,7 +63,8 @@ console.log('🔍 Render condicional: pagina =', pagina, ', admin =', admin);
         {pagina === 'administrarAfiliaciones' && <AdministrarAfiliaciones/>}
 
         {pagina === 'embarcaciones' && (<MenuAdminEmbarcaciones onSeleccion={handleSeleccion} />)}
-        {pagina === 'embarcacionesDeSocios' && <AdministrarEmbarcacionesSocios/>}
+        {pagina === 'listadoEmbarcaciones' && <AdministrarEmbarcacionesSocios/>}
+        {pagina === 'ingresarEmbarcaciones' && <IngresarEmbarcaciones/>}
         {pagina === 'tiposEmbarcacion' && <AdministrarTiposEmbarcacion/>}
 
         {pagina === 'amarras' && <MenuAdminAmarras onSeleccion={handleSeleccion}/>}

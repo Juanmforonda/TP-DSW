@@ -653,12 +653,10 @@ import {
   actualizarEmbarcacion,
   eliminarEmbarcacion,
   reactivarEmbarcacion,
-  crearEmbarcacion,
   cambiarUbicacionEmbarcacion,
 } from '../api/embarcaciones.js';
 import { getAmarras } from '../api/amarras.js';
 import { getBoxes } from '../api/boxes.js';
-import { getTiposEmbarcacion } from '../api/tiposEmbarcacion.js';
 import {
   CButton,
   CModal,
@@ -674,7 +672,6 @@ import {
   CRow,
   CCol,
   CFormSelect,
-  CFormInput,
 } from '@coreui/react';
 import { EntityTable } from '../components/TablaGenerica.jsx';
 
@@ -715,22 +712,9 @@ export function AdministrarEmbarcacionesSocios() {
   const [tipoUbicacion, setTipoUbicacion] = useState('amarra');
   const [ubicacionElegida, setUbicacionElegida] = useState('');
   const [errorUbicacion, setErrorUbicacion] = useState('');
-  const [altaClubOpen, setAltaClubOpen] = useState(false);
-  const [tiposEmbarcacion, setTiposEmbarcacion] = useState([]);
-  const [altaClub, setAltaClub] = useState({
-    nombre: '',
-    matricula: '',
-    eslora: '',
-    tipoEmbarcacion: '',
-    ubicacionTipo: 'amarra',
-    ubicacionId: '',
-  });
 
   useEffect(() => {
     cargarEmbarcaciones();
-    getTiposEmbarcacion()
-      .then((res) => setTiposEmbarcacion(res.data?.data ?? res.data ?? []))
-      .catch((error) => console.error('Error al cargar tipos de embarcación:', error));
   }, []);
 
   const cargarEmbarcaciones = async () => {
@@ -769,63 +753,6 @@ export function AdministrarEmbarcacionesSocios() {
       await cargarEmbarcaciones();
     } catch (error) {
       window.alert(error?.response?.data?.message ?? 'No se pudo reactivar la embarcación');
-    }
-  };
-
-  const abrirAltaClub = async () => {
-    setAltaClub({
-      nombre: '',
-      matricula: '',
-      eslora: '',
-      tipoEmbarcacion: '',
-      ubicacionTipo: 'amarra',
-      ubicacionId: '',
-    });
-    setErrorUbicacion('');
-    await Promise.all([
-      getAmarras().then((res) => setAmarrasLibres(
-        (res.data?.data ?? []).filter((item) => item.estado === 'libre'),
-      )),
-      getBoxes().then((res) => setBoxesLibres(
-        (res.data?.data ?? []).filter((item) => item.estado === 'disponible'),
-      )),
-    ]);
-    setAltaClubOpen(true);
-  };
-
-  const guardarAltaClub = async () => {
-    if (
-      !altaClub.nombre ||
-      !altaClub.matricula ||
-      !altaClub.eslora ||
-      !altaClub.tipoEmbarcacion ||
-      !altaClub.ubicacionId
-    ) {
-      setErrorUbicacion('Completá todos los campos y seleccioná una ubicación.');
-      return;
-    }
-
-    const payload = {
-      nombre: altaClub.nombre,
-      matricula: altaClub.matricula,
-      eslora: Number(altaClub.eslora),
-      tipoEmbarcacion: Number(altaClub.tipoEmbarcacion),
-      ...(altaClub.ubicacionTipo === 'amarra'
-        ? { amarra: Number(altaClub.ubicacionId) }
-        : { box: Number(altaClub.ubicacionId) }),
-    };
-
-    try {
-      await crearEmbarcacion(payload);
-      setAltaClubOpen(false);
-      setErrorUbicacion('');
-      await cargarEmbarcaciones();
-    } catch (error) {
-      setErrorUbicacion(
-        error?.response?.data?.errors?.join('\n') ??
-          error?.response?.data?.message ??
-          'No se pudo crear la embarcación',
-      );
     }
   };
 
@@ -922,10 +849,7 @@ export function AdministrarEmbarcacionesSocios() {
   return (
     <div className="p-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="mb-0">Administración de Embarcaciones</h2>
-        <CButton color="primary" onClick={abrirAltaClub}>
-          Ingresar embarcación del club
-        </CButton>
+        <h2 className="mb-0">Listado de embarcaciones</h2>
       </div>
 
       <CRow className="mb-4">
@@ -1025,74 +949,6 @@ export function AdministrarEmbarcacionesSocios() {
           <CButton color="secondary" onClick={() => setHistorialOpen(false)}>
             Cerrar
           </CButton>
-        </CModalFooter>
-      </CModal>
-
-      <CModal visible={altaClubOpen} onClose={() => setAltaClubOpen(false)}>
-        <CModalHeader>Ingresar embarcación del club</CModalHeader>
-        <CModalBody>
-          {errorUbicacion && <p className="text-danger">{errorUbicacion}</p>}
-          <CFormInput
-            label="Nombre"
-            className="mb-3"
-            value={altaClub.nombre}
-            onChange={(event) => setAltaClub({ ...altaClub, nombre: event.target.value })}
-          />
-          <CFormInput
-            label="Matrícula"
-            className="mb-3"
-            value={altaClub.matricula}
-            onChange={(event) => setAltaClub({ ...altaClub, matricula: event.target.value })}
-          />
-          <CFormInput
-            label="Eslora (metros)"
-            type="number"
-            className="mb-3"
-            value={altaClub.eslora}
-            onChange={(event) => setAltaClub({ ...altaClub, eslora: event.target.value })}
-          />
-          <CFormSelect
-            label="Tipo de embarcación"
-            className="mb-3"
-            value={altaClub.tipoEmbarcacion}
-            onChange={(event) => setAltaClub({ ...altaClub, tipoEmbarcacion: event.target.value })}
-          >
-            <option value="">Seleccionar tipo...</option>
-            {tiposEmbarcacion.map((tipo) => (
-              <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>
-            ))}
-          </CFormSelect>
-          <CFormSelect
-            label="Ubicación"
-            className="mb-3"
-            value={altaClub.ubicacionTipo}
-            onChange={(event) => setAltaClub({
-              ...altaClub,
-              ubicacionTipo: event.target.value,
-              ubicacionId: '',
-            })}
-          >
-            <option value="amarra">Amarra</option>
-            <option value="box">Box</option>
-          </CFormSelect>
-          <CFormSelect
-            label={altaClub.ubicacionTipo === 'amarra' ? 'Amarra disponible' : 'Box disponible'}
-            value={altaClub.ubicacionId}
-            onChange={(event) => setAltaClub({ ...altaClub, ubicacionId: event.target.value })}
-          >
-            <option value="">Seleccionar...</option>
-            {(altaClub.ubicacionTipo === 'amarra' ? amarrasLibres : boxesLibres).map((item) => (
-              <option key={item.id} value={item.id}>
-                {altaClub.ubicacionTipo === 'amarra'
-                  ? `Amarra ${item.id} - ${item.zona}`
-                  : `Box ${item.nroBox ?? item.id}`}
-              </option>
-            ))}
-          </CFormSelect>
-        </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setAltaClubOpen(false)}>Cancelar</CButton>
-          <CButton color="primary" onClick={guardarAltaClub}>Guardar</CButton>
         </CModalFooter>
       </CModal>
 

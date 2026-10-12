@@ -5,10 +5,14 @@ export function MenuAdminEmbarcaciones({ onSeleccion }) {
   return (
     <MenuPadre label="Menú de administración de Embarcaciones">
       <MenuButton
-        label="Ingresar Embarcaciones"
-        onClick={() => onSeleccion('embarcacionesDeSocios')}
+        label="Listado de embarcaciones"
+        onClick={() => onSeleccion('listadoEmbarcaciones')}
       />
-        <MenuButton
+      <MenuButton
+        label="Ingresar embarcaciones"
+        onClick={() => onSeleccion('ingresarEmbarcaciones')}
+      />
+      <MenuButton
         label="Tipos de Embarcación"
         onClick={() => onSeleccion('tiposEmbarcacion')}
       />
