@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import {
   CNavbar,
   CContainer,
@@ -9,7 +10,7 @@ import {
   CButton,
 } from '@coreui/react';
 
-export function AdminNavbar({ onSeleccion, paginaActual }) {
+export function AdminNavbar() {
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = '/';
@@ -20,81 +21,43 @@ export function AdminNavbar({ onSeleccion, paginaActual }) {
       <CContainer fluid className="d-flex justify-content-between align-items-center">
         {/* Izquierda: brand + navegación */}
         <div className="d-flex align-items-center">
-          <CNavbarBrand
-            onClick={() => onSeleccion(null)}
-            style={{ cursor: 'pointer', color: 'white', marginRight: '1rem' }}
-          >
+          <CNavbarBrand as={Link} to="/admin" style={{ color: 'white', marginRight: '1rem' }}>
             Club Náutico
           </CNavbarBrand>
 
           <CNavbarNav className="d-flex flex-row">
             <CNavItem>
-              <CNavLink
-                active={paginaActual === 'perfil'}
-                href="#"
-                onClick={() => onSeleccion('perfil')}
-                style={{ color: 'white' }}
-              >
+              <CNavLink as={NavLink} to="/admin/perfil" style={{ color: 'white' }}>
                 Perfil
               </CNavLink>
             </CNavItem>
             <CNavItem>
-              <CNavLink
-                active={paginaActual === 'socios'}
-                href="#"
-                onClick={() => onSeleccion('socios')}
-                style={{ color: 'white' }}
-              >
+              <CNavLink as={NavLink} to="/admin/socios" style={{ color: 'white' }}>
                 Socios
               </CNavLink>
             </CNavItem>
             <CNavItem>
-              <CNavLink
-                active={paginaActual === 'embarcaciones'}
-                href="#"
-                onClick={() => onSeleccion('embarcaciones')}
-                style={{ color: 'white' }}
-              >
+              <CNavLink as={NavLink} to="/admin/embarcaciones" style={{ color: 'white' }}>
                 Embarcaciones
               </CNavLink>
             </CNavItem>
             <CNavItem>
-              <CNavLink
-                active={paginaActual === 'amarras'}
-                href="#"
-                onClick={() => onSeleccion('amarras')}
-                style={{ color: 'white' }}
-              >
+              <CNavLink as={NavLink} to="/admin/amarras" style={{ color: 'white' }}>
                 Amarras
               </CNavLink>
             </CNavItem>
             <CNavItem>
-              <CNavLink
-                active={paginaActual === 'boxes'}
-                href="#"
-                onClick={() => onSeleccion('boxes')}
-                style={{ color: 'white' }}
-              >
+              <CNavLink as={NavLink} to="/admin/boxes" style={{ color: 'white' }}>
                 Boxes
               </CNavLink>
             </CNavItem>
             <CNavItem>
-              <CNavLink
-                active={paginaActual === 'reservasEmbarcacionClub'}
-                href="#"
-                onClick={() => onSeleccion('reservasEmbarcacionClub')}
-                style={{ color: 'white' }}
-              >
+              <CNavLink as={NavLink} to="/admin/reservas/embarcacion-club" style={{ color: 'white' }}>
                 Reservas Embarcación Club
               </CNavLink>
             </CNavItem>
             <CNavItem>
-              <CNavLink
-                active={paginaActual === 'reservasTravelLift'}
-                href="#"
-                onClick={() => onSeleccion('reservasTravelLift')}
-                style={{ color: 'white' }}
-              >
+              <CNavLink as={NavLink} to="/admin/reservas/travel-lift" style={{ color: 'white' }}>
                 Reservas Travel Lift
               </CNavLink>
             </CNavItem>

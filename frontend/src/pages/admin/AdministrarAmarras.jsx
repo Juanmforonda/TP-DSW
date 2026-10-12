@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { getAmarras } from '../api/amarras.js';
-import { crearAmarra, eliminarAmarra, actualizarAmarra } from '../api/amarras.js';
-import { EntityTable } from '../components/TablaGenerica.jsx';
+import { getAmarras } from '../../api/amarras.js';
+import { crearAmarra, eliminarAmarra, actualizarAmarra } from '../../api/amarras.js';
+import { EntityTable } from '../../components/TablaGenerica.jsx';
 import {
   CCard,
   CCardHeader,

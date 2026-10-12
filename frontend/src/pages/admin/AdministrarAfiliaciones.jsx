@@ -11,8 +11,8 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react-pro'
-import { getSocios } from '../api/socios.js'
-import { getAfiliaciones, actualizarAfiliacion, crearAfiliacion } from '../api/afiliaciones.js'
+import { getSocios } from '../../api/socios.js'
+import { getAfiliaciones, actualizarAfiliacion, crearAfiliacion } from '../../api/afiliaciones.js'
 
 export const AdministrarAfiliaciones = () => {
   const [details, setDetails] = useState([])

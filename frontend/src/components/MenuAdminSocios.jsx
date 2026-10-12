@@ -1,22 +1,24 @@
 import React from 'react';
-import { CCard, CCardBody, CCardHeader } from '@coreui/react';
+import { useNavigate } from 'react-router-dom';
 import { MenuButton } from './menuButton';
 import { MenuPadre } from './menuPadre.jsx';
 
-export function MenuAdminSocios({ onSeleccion }) {
+export function MenuAdminSocios() {
+  const navigate = useNavigate();
+
   return (
     <MenuPadre label="Menú de administración de Socios">
       <MenuButton
         label="Administrar Socios"
-        onClick={() => onSeleccion('administrarSocios')}
+        onClick={() => navigate('/admin/socios/administrar')}
       />
       <MenuButton
         label="Afiliaciones"
-        onClick={() => onSeleccion('administrarAfiliaciones')}
+        onClick={() => navigate('/admin/socios/afiliaciones')}
       />
       <MenuButton
         label="Cuotas y pagos"
-        onClick={() => onSeleccion('administrarCuotas')}
+        onClick={() => navigate('/admin/socios/cuotas')}
       />
     </MenuPadre>
   );

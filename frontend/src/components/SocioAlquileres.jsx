@@ -22,11 +22,15 @@ export function SocioAlquileres({ idSocio }) {
         const todosBoxes = resBoxes.data?.data ?? [];
 
         // Solo las amarras/boxes cuya embarcación asignada pertenece a este socio.
-        setAmarras(todasAmarras.filter((a) => a.embarcacion?.socio?.id === idSocio));
-        setBoxes(todosBoxes.filter((b) => b.embarcacion?.socio?.id === idSocio));
+        setAmarras(
+          todasAmarras.filter((a) => a.embarcacion?.socio?.id === idSocio),
+        );
+        setBoxes(
+          todosBoxes.filter((b) => b.embarcacion?.socio?.id === idSocio),
+        );
       })
       .catch((err) => {
-        console.error('❌ Error al cargar amarras/boxes:', err);
+        console.error(' Error al cargar amarras/boxes:', err);
         setError('Error al cargar tus alquileres');
       })
       .finally(() => {
@@ -39,7 +43,9 @@ export function SocioAlquileres({ idSocio }) {
   return (
     <div className="socio-container">
       <h2 className="socio-title">Mis alquileres</h2>
-      <p className="socio-subtitle">Amarras y boxes vinculados a tus embarcaciones</p>
+      <p className="socio-subtitle">
+        Amarras y boxes vinculados a tus embarcaciones
+      </p>
 
       {loading && <p>Cargando alquileres...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -55,10 +61,18 @@ export function SocioAlquileres({ idSocio }) {
               <div key={`amarra-${amarra.id}`} className="col-md-6 mb-4">
                 <div className="card socio-card shadow-sm p-3">
                   <h6 className="mb-2">Amarra #{amarra.id}</h6>
-                  <p className="mb-1"><strong>Zona:</strong> {amarra.zona}</p>
-                  <p className="mb-1"><strong>Nro Pilón:</strong> {amarra.nroPilon}</p>
-                  <p className="mb-1"><strong>Precio Mensual:</strong> ${amarra.precioMensualBase}</p>
-                  <p className="mb-0"><strong>Embarcación:</strong> {amarra.embarcacion?.nombre}</p>
+                  <p className="mb-1">
+                    <strong>Zona:</strong> {amarra.zona}
+                  </p>
+                  <p className="mb-1">
+                    <strong>Nro Pilón:</strong> {amarra.nroPilon}
+                  </p>
+                  <p className="mb-1">
+                    <strong>Precio Mensual:</strong> ${amarra.precioMensualBase}
+                  </p>
+                  <p className="mb-0">
+                    <strong>Embarcación:</strong> {amarra.embarcacion?.nombre}
+                  </p>
                 </div>
               </div>
             ))}
@@ -74,8 +88,12 @@ export function SocioAlquileres({ idSocio }) {
               <div key={`box-${box.id}`} className="col-md-6 mb-4">
                 <div className="card socio-card shadow-sm p-3">
                   <h6 className="mb-2">Box {box.nroBox}</h6>
-                  <p className="mb-1"><strong>Precio Mensual:</strong> ${box.precioMensualBase}</p>
-                  <p className="mb-0"><strong>Embarcación:</strong> {box.embarcacion?.nombre}</p>
+                  <p className="mb-1">
+                    <strong>Precio Mensual:</strong> ${box.precioMensualBase}
+                  </p>
+                  <p className="mb-0">
+                    <strong>Embarcación:</strong> {box.embarcacion?.nombre}
+                  </p>
                 </div>
               </div>
             ))}

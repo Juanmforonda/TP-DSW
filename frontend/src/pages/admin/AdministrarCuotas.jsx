@@ -17,9 +17,9 @@ import {
   CNavLink,
   CBadge,
 } from '@coreui/react-pro';
-import { getSocios } from '../api/socios.js'
-import { getCuotas, actualizarCuota, generarCuotas, registrarPagoCuota } from '../api/cuotas.js'
-import { getAfiliaciones } from '../api/afiliaciones.js'
+import { getSocios } from '../../api/socios.js'
+import { getCuotas, actualizarCuota, generarCuotas, registrarPagoCuota } from '../../api/cuotas.js'
+import { getAfiliaciones } from '../../api/afiliaciones.js'
 
 export const AdministrarCuotas = () => {
   const [details, setDetails] = useState([]);

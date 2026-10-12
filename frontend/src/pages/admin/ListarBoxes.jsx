@@ -1,6 +1,6 @@
 /*import { useEffect, useState } from 'react';
-import { getBoxes, actualizarBox, eliminarBox } from '../api/boxes.js';
-import { EntityTable } from '../components/TablaGenerica.jsx';
+import { getBoxes, actualizarBox, eliminarBox } from '../../api/boxes.js';
+import { EntityTable } from '../../components/TablaGenerica.jsx';
 import { CCard, CCardBody, CCardHeader, CRow, CCol } from '@coreui/react';*/
 /*
 export default function ListarBoxes() {
@@ -129,7 +129,7 @@ export default function ListarBoxes() {
   */
 
 import { useEffect, useState } from 'react';
-import { getBoxes, actualizarBox, eliminarBox } from '../api/boxes.js';
+import { getBoxes, actualizarBox, eliminarBox } from '../../api/boxes.js';
 import {
   CButton,
   CModal,
@@ -146,7 +146,7 @@ import {
   CCol,
   CFormSelect,
 } from '@coreui/react';
-import { EntityTable } from '../components/TablaGenerica.jsx';
+import { EntityTable } from '../../components/TablaGenerica.jsx';
 
 const columns = [
   { key: 'id', label: 'ID' },

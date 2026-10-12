@@ -4,9 +4,9 @@ import {
   crearTipoEmbarcacion,
   eliminarTipoEmbarcacion,
   actualizarTipoEmbarcacion,
-} from '../api/tiposEmbarcacion.js'
+} from '../../api/tiposEmbarcacion.js'
 
-import { EntityTable } from '../components/TablaGenerica.jsx'
+import { EntityTable } from '../../components/TablaGenerica.jsx'
 import {
   CCard,
   CCardHeader,

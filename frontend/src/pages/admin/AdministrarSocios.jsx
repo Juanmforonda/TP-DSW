@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { getSocios, crearSocio, actualizarSocio, bajaLogicaSocio } from '../api/socios.js';
-import { TablaSocios } from '../components/tablaSocios.jsx';
-import { EntityTable } from '../components/TablaGenerica.jsx';
+import { getSocios, crearSocio, actualizarSocio, bajaLogicaSocio } from '../../api/socios.js';
+import { TablaSocios } from '../../components/tablaSocios.jsx';
+import { EntityTable } from '../../components/TablaGenerica.jsx';
 import {
   CCard,
   CCardHeader,
@@ -12,7 +12,7 @@ import {
   CFormInput,
   CButton,
 } from '@coreui/react';
-import { crearAfiliacion } from '../api/afiliaciones.js';
+import { crearAfiliacion } from '../../api/afiliaciones.js';
 
 export default function AdministrarSocios() {
   const [sociosActivos, setSociosActivos] = useState([]);

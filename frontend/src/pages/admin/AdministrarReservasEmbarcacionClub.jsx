@@ -25,15 +25,15 @@ import {
   CForm,
   CFormLabel,
 } from '@coreui/react';
-import TimeSlotPicker from '../components/franjaHoraria.jsx';
+import TimeSlotPicker from '../../components/franjaHoraria.jsx';
 import {
   getReservasEmbarcacionClub,
   crearReservaEmbarcacionClub,
   actualizarReservaEmbarcacionClub,
   eliminarReservaEmbarcacionClub,
-} from '../api/reservasEmbarcacionClub.js';
-import { getSocios } from '../api/socios.js';
-import { getEmbarcacionesClub } from '../api/embarcaciones.js';
+} from '../../api/reservasEmbarcacionClub.js';
+import { getSocios } from '../../api/socios.js';
+import { getEmbarcacionesClub } from '../../api/embarcaciones.js';
 
 export function AdministrarReservasEmbarcacionClub() {
   const [reservas, setReservas] = useState([]);

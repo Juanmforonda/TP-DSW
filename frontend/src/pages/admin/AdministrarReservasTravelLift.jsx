@@ -3,12 +3,12 @@ import {
   CAlert, CButton, CCard, CCardBody, CCardHeader, CFormInput, CFormSelect,
   CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow,
 } from '@coreui/react';
-import { getEmbarcaciones } from '../api/embarcaciones.js';
-import { getSocios } from '../api/socios.js';
+import { getEmbarcaciones } from '../../api/embarcaciones.js';
+import { getSocios } from '../../api/socios.js';
 import {
   cancelarReservaTravelLift, eliminarReservaTravelLift, finalizarReservaTravelLift,
   getReservasTravelLift,
-} from '../api/reservasTravelLift.js';
+} from '../../api/reservasTravelLift.js';
 
 const unwrap = (response) => response?.data?.data ?? response?.data ?? [];
 const formatDate = (value) => new Date(value).toLocaleString('es-AR');

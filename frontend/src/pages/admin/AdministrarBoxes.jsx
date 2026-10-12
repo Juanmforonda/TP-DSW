@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getBoxes, crearBox, eliminarBox, actualizarBox } from '../api/boxes.js';
-import { EntityTable } from '../components/TablaGenerica.jsx';
+import { getBoxes, crearBox, eliminarBox, actualizarBox } from '../../api/boxes.js';
+import { EntityTable } from '../../components/TablaGenerica.jsx';
 import {
   CCard,
   CCardHeader,

@@ -22,7 +22,7 @@ import {
   CListGroup,
   CListGroupItem,
 } from '@coreui/react';
-import { getEmbarcacionesClub } from '../api/embarcaciones.js';
+import { getEmbarcacionesClub } from '../../api/embarcaciones.js';
 import {
   getReservasPorSocio,
   getReservasPorEmbarcacion,
@@ -30,9 +30,9 @@ import {
   actualizarReservaEmbarcacionClub,
   cancelarReservaEmbarcacionClub,
   finalizarReservaEmbarcacionClub,
-} from '../api/reservasEmbarcacionClub.js';
-import TimeSlotPicker from '../components/franjaHoraria.jsx';
-import ListaEmbarcacionesClub from '../components/ListaEmbarcacionesClub.jsx';
+} from '../../api/reservasEmbarcacionClub.js';
+import TimeSlotPicker from '../../components/franjaHoraria.jsx';
+import ListaEmbarcacionesClub from '../../components/ListaEmbarcacionesClub.jsx';
 
 export function SocioReservasEmbarcacion({ idSocio }) {
   const [embarcacionesClub, setEmbarcacionesClub] = useState([]);

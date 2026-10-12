@@ -33,13 +33,13 @@ export function SocioHome2({onSeleccion}) {
     {
       title: 'Reservas Embarcación Club',
       icon: cilCalendar,
-      link: 'reservasEmbarcacionClub',
+      link: 'reservas/embarcacion-club',
       desc: 'Gestiona las reservas de embarcaciones del club',
     },
     {
       title: 'Reservas Travel Lift',
       icon: cilCalendar,
-      link: 'reservasTravelLift',
+      link: 'reservas/travel-lift',
       desc: 'Reserva el Travel Lift para tu embarcación',
     },
     {

@@ -9,11 +9,11 @@ import {
   CFormSelect,
   CRow,
 } from '@coreui/react';
-import { crearEmbarcacion } from '../api/embarcaciones.js';
-import { getAmarras } from '../api/amarras.js';
-import { getBoxes } from '../api/boxes.js';
-import { getSocios } from '../api/socios.js';
-import { getTiposEmbarcacion } from '../api/tiposEmbarcacion.js';
+import { crearEmbarcacion } from '../../api/embarcaciones.js';
+import { getAmarras } from '../../api/amarras.js';
+import { getBoxes } from '../../api/boxes.js';
+import { getSocios } from '../../api/socios.js';
+import { getTiposEmbarcacion } from '../../api/tiposEmbarcacion.js';
 
 const formularioInicial = {
   nombre: '',

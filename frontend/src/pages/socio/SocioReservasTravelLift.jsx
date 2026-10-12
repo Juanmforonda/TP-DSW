@@ -4,12 +4,12 @@ import {
   CFormLabel, CFormSelect, CTable, CTableBody, CTableDataCell, CTableHead,
   CTableHeaderCell, CTableRow,
 } from '@coreui/react';
-import { getEmbarcacionesActivasPorSocio } from '../api/embarcaciones.js';
+import { getEmbarcacionesActivasPorSocio } from '../../api/embarcaciones.js';
 import {
   cancelarReservaTravelLift, crearReservaTravelLift, finalizarReservaTravelLift,
   getReservasTravelLift, getReservasTravelLiftPorSocio,
-} from '../api/reservasTravelLift.js';
-import TravelLiftTimePicker from '../components/TravelLiftTimePicker.jsx';
+} from '../../api/reservasTravelLift.js';
+import TravelLiftTimePicker from '../../components/TravelLiftTimePicker.jsx';
 
 const unwrap = (response) => response?.data?.data ?? response?.data ?? [];
 const formatDate = (value) => new Date(value).toLocaleString('es-AR');

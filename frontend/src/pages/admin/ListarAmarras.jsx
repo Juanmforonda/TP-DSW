@@ -4,7 +4,7 @@ import {
   getAmarras,
   actualizarAmarra,
   eliminarAmarra,
-} from '../api/amarras.js';
+} from '../../api/amarras.js';
 import {
   CButton,
   CModal,
@@ -21,7 +21,7 @@ import {
   CCol,
   CFormSelect
 } from '@coreui/react';
-import { EntityTable } from '../components/TablaGenerica.jsx';
+import { EntityTable } from '../../components/TablaGenerica.jsx';
 /*
 export default function ListarAmarras() {
   const [amarras, setAmarras] = useState([]);

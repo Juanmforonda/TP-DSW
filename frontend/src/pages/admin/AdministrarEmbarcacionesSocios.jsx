@@ -19,16 +19,16 @@ import {
   getEmbarcacionesClub,
   crearEmbarcacion,
   eliminarEmbarcacion,
-} from '../api/embarcaciones.js'
+} from '../../api/embarcaciones.js'
 import {
   getReservasInfraestructura,
   crearReservaInfraestructura,
   finalizarReservaInfraestructura,
-} from '../api/reservasInfraestructura.js'
-import { getSocios } from '../api/socios.js'
-import { getTiposEmbarcacion } from '../api/tiposEmbarcacion.js'
-import { getAmarras } from '../api/amarras.js'
-import { getBoxes } from '../api/boxes.js'
+} from '../../api/reservasInfraestructura.js'
+import { getSocios } from '../../api/socios.js'
+import { getTiposEmbarcacion } from '../../api/tiposEmbarcacion.js'
+import { getAmarras } from '../../api/amarras.js'
+import { getBoxes } from '../../api/boxes.js'
 
 const AdministrarEmbarcacionesSocios = () => {
   const [socios, setSocios] = useState([])
@@ -654,9 +654,9 @@ import {
   eliminarEmbarcacion,
   reactivarEmbarcacion,
   cambiarUbicacionEmbarcacion,
-} from '../api/embarcaciones.js';
-import { getAmarras } from '../api/amarras.js';
-import { getBoxes } from '../api/boxes.js';
+} from '../../api/embarcaciones.js';
+import { getAmarras } from '../../api/amarras.js';
+import { getBoxes } from '../../api/boxes.js';
 import {
   CButton,
   CModal,
@@ -673,7 +673,7 @@ import {
   CCol,
   CFormSelect,
 } from '@coreui/react';
-import { EntityTable } from '../components/TablaGenerica.jsx';
+import { EntityTable } from '../../components/TablaGenerica.jsx';
 
 const columnsConSocio = [
   { key: 'id', label: 'ID' },
