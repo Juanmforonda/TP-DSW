@@ -43,6 +43,12 @@ export function SocioHome2({onSeleccion}) {
       desc: 'Gestiona las reservas de embarcaciones del club',
     },
     {
+      title: 'Reservas Travel Lift',
+      icon: cilCalendar,
+      link: 'reservasTravelLift',
+      desc: 'Reserva el Travel Lift para tu embarcación',
+    },
+    {
       title: 'Alquileres Amarras/Boxes',
       icon: cilStorage,
       link: 'amarras',

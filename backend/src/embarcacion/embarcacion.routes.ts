@@ -6,6 +6,7 @@ import {
   add,
   update,
   remove,
+  reactivar,
   findBySocio,
   findEmbarcacionesClub,
   cambiarUbicacion,
@@ -20,5 +21,6 @@ embarcacionRouter.get('/', findAll);
 embarcacionRouter.get('/:id', findOne);
 embarcacionRouter.post('/', sanitizeEmbarcacionInput, add);
 embarcacionRouter.post('/:id/cambiar-ubicacion', cambiarUbicacion);
+embarcacionRouter.post('/:id/reactivar', reactivar);
 embarcacionRouter.put('/:id', sanitizeEmbarcacionInput, update);
 embarcacionRouter.delete('/:id', remove);

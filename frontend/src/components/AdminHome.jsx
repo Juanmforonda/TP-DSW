@@ -56,6 +56,12 @@ export default function AdminHome({onSeleccion}) {
       link: 'reservasEmbarcacionClub',
       desc: 'Gestiona las reservas de embarcaciones del club',
     },
+    {
+      title: 'Reservas Travel Lift',
+      icon: cilCalendar,
+      link: 'reservasTravelLift',
+      desc: 'Gestiona las reservas de uso del Travel Lift',
+    },
   ];
 
   return (

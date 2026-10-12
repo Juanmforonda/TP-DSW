@@ -16,6 +16,7 @@ export function SocioNavbar({ onSeleccion, paginaActual, socio }) {
     { key: 'embarcaciones', label: 'Embarcaciones' },
     { key: 'amarras', label: 'Amarras/Boxes' },
     { key: 'reservas', label: 'Reservas' },
+    { key: 'reservasTravelLift', label: 'Travel Lift' },
     { key: 'cuotas', label: 'Cuotas' },
   ];
 
