@@ -31,12 +31,6 @@ export function SocioHome2({onSeleccion}) {
       desc: 'Controla tus cuotas y pagos',
     },
     {
-      title: 'Afiliaciones',
-      icon: cilBoatAlt,
-      link: 'afiliaciones',
-      desc: 'Gestiona tus afiliaciones al club',
-    },
-    {
       title: 'Reservas Embarcación Club',
       icon: cilCalendar,
       link: 'reservasEmbarcacionClub',
