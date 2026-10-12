@@ -8,6 +8,7 @@ import { SocioReservasEmbarcacion } from './SocioReservasEmbarcacion.jsx';
 import {SocioHome2} from '../components/SocioHome2.jsx';
 import { SocioAfiliaciones } from './SocioAfiliaciones.tsx';
 import { SocioAlquileres } from '../components/SocioAlquileres.jsx';
+import { SocioReservasTravelLift } from './SocioReservasTravelLift.jsx';
 
 export function SocioPanel() {
   const [pagina, setPagina] = useState(null);
@@ -55,6 +56,9 @@ useEffect(() => {
         {pagina === 'reservasEmbarcacionClub' && socio && (
           <SocioReservasEmbarcacion idSocio={socio.id} />
         
+        )}
+        {pagina === 'reservasTravelLift' && socio && (
+          <SocioReservasTravelLift idSocio={socio.id} />
         )}
         {pagina === 'afiliaciones' && socio && (
           <SocioAfiliaciones idSocio={socio.id} />

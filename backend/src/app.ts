@@ -10,6 +10,7 @@ import { afiliacionRouter } from './afiliacion/afiliacion.routes.js'
 import { cuotaMensualRouter } from './cuotaMensual/cuotaMensual.routes.js'
 import {reservaEmbarcacionClubRouter} from './reservaEmbarcacionClub/reservaEmbarcacionClub.routes.js'
 import { reservaInfraestructuraRouter } from './reservaInfraestructura/reservaInfraestructura.routes.js'
+import { reservaTravelLiftRouter } from './reservaTravelLift/reservaTravelLift.routes.js'
 import {orm, syncSchema} from './shared/orm.js'
 import { RequestContext } from '@mikro-orm/mysql'
 import { authRouter } from './auth/auth.routes.js'
@@ -40,6 +41,7 @@ app.use('/api/cuotasMensuales', cuotaMensualRouter)
 app.use('/api', authRouter)
 app.use('/api/reservasEmbarcacionClub', reservaEmbarcacionClubRouter)
 app.use('/api/reservasInfraestructura', reservaInfraestructuraRouter)
+app.use('/api/reservasTravelLift', reservaTravelLiftRouter)
 app.use('/api/webhooks', webhookRouter);
 
 

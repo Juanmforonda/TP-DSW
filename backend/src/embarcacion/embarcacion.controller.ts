@@ -228,6 +228,26 @@ async function remove(req: Request, res: Response) {
   }
 }
 
+async function reactivar(req: Request, res: Response) {
+  try {
+    const id = Number.parseInt(req.params.id, 10);
+    const embarcacion = await em.findOneOrFail(Embarcacion, { id });
+
+    if (!embarcacion.fechaFin) {
+      return res.status(400).json({ message: 'La embarcación ya está activa' });
+    }
+
+    embarcacion.fechaFin = undefined;
+    await em.flush();
+    res.status(200).json({ message: 'Embarcación reactivada', data: embarcacion });
+  } catch (error: any) {
+    if (error.name === 'NotFoundError') {
+      return res.status(404).json({ message: 'Embarcación no encontrada' });
+    }
+    res.status(500).json({ message: error.message });
+  }
+}
+
 async function findBySocio(req: Request, res: Response) {
   try {
     const idSocio = Number.parseInt(req.params.idSocio);
@@ -367,8 +387,8 @@ export {
   add,
   update,
   remove,
+  reactivar,
   findBySocio,
   findEmbarcacionesClub,
   cambiarUbicacion,
 };
-

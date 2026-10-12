@@ -17,6 +17,7 @@ import ListarBoxes from './ListarBoxes.jsx';
 import AdministrarEmbarcacionesSocios from './AdministrarEmbarcacionesSocios.jsx';
 import { MenuAdminEmbarcaciones } from '../components/MenuAdminEmbarcaciones.jsx';
 import AdministrarTiposEmbarcacion from './AdministrarTiposEmbarcacion.jsx';
+import { AdministrarReservasTravelLift } from './AdministrarReservasTravelLift.jsx';
 
 // importá otros componentes cuando los tengas
 
@@ -68,6 +69,7 @@ console.log('🔍 Render condicional: pagina =', pagina, ', admin =', admin);
         {pagina === 'administrarAmarras' && <AdministrarAmarras/>}
 
         {pagina === 'reservasEmbarcacionClub' && <AdministrarReservasEmbarcacionClub />}
+        {pagina === 'reservasTravelLift' && <AdministrarReservasTravelLift />}
         {pagina === 'listarAmarras' && <ListarAmarras/>}
 
         {pagina === 'boxes' && <MenuAdminBox onSeleccion={handleSeleccion}/>}

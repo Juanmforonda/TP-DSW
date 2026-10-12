@@ -88,6 +88,16 @@ export function AdminNavbar({ onSeleccion, paginaActual }) {
                 Reservas Embarcación Club
               </CNavLink>
             </CNavItem>
+            <CNavItem>
+              <CNavLink
+                active={paginaActual === 'reservasTravelLift'}
+                href="#"
+                onClick={() => onSeleccion('reservasTravelLift')}
+                style={{ color: 'white' }}
+              >
+                Reservas Travel Lift
+              </CNavLink>
+            </CNavItem>
           </CNavbarNav>
           
         </div>

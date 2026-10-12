@@ -7,6 +7,7 @@ import { BaseEntity } from '../shared/baseEntity.entity.js';
 import { Socio } from '../socio/socio.entity.js';
 import { ReservaEmbarcacionClub } from '../reservaEmbarcacionClub/reservaEmbarcacionClub.entity.js';
 import { ReservaInfraestructura } from '../reservaInfraestructura/reservaInfraestructura.entity.js';
+import { ReservaTravelLift } from '../reservaTravelLift/reservaTravelLift.entity.js';
 import { IsNotEmpty, IsString, IsNumber, Min, Max, IsPositive, Length, IsDate, IsOptional } from 'class-validator';
 
 
@@ -47,6 +48,11 @@ export class Embarcacion extends BaseEntity {
     cascade: [Cascade.ALL],
   })
   reservasInfraestructura = new Collection<ReservaInfraestructura>(this);
+
+  @OneToMany(() => ReservaTravelLift, (reserva) => reserva.embarcacion, {
+    cascade: [Cascade.ALL],
+  })
+  reservasTravelLift = new Collection<ReservaTravelLift>(this);
 
   @Property({ nullable: true }) // Cuando es null significa que la afiliacion esta activa
   @Type(() => Date)

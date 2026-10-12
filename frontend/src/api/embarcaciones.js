@@ -7,6 +7,7 @@ const api = axios.create({
 export const getEmbarcaciones = (params = {}) => api.get('/api/embarcaciones', { params });
 export const crearEmbarcacion= (data) => api.post ('/api/embarcaciones', data);
 export const eliminarEmbarcacion = (id) => api.delete(`/api/embarcaciones/${id}`);
+export const reactivarEmbarcacion = (id) => api.post(`/api/embarcaciones/${id}/reactivar`);
 export const actualizarEmbarcacion = (id, data) => api.put(`/api/embarcaciones/${id}`, data);
 export const getEmbarcacionesClub = () => api.get('/api/embarcaciones/club');
 export const getEmbarcacionesActivasPorSocio = (idSocio) => {
