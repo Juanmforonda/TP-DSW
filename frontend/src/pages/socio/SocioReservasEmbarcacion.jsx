@@ -33,6 +33,12 @@ import {
 } from '../../api/reservasEmbarcacionClub.js';
 import TimeSlotPicker from '../../components/FranjaHoraria.jsx';
 import ListaEmbarcacionesClub from '../../components/ListaEmbarcacionesClub.jsx';
+import {
+  listFromResponse,
+  toDateTimeLocal,
+  toISOStringOrNull,
+  validateReservationRange,
+} from '../../utils/reservas.js';
 
 export function SocioReservasEmbarcacion({ idSocio }) {
   const [embarcacionesClub, setEmbarcacionesClub] = useState([]);
@@ -77,9 +83,7 @@ export function SocioReservasEmbarcacion({ idSocio }) {
   async function cargarEmbarcaciones() {
     try {
       const res = await getEmbarcacionesClub();
-      const data = res?.data ?? (await res.json?.());
-      const list = data?.data ?? data ?? [];
-      setEmbarcacionesClub(list);
+      setEmbarcacionesClub(listFromResponse(res));
     } catch {
       setEmbarcacionesClub([]);
     }
@@ -88,9 +92,7 @@ export function SocioReservasEmbarcacion({ idSocio }) {
   async function cargarReservasSocio() {
     try {
       const res = await getReservasPorSocio(idSocio);
-      const data = res?.data ?? (await res.json?.());
-      const list = data?.data ?? data ?? [];
-      setReservasSocio(list);
+      setReservasSocio(listFromResponse(res));
     } catch {
       setReservasSocio([]);
     }
@@ -99,50 +101,18 @@ export function SocioReservasEmbarcacion({ idSocio }) {
   async function cargarReservasEmbarcacion(id) {
     try {
       const res = await getReservasPorEmbarcacion(id);
-      const data = res?.data ?? (await res.json?.());
-      const list = data?.data ?? data ?? [];
-      setReservasEmb(list);
+      setReservasEmb(listFromResponse(res));
     } catch {
       setReservasEmb([]);
     }
   }
 
   function toISO(localValue) {
-    if (!localValue) return null;
-    const d = new Date(localValue);
-    return isNaN(d.getTime()) ? null : d.toISOString();
-  }
-
-  function localToDate(localValue) {
-    if (!localValue) return null;
-    const d = new Date(localValue);
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-  function overlaps(aStart, aEnd, bStart, bEnd) {
-    return aStart < bEnd && aEnd > bStart;
+    return toISOStringOrNull(localValue);
   }
 
   function clientValidate(startLocal, endLocal, reservas = [], excludeId) {
-    const start = localToDate(startLocal);
-    const end = localToDate(endLocal);
-    if (!start || !end) return 'Fechas inválidas';
-    if (start >= end)
-      return 'La fecha de inicio debe ser anterior a la fecha de fin';
-    if (end.getTime() - start.getTime() > 3 * 60 * 60 * 1000)
-      return 'La reserva no puede durar más de 3 horas';
-
-    const activos = (reservas || []).filter((r) => r && r.estado === 'ACTIVA' && r.id !== excludeId);
-
-    for (const r of activos) {
-      const ri = new Date(r.fechaInicio);
-      const rf = new Date(r.fechaFin);
-      if (isNaN(ri.getTime()) || isNaN(rf.getTime())) continue;
-      if (overlaps(start, end, ri, rf))
-        return 'La embarcación ya tiene una reserva en ese horario';
-    }
-
-    return null;
+    return validateReservationRange(startLocal, endLocal, reservas, excludeId);
   }
 
   async function handleCreate(e) {
@@ -191,20 +161,13 @@ export function SocioReservasEmbarcacion({ idSocio }) {
 
   function abrirEditar(reserva) {
     setEditingReserva(reserva);
-    const inicioLocal = formatForDatetimeLocal(reserva.fechaInicio);
-    const finLocal = formatForDatetimeLocal(reserva.fechaFin);
+    const inicioLocal = toDateTimeLocal(reserva.fechaInicio);
+    const finLocal = toDateTimeLocal(reserva.fechaFin);
     setEditInicio(inicioLocal);
     setEditFin(finLocal);
     setEditDate(inicioLocal?.split?.('T')?.[0] ?? '');
     setEditError(null);
     setEditModalOpen(true);
-  }
-
-  function formatForDatetimeLocal(iso) {
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return '';
-    const tzOffset = d.getTimezoneOffset() * 60000;
-    return new Date(d.getTime() - tzOffset).toISOString().slice(0, 16);
   }
 
   async function handleEditSave() {
@@ -285,7 +248,7 @@ export function SocioReservasEmbarcacion({ idSocio }) {
   }
 
   function onTimeSlotChange(a, b) {
-    // same handler for create: accepts (start, end) or { inicioLocal, finLocal } / { start, end }
+    // mismos handler para crear:  (start, end) o { inicioLocal, finLocal } / { start, end }
     let start = a;
     let end = b;
     if (a && typeof a === 'object') {
@@ -641,7 +604,7 @@ export function SocioReservasEmbarcacion({ idSocio }) {
         </CRow>
       </CContainer>
 
-      {/* Edit modal: usar Date + TimeSlotPicker igual que Crear Reserva */}
+      {/* Edit modal: usa Date + TimeSlotPicker igual que Crear Reserva */}
       <CModal
         alignment="center"
         visible={editModalOpen}
@@ -662,7 +625,7 @@ export function SocioReservasEmbarcacion({ idSocio }) {
                 value={editDate}
                 onChange={(e) => {
                   setEditDate(e.target.value);
-                  // limpiar selección de hora al cambiar día
+                  // limpiar seleccion de hora al cambiar dia
                   setEditInicio('');
                   setEditFin('');
                 }}

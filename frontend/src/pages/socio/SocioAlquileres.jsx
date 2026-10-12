@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { getAmarras } from '../../api/amarras.js';
 import { getBoxes } from '../../api/boxes.js';
 import '../../components/SocioHome.css';
+import { EmptyState } from '../../components/EmptyState.jsx';
+import { ErrorState } from '../../components/ErrorState.jsx';
+import { LoadingState } from '../../components/LoadingState.jsx';
 
 export function SocioAlquileres({ idSocio }) {
   const [amarras, setAmarras] = useState([]);
@@ -47,10 +50,10 @@ export function SocioAlquileres({ idSocio }) {
         Amarras y boxes vinculados a tus embarcaciones
       </p>
 
-      {loading && <p>Cargando alquileres...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {loading && <LoadingState message="Cargando alquileres..." />}
+      {error && <ErrorState message={error} />}
       {!loading && !error && sinAlquileres && (
-        <p>No tenés amarras ni boxes alquilados actualmente.</p>
+        <EmptyState message="No tenés amarras ni boxes alquilados actualmente." />
       )}
 
       {!loading && !error && amarras.length > 0 && (

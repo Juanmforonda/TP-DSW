@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { getEmbarcacionesActivasPorSocio } from '../../api/embarcaciones';
 import '../../components/SocioHome.css'; 
+import { EmptyState } from '../../components/EmptyState.jsx';
+import { ErrorState } from '../../components/ErrorState.jsx';
+import { LoadingState } from '../../components/LoadingState.jsx';
 
 export function SocioEmbarcaciones({ idSocio }) {
   const [embarcs, setEmbarcs] = useState([]);
@@ -34,10 +37,10 @@ export function SocioEmbarcaciones({ idSocio }) {
       <h2 className="socio-title">Mis embarcaciones</h2>
       <p className="socio-subtitle">Listado de embarcaciones registradas</p>
 
-      {loading && <p>Cargando embarcaciones...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {loading && <LoadingState message="Cargando embarcaciones..." />}
+      {error && <ErrorState message={error} />}
       {!loading && !error && embarcs.length === 0 && (
-        <p>No tenés embarcaciones registradas.</p>
+        <EmptyState message="No tenés embarcaciones registradas." />
       )}
 
       <div className="row">

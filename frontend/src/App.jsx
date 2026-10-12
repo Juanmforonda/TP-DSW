@@ -1,5 +1,9 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { AdminDashboard, AdminPerfilPage, AdminPanel } from './pages/admin/adminPanel.jsx';
+import {
+  AdminDashboard,
+  AdminPerfilPage,
+  AdminPanel,
+} from './pages/admin/adminPanel.jsx';
 import Login from './pages/Login';
 import {
   SocioAlquileresPage,
@@ -49,19 +53,37 @@ export default function App() {
           <Route path="socios" element={<MenuAdminSocios />} />
           <Route path="socios/administrar" element={<AdministrarSocios />} />
           <Route path="socios/cuotas" element={<AdministrarCuotas />} />
-          <Route path="socios/afiliaciones" element={<AdministrarAfiliaciones />} />
+          <Route
+            path="socios/afiliaciones"
+            element={<AdministrarAfiliaciones />}
+          />
           <Route path="embarcaciones" element={<MenuAdminEmbarcaciones />} />
-          <Route path="embarcaciones/listado" element={<AdministrarEmbarcacionesSocios />} />
-          <Route path="embarcaciones/ingresar" element={<IngresarEmbarcaciones />} />
-          <Route path="embarcaciones/tipos" element={<AdministrarTiposEmbarcacion />} />
+          <Route
+            path="embarcaciones/listado"
+            element={<AdministrarEmbarcacionesSocios />}
+          />
+          <Route
+            path="embarcaciones/ingresar"
+            element={<IngresarEmbarcaciones />}
+          />
+          <Route
+            path="embarcaciones/tipos"
+            element={<AdministrarTiposEmbarcacion />}
+          />
           <Route path="amarras" element={<MenuAdminAmarras />} />
           <Route path="amarras/administrar" element={<AdministrarAmarras />} />
           <Route path="amarras/listar" element={<ListarAmarras />} />
           <Route path="boxes" element={<MenuAdminBox />} />
           <Route path="boxes/administrar" element={<AdministrarBoxes />} />
           <Route path="boxes/listar" element={<ListarBoxes />} />
-          <Route path="reservas/embarcacion-club" element={<AdministrarReservasEmbarcacionClub />} />
-          <Route path="reservas/travel-lift" element={<AdministrarReservasTravelLift />} />
+          <Route
+            path="reservas/embarcacion-club"
+            element={<AdministrarReservasEmbarcacionClub />}
+          />
+          <Route
+            path="reservas/travel-lift"
+            element={<AdministrarReservasTravelLift />}
+          />
         </Route>
 
         <Route path="/socio" element={<SocioPanel />}>
@@ -70,12 +92,21 @@ export default function App() {
           <Route path="embarcaciones" element={<SocioEmbarcacionesPage />} />
           <Route path="cuotas" element={<SocioCuotasPage />} />
           <Route path="amarras" element={<SocioAlquileresPage />} />
-          <Route path="reservas/embarcacion-club" element={<SocioReservasEmbarcacionPage />} />
-          <Route path="reservas/travel-lift" element={<SocioReservasTravelLiftPage />} />
+          <Route
+            path="reservas/embarcacion-club"
+            element={<SocioReservasEmbarcacionPage />}
+          />
+          <Route
+            path="reservas/travel-lift"
+            element={<SocioReservasTravelLiftPage />}
+          />
         </Route>
 
         <Route path="/pago/exito" element={<PagoResultado tipo="exito" />} />
-        <Route path="/pago/pendiente" element={<PagoResultado tipo="pendiente" />} />
+        <Route
+          path="/pago/pendiente"
+          element={<PagoResultado tipo="pendiente" />}
+        />
         <Route path="/pago/error" element={<PagoResultado tipo="error" />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

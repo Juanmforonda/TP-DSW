@@ -34,6 +34,12 @@ import {
 } from '../../api/reservasEmbarcacionClub.js';
 import { getSocios } from '../../api/socios.js';
 import { getEmbarcacionesClub } from '../../api/embarcaciones.js';
+import {
+  listFromResponse,
+  toDateTimeLocal,
+  toISOStringOrNull,
+  validateReservationRange,
+} from '../../utils/reservas.js';
 
 export function AdministrarReservasEmbarcacionClub() {
   const [reservas, setReservas] = useState([]);
@@ -71,17 +77,6 @@ export function AdministrarReservasEmbarcacionClub() {
   const [confirmAction, setConfirmAction] = useState(null); // 'cancel'|'finalizar'|'delete'
   const [confirmReserva, setConfirmReserva] = useState(null);
 
-  // unwrap helper (acepta axios response o ya-data)
-  function unwrap(res) {
-    if (!res) return null;
-    if (res?.data !== undefined) return res.data;
-    return res;
-  }
-  function listFrom(res) {
-    const u = unwrap(res);
-    return Array.isArray(u) ? u : u?.data ?? u?.reservas ?? [];
-  }
-
   async function loadInitial() {
     setError('');
     try {
@@ -90,9 +85,9 @@ export function AdministrarReservasEmbarcacionClub() {
         getEmbarcacionesClub(),
         getSocios(),
       ]);
-      setReservas(listFrom(rRes));
-      setEmbarcaciones(listFrom(rEmb));
-      setSocios(listFrom(rSoc));
+      setReservas(listFromResponse(rRes));
+      setEmbarcaciones(listFromResponse(rEmb));
+      setSocios(listFromResponse(rSoc));
     } catch (err) {
       setError(
         err?.response?.data?.message ?? err?.message ?? 'Error cargando datos'
@@ -105,7 +100,6 @@ export function AdministrarReservasEmbarcacionClub() {
 
   useEffect(() => {
     loadInitial();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // filtrado cliente 
@@ -152,50 +146,11 @@ export function AdministrarReservasEmbarcacionClub() {
     : [];
 
   // helpers datetime-local <-> ISO + utilidades de validación
-  const toISO = (dtLocal) => {
-    if (!dtLocal) return '';
-    const d = new Date(dtLocal);
-    return d.toISOString();
-  };
-  const toLocal = (iso) => {
-    if (!iso) return '';
-    const d = new Date(iso);
-    const tzOffset = d.getTimezoneOffset() * 60000;
-    return new Date(d.getTime() - tzOffset).toISOString().slice(0, 16);
-  };
+  const toISO = toISOStringOrNull;
+  const toLocal = toDateTimeLocal;
 
-  function localToDate(localValue) {
-    if (!localValue) return null;
-    const d = new Date(localValue);
-    return isNaN(d.getTime()) ? null : d;
-  }
-  function overlaps(aStart, aEnd, bStart, bEnd) {
-    return aStart < bEnd && aEnd > bStart;
-  }
   function clientValidate(startLocal, endLocal, reservas = [], excludeId) {
-    const start = localToDate(startLocal);
-    const end = localToDate(endLocal);
-    if (!start || !end) return 'Fechas inválidas';
-    if (start >= end)
-      return 'La fecha de inicio debe ser anterior a la fecha de fin';
-    if (end.getTime() - start.getTime() > 3 * 60 * 60 * 1000)
-      return 'La reserva no puede durar más de 3 horas';
-
-    const activos = (reservas || []).filter(
-      (r) =>
-        r &&
-        String((r.estado ?? '').toUpperCase()) === 'ACTIVA' &&
-        r.id !== excludeId
-    );
-
-    for (const r of activos) {
-      const ri = new Date(r.fechaInicio);
-      const rf = new Date(r.fechaFin);
-      if (isNaN(ri.getTime()) || isNaN(rf.getTime())) continue;
-      if (overlaps(start, end, ri, rf))
-        return 'La embarcación ya tiene una reserva en ese horario';
-    }
-    return null;
+    return validateReservationRange(startLocal, endLocal, reservas, excludeId);
   }
 
   // create handlers using TimeSlotPicker
@@ -247,7 +202,7 @@ export function AdministrarReservasEmbarcacionClub() {
     }
   };
 
-  // editar handlers using TimeSlotPicker
+  // editar handlers usando TimeSlotPicker
   function openEdit(reserva) {
     setEditing(reserva);
     const inicioLocal = toLocal(reserva.fechaInicio);

@@ -10,9 +10,9 @@ import {
   getReservasTravelLift, getReservasTravelLiftPorSocio,
 } from '../../api/reservasTravelLift.js';
 import TravelLiftTimePicker from '../../components/TravelLiftTimePicker.jsx';
+import { formatReservationDate, listFromResponse } from '../../utils/reservas.js';
 
-const unwrap = (response) => response?.data?.data ?? response?.data ?? [];
-const formatDate = (value) => new Date(value).toLocaleString('es-AR');
+const unwrap = listFromResponse;
 
 export function SocioReservasTravelLift({ idSocio }) {
   const [embarcaciones, setEmbarcaciones] = useState([]);
@@ -105,8 +105,8 @@ export function SocioReservasTravelLift({ idSocio }) {
             {reservas.map((reserva) => (
               <CTableRow key={reserva.id}>
                 <CTableDataCell>{reserva.embarcacion?.nombre ?? reserva.embarcacion}</CTableDataCell>
-                <CTableDataCell>{formatDate(reserva.fechaHoraInicio)}</CTableDataCell>
-                <CTableDataCell>{formatDate(reserva.fechaHoraFin)}</CTableDataCell>
+                <CTableDataCell>{formatReservationDate(reserva.fechaHoraInicio)}</CTableDataCell>
+                <CTableDataCell>{formatReservationDate(reserva.fechaHoraFin)}</CTableDataCell>
                 <CTableDataCell>{reserva.estado}</CTableDataCell>
                 <CTableDataCell>
                   {reserva.estado === 'ACTIVA' && <><CButton size="sm" color="warning" className="me-2" onClick={() => cambiarEstado(reserva, cancelarReservaTravelLift)}>Cancelar</CButton><CButton size="sm" color="success" onClick={() => cambiarEstado(reserva, finalizarReservaTravelLift)}>Finalizar</CButton></>}
