@@ -6,6 +6,7 @@ import Home from './pages/landing/Home';
 import About from './pages/landing/About';
 import Testimonials from './pages/landing/Testimonials';
 import Contact from './pages/landing/Contact';
+import { PagoResultado } from './pages/PagoResultado.jsx';
 
 
 export default function App() {
@@ -19,6 +20,9 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/socio" element={<SocioPanel />} />
+        <Route path="/pago/exito" element={<PagoResultado tipo="exito" />} />
+        <Route path="/pago/pendiente" element={<PagoResultado tipo="pendiente" />} />
+        <Route path="/pago/error" element={<PagoResultado tipo="error" />} />
       </Routes>
     </BrowserRouter>
   )

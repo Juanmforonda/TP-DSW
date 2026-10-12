@@ -13,6 +13,7 @@ import { reservaInfraestructuraRouter } from './reservaInfraestructura/reservaIn
 import {orm, syncSchema} from './shared/orm.js'
 import { RequestContext } from '@mikro-orm/mysql'
 import { authRouter } from './auth/auth.routes.js'
+import { webhookRouter } from './webhook/webhook.routes.js'
 
 import cors from 'cors'; 
 
@@ -39,6 +40,7 @@ app.use('/api/cuotasMensuales', cuotaMensualRouter)
 app.use('/api', authRouter)
 app.use('/api/reservasEmbarcacionClub', reservaEmbarcacionClubRouter)
 app.use('/api/reservasInfraestructura', reservaInfraestructuraRouter)
+app.use('/api/webhooks', webhookRouter);
 
 
 
