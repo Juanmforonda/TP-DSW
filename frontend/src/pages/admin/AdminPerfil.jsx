@@ -7,8 +7,8 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react';
-import { getAdministradores, actualizarAdministrador } from '../api/administradores';
-import './AdminHome.css';
+import { getAdministradores, actualizarAdministrador } from '../../api/administradores';
+import '../../components/AdminHome.css';
 
 
 export function AdminPerfil({ idAdmin }) {

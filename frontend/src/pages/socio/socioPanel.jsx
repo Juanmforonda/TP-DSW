@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useOutletContext } from 'react-router-dom';
 import { SocioNavbar } from '../../components/SocioNavbar.jsx';
-import { SocioHome2 } from '../../components/SocioHome2.jsx';
-import { SocioEmbarcaciones } from '../../components/SocioEmbarcaciones.jsx';
-import { SocioCuotas } from '../../components/SocioCuotas.jsx';
-import { SocioPerfil } from '../../components/SocioPerfil.jsx';
-import { SocioAlquileres } from '../../components/SocioAlquileres.jsx';
+import { SocioHome2 } from './SocioHome2.jsx';
+import { SocioEmbarcaciones } from './SocioEmbarcaciones.jsx';
+import { SocioCuotas } from './SocioCuotas.jsx';
+import { SocioPerfil } from './SocioPerfil.jsx';
+import { SocioAlquileres } from './SocioAlquileres.jsx';
 import { SocioReservasEmbarcacion } from './SocioReservasEmbarcacion.jsx';
 import { SocioReservasTravelLift } from './SocioReservasTravelLift.jsx';
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getSocios, crearSocio, actualizarSocio, bajaLogicaSocio } from '../../api/socios.js';
-import { TablaSocios } from '../../components/tablaSocios.jsx';
+import { TablaSocios } from '../../components/TablaSocios.jsx';
 import { EntityTable } from '../../components/TablaGenerica.jsx';
 import {
   CCard,

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { MenuButton } from './menuButton';
-import { MenuPadre } from './menuPadre.jsx';
+import { MenuButton } from '../../components/MenuButton.jsx';
+import { MenuPadre } from '../../components/MenuPadre.jsx';
 
 export function MenuAdminAmarras(){
   const navigate = useNavigate();

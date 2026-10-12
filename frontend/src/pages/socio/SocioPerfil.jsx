@@ -7,8 +7,8 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react';
-import { getSocios, actualizarSocio } from '../api/socios';
-import './SocioHome.css';
+import { getSocios, actualizarSocio } from '../../api/socios';
+import '../../components/SocioHome.css';
 
 export function SocioPerfil({ idSocio }) {
   const [socio, setSocio] = useState(null);

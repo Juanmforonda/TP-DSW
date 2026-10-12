@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getCuotasPorSocio, crearPreferenciaMP } from '../api/cuotas';
-import './socioHome.css';
+import { getCuotasPorSocio, crearPreferenciaMP } from '../../api/cuotas';
+import '../../components/SocioHome.css';
 import {
   CCard,
   CCardBody,

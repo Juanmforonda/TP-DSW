@@ -25,7 +25,7 @@ import {
   CForm,
   CFormLabel,
 } from '@coreui/react';
-import TimeSlotPicker from '../../components/franjaHoraria.jsx';
+import TimeSlotPicker from '../../components/FranjaHoraria.jsx';
 import {
   getReservasEmbarcacionClub,
   crearReservaEmbarcacionClub,

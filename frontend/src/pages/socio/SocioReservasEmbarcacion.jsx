@@ -31,7 +31,7 @@ import {
   cancelarReservaEmbarcacionClub,
   finalizarReservaEmbarcacionClub,
 } from '../../api/reservasEmbarcacionClub.js';
-import TimeSlotPicker from '../../components/franjaHoraria.jsx';
+import TimeSlotPicker from '../../components/FranjaHoraria.jsx';
 import ListaEmbarcacionesClub from '../../components/ListaEmbarcacionesClub.jsx';
 
 export function SocioReservasEmbarcacion({ idSocio }) {

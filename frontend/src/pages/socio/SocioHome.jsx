@@ -8,9 +8,9 @@ import {
   CCol,
 } from '@coreui/react'
 import { useEffect, useState } from 'react'
-import { getCuotasPorSocio } from '../api/cuotas'
-import { getAfiliaciones } from '../api/afiliaciones'
-import { getEmbarcacionesActivasPorSocio } from '../api/embarcaciones'
+import { getCuotasPorSocio } from '../../api/cuotas'
+import { getAfiliaciones } from '../../api/afiliaciones'
+import { getEmbarcacionesActivasPorSocio } from '../../api/embarcaciones'
 
 export default function SocioHome({ idSocio, onSeleccion }) {
   const [cuotas, setCuotas] = useState([])

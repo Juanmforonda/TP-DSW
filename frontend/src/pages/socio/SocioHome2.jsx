@@ -14,7 +14,7 @@ import {
   cilStorage,
 } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
-import './AdminHome.css';
+import '../../components/AdminHome.css';
 
 export function SocioHome2({onSeleccion}) {
   const modules = [

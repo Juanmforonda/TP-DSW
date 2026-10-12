@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { getAmarras } from '../api/amarras.js';
-import { getBoxes } from '../api/boxes.js';
-import './socioHome.css';
+import { getAmarras } from '../../api/amarras.js';
+import { getBoxes } from '../../api/boxes.js';
+import '../../components/SocioHome.css';
 
 export function SocioAlquileres({ idSocio }) {
   const [amarras, setAmarras] = useState([]);

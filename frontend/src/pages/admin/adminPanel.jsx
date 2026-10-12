@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useOutletContext } from 'react-router-dom';
 import { CContainer } from '@coreui/react';
 import { AdminNavbar } from '../../components/AdminNavbar.jsx';
-import AdminHome from '../../components/AdminHome.jsx';
-import { AdminPerfil } from '../../components/AdminPerfil.jsx';
+import AdminHome from './AdminHome.jsx';
+import { AdminPerfil } from './AdminPerfil.jsx';
 
 export function AdminPanel() {
   const [admin, setAdmin] = useState(null);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getEmbarcacionesActivasPorSocio } from '../api/embarcaciones';
-import './socioHome.css'; 
+import { getEmbarcacionesActivasPorSocio } from '../../api/embarcaciones';
+import '../../components/SocioHome.css'; 
 
 export function SocioEmbarcaciones({ idSocio }) {
   const [embarcs, setEmbarcs] = useState([]);
