@@ -58,7 +58,7 @@ export function PagoResultado({ tipo }) {
   useEffect(() => {
     if (verificando) return;
     if (segundos <= 0) {
-      navigate('/socio');
+      navigate('/socio/cuotas');
       return;
     }
     const timer = setTimeout(() => setSegundos((s) => s - 1), 1000);
