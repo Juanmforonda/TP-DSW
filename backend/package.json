@@ -6,7 +6,8 @@
   "main": "app.js",
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
-    "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/app.js\""
+    "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/app.js\"",
+    "seed": "pnpm build && node ./dist/seed.js"
   },
   "keywords": [],
   "author": "",
