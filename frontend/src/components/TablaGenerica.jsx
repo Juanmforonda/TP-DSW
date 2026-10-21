@@ -149,28 +149,46 @@ export function EntityTable({
             if (col.readonly) return null;
 
             if (col.key === 'estado') {
+              // Las amarras ocupadas no pueden cambiar de estado.
+              const esAmarraOcupada =
+                entityName === 'amarra' &&
+                selected?.estado?.toLowerCase() === 'ocupado';
+
               const opciones =
                 entityName === 'box'
                   ? ['disponible', 'ocupado', 'mantenimiento']
-                  : ['libre', 'ocupado', 'mantenimiento'];
+                  : entityName === 'amarra'
+                    ? ['libre', 'mantenimiento']
+                    : ['libre', 'ocupado', 'mantenimiento'];
+
               return (
                 <div key={col.key} className="mb-3">
                   <label className="form-label">{col.label}</label>
-                  <select
-                    className="form-select"
-                    value={selected?.[col.key] || ''}
-                    onChange={(e) => handleChange(col.key, e.target.value)}
-                  >
-                    <option value="">Seleccione un estado</option>
-                    {opciones.map((op) => (
-                      <option key={op} value={op}>
-                        {op.charAt(0).toUpperCase() + op.slice(1)}
-                      </option>
-                    ))}
-                  </select>
+
+                  {esAmarraOcupada ? (
+                    <CFormInput
+                      value="Ocupado"
+                      disabled
+                    />
+                  ) : (
+                    <select
+                      className="form-select"
+                      value={selected?.[col.key] || ''}
+                      onChange={(e) => handleChange(col.key, e.target.value)}
+                    >
+                      <option value="">Seleccione un estado</option>
+
+                      {opciones.map((op) => (
+                        <option key={op} value={op}>
+                          {op.charAt(0).toUpperCase() + op.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               );
             }
+
 
             if (col.key === 'zona') {
               return (
