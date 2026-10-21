@@ -148,24 +148,33 @@ export function EntityTable({
             if (col.key === 'id') return null;
             if (col.readonly) return null;
 
+            if (
+              entityName === 'box' &&
+              ['embarcacion', 'socio'].includes(col.key)
+            ) {
+              return null;
+            }
+            
             if (col.key === 'estado') {
-              // Las amarras ocupadas no pueden cambiar de estado.
-              const esAmarraOcupada =
-                entityName === 'amarra' &&
-                selected?.estado?.toLowerCase() === 'ocupado';
+              const estadoActual = String(selected?.estado ?? '').toLowerCase();
 
-              const opciones =
-                entityName === 'box'
-                  ? ['disponible', 'ocupado', 'mantenimiento']
-                  : entityName === 'amarra'
-                    ? ['libre', 'mantenimiento']
-                    : ['libre', 'ocupado', 'mantenimiento'];
+              const esBox = entityName === 'box';
+              const esAmarra = entityName === 'amarra';
+
+              const estaOcupado =
+                estadoActual === 'ocupado';
+
+              const opciones = esBox
+                ? ['disponible', 'mantenimiento']
+                : esAmarra
+                  ? ['libre', 'mantenimiento']
+                  : ['libre', 'ocupado', 'mantenimiento'];
 
               return (
                 <div key={col.key} className="mb-3">
                   <label className="form-label">{col.label}</label>
 
-                  {esAmarraOcupada ? (
+                  {((esBox || esAmarra) && estaOcupado) ? (
                     <CFormInput
                       value="Ocupado"
                       disabled
@@ -173,11 +182,9 @@ export function EntityTable({
                   ) : (
                     <select
                       className="form-select"
-                      value={selected?.[col.key] || ''}
+                      value={estadoActual}
                       onChange={(e) => handleChange(col.key, e.target.value)}
                     >
-                      <option value="">Seleccione un estado</option>
-
                       {opciones.map((op) => (
                         <option key={op} value={op}>
                           {op.charAt(0).toUpperCase() + op.slice(1)}
@@ -188,6 +195,7 @@ export function EntityTable({
                 </div>
               );
             }
+
 
 
             if (col.key === 'zona') {
