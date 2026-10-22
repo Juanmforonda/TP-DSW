@@ -10,7 +10,7 @@ import {
   EstadoReservaInfraestructura,
   ReservaInfraestructura,
 } from '../reservaInfraestructura/reservaInfraestructura.entity.js';
-import { validarUbicacionExclusiva } from './embarcacion_test.js'
+import { validarUbicacionExclusiva } from './embarcacion.rules.js'
 
 const em = orm.em;
 
@@ -71,16 +71,7 @@ async function findOne(req: Request, res: Response) {
   }
 }
 
-function validarUbicacionExclusiva(amarraId: unknown, boxId: unknown) {
-  const tieneAmarra = amarraId !== undefined && amarraId !== null;
-  const tieneBox = boxId !== undefined && boxId !== null;
-  if (!tieneAmarra && !tieneBox) {
-    throw new Error('Debes asignar una amarra o un box para crear la embarcación');
-  }
-  if (tieneAmarra && tieneBox) {
-    throw new Error('La embarcación no puede asignarse simultáneamente a amarra y box');
-  }
-}
+
 
 async function add(req: Request, res: Response) {
   try {
