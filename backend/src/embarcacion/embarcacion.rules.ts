@@ -17,3 +17,13 @@ export function validarUbicacionExclusiva(
     );
   }
 }
+
+export function validarReactivacion(
+  fechaFin?: Date
+) {
+  if (!fechaFin) {
+    throw new Error(
+      'La embarcación ya está activa'
+    )
+  }
+}

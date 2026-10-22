@@ -10,7 +10,10 @@ import {
   EstadoReservaInfraestructura,
   ReservaInfraestructura,
 } from '../reservaInfraestructura/reservaInfraestructura.entity.js';
-import { validarUbicacionExclusiva } from './embarcacion.rules.js'
+import { 
+  validarUbicacionExclusiva, 
+  validarReactivacion
+} from './embarcacion.rules.js'
 
 const em = orm.em;
 
@@ -220,23 +223,45 @@ async function remove(req: Request, res: Response) {
   }
 }
 
+
 async function reactivar(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id, 10);
-    const embarcacion = await em.findOneOrFail(Embarcacion, { id });
 
-    if (!embarcacion.fechaFin) {
-      return res.status(400).json({ message: 'La embarcación ya está activa' });
-    }
-
+    const embarcacion = await em.findOneOrFail(
+      Embarcacion,
+      { id }
+    );
+    validarReactivacion(
+      embarcacion.fechaFin
+    );
     embarcacion.fechaFin = undefined;
     await em.flush();
-    res.status(200).json({ message: 'Embarcación reactivada', data: embarcacion });
+    res.status(200).json({
+      message: 'Embarcación reactivada',
+      data: embarcacion
+    });
+
   } catch (error: any) {
+
     if (error.name === 'NotFoundError') {
-      return res.status(404).json({ message: 'Embarcación no encontrada' });
+      return res.status(404).json({
+        message: 'Embarcación no encontrada'
+      });
     }
-    res.status(500).json({ message: error.message });
+
+    if (
+      error.message ===
+      'La embarcación ya está activa'
+    ) {
+      return res.status(400).json({
+        message: error.message
+      });
+    }
+
+    res.status(500).json({
+      message: error.message
+    });
   }
 }
 

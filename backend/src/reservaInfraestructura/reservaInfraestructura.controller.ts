@@ -7,6 +7,7 @@ import {
 import { Embarcacion } from '../embarcacion/embarcacion.entity.js';
 import { Amarra, Estado as EstadoAmarra } from '../amarra/amarra.entity.js';
 import { Box, Estado as EstadoBox } from '../box/box.entity.js';
+import { validarFechas } from './reservaInfraestructura.rules.js';
 
 const em = orm.em;
 
@@ -44,17 +45,6 @@ function validarXorUbicacion(amarraId: unknown, boxId: unknown) {
   }
 }
 
-function validarFechas(inicio: Date, fin?: Date | null) {
-  if (Number.isNaN(inicio.getTime())) {
-    throw new Error('La fecha de inicio es inválida');
-  }
-  if (fin && Number.isNaN(fin.getTime())) {
-    throw new Error('La fecha de fin es inválida');
-  }
-  if (fin && inicio > fin) {
-    throw new Error('La fecha de inicio debe ser anterior o igual a la fecha de fin');
-  }
-}
 
 async function marcarInfraestructuraLibreSiCorresponde(reserva: ReservaInfraestructura) {
   if (reserva.amarra) {
