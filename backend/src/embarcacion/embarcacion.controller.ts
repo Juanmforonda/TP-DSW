@@ -10,6 +10,7 @@ import {
   EstadoReservaInfraestructura,
   ReservaInfraestructura,
 } from '../reservaInfraestructura/reservaInfraestructura.entity.js';
+import { validarUbicacionExclusiva } from './embarcacion_test.js'
 
 const em = orm.em;
 

@@ -5,10 +5,11 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build": "tsc -p ./tsconfig.json",
-    "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/app.js\"",
-    "seed": "pnpm build && node ./dist/seed.js"
-  },
+  "build": "tsc -p ./tsconfig.json",
+  "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/app.js\"",
+  "seed": "pnpm build && node ./dist/seed.js",
+  "test": "vitest"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -40,6 +41,7 @@
     "@types/node": "22.15.30",
     "ts-node": "^10.9.2",
     "tsc-watch": "7.1.1",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "vitest": "^5.0.5"
   }
 }

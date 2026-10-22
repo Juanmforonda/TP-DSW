@@ -13,4 +13,10 @@ export default defineConfig({
       },
     },
   },
+
+  test: {
+    exclude: [
+      'dist/**'
+    ]
+  },
 });
