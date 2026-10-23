@@ -18,7 +18,7 @@ import { webhookRouter } from './webhook/webhook.routes.js'
 
 import cors from 'cors'; 
 
-const app = express()
+export const app = express()
 
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:5174'], // Permitir ambos puertos
@@ -50,8 +50,13 @@ app.use((_, res) => {
   return res.status(404).send({ message: 'Resource not found' })
 })
 
-await syncSchema()  //Nunca llamar a esto en producción, solo para desarrollo
 
-app.listen(3000, () => {
-  console.log('Server runnning on http://localhost:3000/')
-})
+
+if (process.env.NODE_ENV !== 'test') {
+
+  await syncSchema()  //Nunca llamar a esto en producción, solo para desarrollo
+
+  app.listen(3000, () => {
+    console.log('Server running on http://localhost:3000/')
+  })
+}
