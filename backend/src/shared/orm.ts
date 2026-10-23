@@ -1,27 +1,28 @@
-import { MikroORM } from "@mikro-orm/mysql";
-import { SqlHighlighter } from "@mikro-orm/sql-highlighter";
-import 'dotenv/config'; // carga las variables del archivo .env
+import { MikroORM } from '@mikro-orm/mysql';
+import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
+import 'dotenv/config';
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 export const orm = await MikroORM.init({
   entities: ['dist/**/*.entity.js'],
   entitiesTs: ['src/**/*.entity.ts'],
   dbName: process.env.DB_NAME,
-  clientUrl: `mysql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+  clientUrl: `mysql://${process.env.DB_USER}:${encodeURIComponent(String(process.env.DB_PASSWORD ?? ''))}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
   highlighter: new SqlHighlighter(),
-  debug: true,
+  debug: !isProduction,
   schemaGenerator: {
-    disableForeignKeys: true,
+    disableForeignKeys: false,
     createForeignKeyConstraints: true,
     ignoreSchema: [],
   },
+  allowGlobalContext: false,
 });
 
 export const syncSchema = async () => {
   const generator = orm.getSchemaGenerator();
-  /*
-  // Uncomment the following lines if you want to drop and recreate the schema
-  await generator.dropSchema();
-  await generator.createSchema();
-  */
+  if (isProduction) {
+    return;
+  }
   await generator.updateSchema();
-}
+};
