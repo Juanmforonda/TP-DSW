@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getAmarras } from '../../api/amarras.js';
-import { getBoxes } from '../../api/boxes.js';
+import { getReservasInfraestructura } from '../../api/reservasInfraestructura.js';
 import '../../components/SocioHome.css';
 import { EmptyState } from '../../components/EmptyState.jsx';
 import { ErrorState } from '../../components/ErrorState.jsx';
@@ -19,21 +18,35 @@ export function SocioAlquileres({ idSocio }) {
       return;
     }
 
-    Promise.all([getAmarras(), getBoxes()])
-      .then(([resAmarras, resBoxes]) => {
-        const todasAmarras = resAmarras.data?.data ?? [];
-        const todosBoxes = resBoxes.data?.data ?? [];
+    getReservasInfraestructura()
+      .then((res) => {
+        const reservas = res.data?.data ?? [];
+        const reservasActivas = reservas.filter((reserva) => {
+          const socioId = Number(reserva.socio?.id ?? reserva.socio);
+          return socioId === Number(idSocio) && reserva.estado === 'ACTIVA';
+        });
 
-        // Solo las amarras/boxes cuya embarcación asignada pertenece a este socio.
-        setAmarras(
-          todasAmarras.filter((a) => a.embarcacion?.socio?.id === idSocio),
-        );
-        setBoxes(
-          todosBoxes.filter((b) => b.embarcacion?.socio?.id === idSocio),
-        );
+        const amarrasDelSocio = reservasActivas
+          .filter((reserva) => reserva.amarra)
+          .map((reserva) => ({
+            ...reserva.amarra,
+            embarcacion: reserva.embarcacion,
+            socio: reserva.socio,
+          }));
+
+        const boxesDelSocio = reservasActivas
+          .filter((reserva) => reserva.box)
+          .map((reserva) => ({
+            ...reserva.box,
+            embarcacion: reserva.embarcacion,
+            socio: reserva.socio,
+          }));
+
+        setAmarras(amarrasDelSocio);
+        setBoxes(boxesDelSocio);
       })
       .catch((err) => {
-        console.error(' Error al cargar amarras/boxes:', err);
+        console.error('Error al cargar amarras/boxes:', err);
         setError('Error al cargar tus alquileres');
       })
       .finally(() => {
@@ -48,6 +61,9 @@ export function SocioAlquileres({ idSocio }) {
       <h2 className="socio-title">Mis alquileres</h2>
       <p className="socio-subtitle">
         Amarras y boxes vinculados a tus embarcaciones
+      </p>
+      <p className="text-muted small mt-2 mb-3">
+        Acercate a la secretaria para solicitar cambios de amarra/box.
       </p>
 
       {loading && <LoadingState message="Cargando alquileres..." />}
