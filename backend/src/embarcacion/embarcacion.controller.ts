@@ -10,6 +10,10 @@ import {
   EstadoReservaInfraestructura,
   ReservaInfraestructura,
 } from '../reservaInfraestructura/reservaInfraestructura.entity.js';
+import { 
+  validarUbicacionExclusiva, 
+  validarReactivacion
+} from './embarcacion.rules.js'
 
 const em = orm.em;
 
@@ -70,16 +74,7 @@ async function findOne(req: Request, res: Response) {
   }
 }
 
-function validarUbicacionExclusiva(amarraId: unknown, boxId: unknown) {
-  const tieneAmarra = amarraId !== undefined && amarraId !== null;
-  const tieneBox = boxId !== undefined && boxId !== null;
-  if (!tieneAmarra && !tieneBox) {
-    throw new Error('Debes asignar una amarra o un box para crear la embarcación');
-  }
-  if (tieneAmarra && tieneBox) {
-    throw new Error('La embarcación no puede asignarse simultáneamente a amarra y box');
-  }
-}
+
 
 async function add(req: Request, res: Response) {
   try {
@@ -228,23 +223,45 @@ async function remove(req: Request, res: Response) {
   }
 }
 
+
 async function reactivar(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id, 10);
-    const embarcacion = await em.findOneOrFail(Embarcacion, { id });
 
-    if (!embarcacion.fechaFin) {
-      return res.status(400).json({ message: 'La embarcación ya está activa' });
-    }
-
+    const embarcacion = await em.findOneOrFail(
+      Embarcacion,
+      { id }
+    );
+    validarReactivacion(
+      embarcacion.fechaFin
+    );
     embarcacion.fechaFin = undefined;
     await em.flush();
-    res.status(200).json({ message: 'Embarcación reactivada', data: embarcacion });
+    res.status(200).json({
+      message: 'Embarcación reactivada',
+      data: embarcacion
+    });
+
   } catch (error: any) {
+
     if (error.name === 'NotFoundError') {
-      return res.status(404).json({ message: 'Embarcación no encontrada' });
+      return res.status(404).json({
+        message: 'Embarcación no encontrada'
+      });
     }
-    res.status(500).json({ message: error.message });
+
+    if (
+      error.message ===
+      'La embarcación ya está activa'
+    ) {
+      return res.status(400).json({
+        message: error.message
+      });
+    }
+
+    res.status(500).json({
+      message: error.message
+    });
   }
 }
 
