@@ -40,7 +40,17 @@ import {
   validateReservationRange,
 } from '../../utils/reservas.js';
 
+function getTodayLocalDate() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
 export function SocioReservasEmbarcacion({ idSocio }) {
+  const todayLocal = getTodayLocalDate();
   const [embarcacionesClub, setEmbarcacionesClub] = useState([]);
   const [reservasSocio, setReservasSocio] = useState([]);
   const [selectedEmb, setSelectedEmb] = useState(null);
@@ -339,6 +349,7 @@ export function SocioReservasEmbarcacion({ idSocio }) {
                             <CFormInput
                               type="date"
                               value={dateSelected}
+                              min={todayLocal}
                               onChange={(e) => {
                                 setDateSelected(e.target.value);
                                 setInicio('');
@@ -623,6 +634,7 @@ export function SocioReservasEmbarcacion({ idSocio }) {
               <CFormInput
                 type="date"
                 value={editDate}
+                min={todayLocal}
                 onChange={(e) => {
                   setEditDate(e.target.value);
                   // limpiar seleccion de hora al cambiar dia

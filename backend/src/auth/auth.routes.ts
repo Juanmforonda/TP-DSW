@@ -3,6 +3,18 @@ import { login } from './auth.service.js';
 import { AuthError, ValidationError } from './auth.errors.js';
 
 const router = Router();
+const JWT_SECRET = process.env.JWT_SECRET ?? 'dev-only-secret-change-me';
+
+function sanitizeLoginInput(input: unknown) {
+  if (typeof input !== 'object' || input === null) return { email: '', password: '' };
+
+  const { email, password } = input as { email?: string; password?: string };
+
+  return {
+    email: typeof email === 'string' ? email.trim().toLowerCase() : '',
+    password: typeof password === 'string' ? password.trim() : '',
+  };
+}
 
 router.post('/login', async (req: Request, res: Response) => {
   try {
