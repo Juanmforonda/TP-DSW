@@ -12,10 +12,10 @@ Sistema web full stack para la gestión de un club náutico, desarrollado como t
 
 Instalar antes de comenzar:
 
-- Node.js 18 o superior.
-- MySQL Server en ejecución.
-- pnpm para el backend (`npm install -g pnpm`).
-- npm para el frontend.
+- Node.js 22.23.3
+- MySQL
+- pnpm para el backend (versión 10.7.1) (`npm install -g pnpm`).
+- npm para el frontend (incluido con Node).
 
 ## Instalación y configuración
 
@@ -89,12 +89,12 @@ Es seguro ejecutarlo más de una vez: busca los registros de prueba por email, m
 
 Las contraseñas de los usuarios de prueba son los últimos seis dígitos de su DNI:
 
-| Rol | Email | Contraseña |
-| --- | --- | --- |
-| Administrador | `admin.demo@clubnautico.test` | `123456` |
-| Socio | `lucas.demo@clubnautico.test` | `123456` |
-| Socio | `sofia.demo@clubnautico.test` | `234567` |
-| Socio | `mateo.demo@clubnautico.test` | `345678` |
+| Rol           | Email                         | Contraseña |
+| ------------- | ----------------------------- | ---------- |
+| Administrador | `admin.demo@clubnautico.test` | `123456`   |
+| Socio         | `lucas.demo@clubnautico.test` | `123456`   |
+| Socio         | `sofia.demo@clubnautico.test` | `234567`   |
+| Socio         | `mateo.demo@clubnautico.test` | `345678`   |
 
 ## Ejecutar el sistema
 
@@ -145,4 +145,4 @@ Volver a ejecutar `pnpm seed` y usar exactamente los emails y contraseñas de la
 
 ### Mercado Pago no funciona
 
-El flujo de Mercado Pago requiere un token de prueba válido y, para webhooks o retornos externos, URLs públicas. El resto del sistema se puede probar sin configurar Mercado Pago. 
+El flujo de Mercado Pago requiere un token de prueba válido y, para webhooks o retornos externos, URLs públicas. El resto del sistema se puede probar sin configurar Mercado Pago.
