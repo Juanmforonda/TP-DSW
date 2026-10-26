@@ -148,6 +148,7 @@ import {
 } from '@coreui/react';
 import { EntityTable } from '../../components/TablaGenerica.jsx';
 
+
 const columns = [
   { key: 'id', label: 'ID' },
   { key: 'estado', label: 'Estado' },
@@ -156,6 +157,7 @@ const columns = [
   { key: 'embarcacion', label: 'Embarcación' },
   { key: 'socio', label: 'Socio' },
 ];
+
 
 export default function ListarBoxes() {
   const [boxes, setBoxes] = useState([]);
@@ -179,14 +181,25 @@ export default function ListarBoxes() {
     }
   };
 
+
   const handleEdit = async (id, datosActualizados) => {
     try {
-      await actualizarBox(id, datosActualizados);
-      cargarBoxes();
+      const datosBox = {
+        estado: datosActualizados.estado,
+        nroBox: datosActualizados.nroBox,
+        precioMensualBase: datosActualizados.precioMensualBase,
+      };
+
+      await actualizarBox(id, datosBox);
+      await cargarBoxes();
     } catch (error) {
-      console.error('Error al actualizar box:', error);
+      console.error(
+        'Error al actualizar box:',
+        error.response?.data ?? error.message
+      );
     }
   };
+
 
   const handleDelete = async (id) => {
     try {
