@@ -12,13 +12,12 @@ import {
   cilPool,
   cilBoatAlt,
   cilCalendar,
-  cilAddressBook,
   cilStorage,
 } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import '../../components/AdminHome.css';
 
-export default function AdminHome({onSeleccion}) {
+export default function AdminHome({ onSeleccion }) {
   const modules = [
     {
       title: 'Socios',
@@ -44,12 +43,7 @@ export default function AdminHome({onSeleccion}) {
       link: 'embarcaciones',
       desc: 'Gestiona embarcaciones de los socios, tipos y más',
     },
-    {
-      title: 'Alquileres Amarras/Boxes',
-      icon: cilAddressBook,
-      link: '/reservas',
-      desc: 'Controla los alquileres de boxes y amarras',
-    },
+
     {
       title: 'Reservas Embarcación Club',
       icon: cilCalendar,
@@ -74,12 +68,9 @@ export default function AdminHome({onSeleccion}) {
       <CRow className="g-4">
         {modules.map((m, idx) => (
           <CCol xs={12} sm={6} md={3} key={idx}>
-            <CCard
-              className="admin-card"
-              onClick={() => onSeleccion(m.link)}
-            >
+            <CCard className="admin-card" onClick={() => onSeleccion(m.link)}>
               <CCardBody className="text-center">
-                <CIcon icon={m.icon} size="3xl" className="admin-icon"    />
+                <CIcon icon={m.icon} size="3xl" className="admin-icon" />
                 <CCardTitle>{m.title}</CCardTitle>
                 <CCardText>{m.desc}</CCardText>
               </CCardBody>
