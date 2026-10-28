@@ -17,6 +17,10 @@ export const orm = await MikroORM.init({
     ignoreSchema: [],
   },
   allowGlobalContext: false,
+  driverOptions:
+    process.env.DB_SSL === 'true'
+      ? { connection: { ssl: { rejectUnauthorized: false } } }
+      : {},
 });
 
 export const syncSchema = async () => {
