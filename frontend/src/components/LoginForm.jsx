@@ -1,22 +1,29 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  CCard, CCardHeader, CCardBody,
-  CRow, CCol, CForm, CFormInput, CButton
+  CCard,
+  CCardHeader,
+  CCardBody,
+  CRow,
+  CCol,
+  CForm,
+  CFormInput,
+  CButton,
 } from '@coreui/react';
+
+const API_URL = import.meta.env.VITE_API_URL ?? '';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -80,7 +87,11 @@ export default function LoginForm() {
                   Entrar
                 </CButton>
               </div>
-              {error && <p className="mt-3" style={{ color: 'red' }}>{error}</p>}
+              {error && (
+                <p className="mt-3" style={{ color: 'red' }}>
+                  {error}
+                </p>
+              )}
             </CForm>
           </CCardBody>
         </CCard>
