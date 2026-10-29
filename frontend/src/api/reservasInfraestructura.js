@@ -1,8 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? '/',
-});
+import api from './client.js';
 
 export const getReservasInfraestructura = () => api.get('/api/reservasInfraestructura');
 export const getReservasInfraestructuraPorEmbarcacion = (idEmbarcacion) =>
@@ -16,4 +12,3 @@ export const finalizarReservaInfraestructura = (id) =>
   api.post(`/api/reservasInfraestructura/${id}/finalizar`);
 export const eliminarReservaInfraestructura = (id) =>
   api.delete(`/api/reservasInfraestructura/${id}`);
-

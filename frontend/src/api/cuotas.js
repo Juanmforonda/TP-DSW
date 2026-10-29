@@ -1,8 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? '/',
-});
+import api from './client.js';
 
 export const getCuotas= () => api.get('/api/cuotasMensuales');
 export const eliminarCuota = (id) => api.delete(`/api/cuotasMensuales/${id}`);
@@ -12,4 +8,3 @@ export const registrarPagoCuota = (id, data) => api.post(`/api/cuotasMensuales/$
 export const generarCuotas = (mes, anio) => api.post('/api/cuotasMensuales/generar', { mes, anio });
 export const crearPreferenciaMP = (idCuota) => api.post(`/api/cuotasMensuales/${idCuota}/mercadopago/preferencia`);
 export const confirmarPagoMP = (paymentId) => api.post('/api/cuotasMensuales/mercadopago/confirmar', { paymentId });
-

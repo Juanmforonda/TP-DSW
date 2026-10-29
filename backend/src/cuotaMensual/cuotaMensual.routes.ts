@@ -14,7 +14,7 @@ import {
 
 export const cuotaMensualRouter = Router();
 
-const MP_ENABLED = process.env.MP_ENABLES === 'true';
+const MP_ENABLED = process.env.MP_ENABLED === 'true';
 
 if (MP_ENABLED) {
   cuotaMensualRouter.post('/mercadopago/confirmar', confirmarPagoMP);

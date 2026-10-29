@@ -18,6 +18,7 @@ import { orm, syncSchema } from './shared/orm.js';
 import { RequestContext } from '@mikro-orm/mysql';
 import { authRouter } from './auth/auth.routes.js';
 import { webhookRouter } from './webhook/webhook.routes.js';
+import { requireAuth, requireRole } from './auth/auth.middleware.js';
 
 const app = express();
 app.set('trust proxy', 1); //para que no detecte el proxy de Render como un cliente(y no haya problemas con el rate limit)
@@ -65,18 +66,18 @@ app.use((req, res, next) => {
   RequestContext.create(orm.em, next);
 });
 
-app.use('/api/socios', socioRouter);
-app.use('/api/tiposEmbarcacion', tipoEmbarcacionRouter);
-app.use('/api/embarcaciones', embarcacionRouter);
-app.use('/api/administradores', administradorRouter);
-app.use('/api/boxes', boxRouter);
-app.use('/api/amarras', amarraRouter);
-app.use('/api/afiliaciones', afiliacionRouter);
-app.use('/api/cuotasMensuales', cuotaMensualRouter);
 app.use('/api', authRouter);
-app.use('/api/reservasEmbarcacionClub', reservaEmbarcacionClubRouter);
-app.use('/api/reservasInfraestructura', reservaInfraestructuraRouter);
-app.use('/api/reservasTravelLift', reservaTravelLiftRouter);
+app.use('/api/socios', requireAuth, socioRouter);
+app.use('/api/tiposEmbarcacion', requireAuth, tipoEmbarcacionRouter);
+app.use('/api/embarcaciones', requireAuth, embarcacionRouter);
+app.use('/api/administradores', requireAuth, requireRole('admin'), administradorRouter);
+app.use('/api/boxes', requireAuth, boxRouter);
+app.use('/api/amarras', requireAuth, amarraRouter);
+app.use('/api/afiliaciones', requireAuth, afiliacionRouter);
+app.use('/api/cuotasMensuales', requireAuth, cuotaMensualRouter);
+app.use('/api/reservasEmbarcacionClub', requireAuth, reservaEmbarcacionClubRouter);
+app.use('/api/reservasInfraestructura', requireAuth, reservaInfraestructuraRouter);
+app.use('/api/reservasTravelLift', requireAuth, reservaTravelLiftRouter);
 if (process.env.MP_ENABLED === 'true') {
   app.use('/api/webhooks', webhookRouter);
 }

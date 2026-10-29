@@ -1,8 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? '/', 
-});
+import api from './client.js';
 
 export const getTiposEmbarcacion= () => api.get('/api/tiposEmbarcacion');
 export const crearTipoEmbarcacion= (data) => api.post ('/api/tiposEmbarcacion', data);

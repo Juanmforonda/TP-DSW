@@ -1,8 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? '/',
-});
+import api from './client.js';
 
 export const getAfiliaciones = () => api.get('/api/afiliaciones');
 export const crearAfiliacion = (data) => api.post('/api/afiliaciones', data);

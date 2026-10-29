@@ -5,8 +5,10 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-  "build": "tsc -p ./tsconfig.json",
+  "build": "tsc",
+  "build:dev": "tsc -p ./tsconfig.json",
   "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/src/app.js\"",
+  "start": "node dist/src/app.js",
   "seed": "pnpm build && node ./dist/seed.js",
   "test": "vitest --run"
 },
