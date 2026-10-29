@@ -1,8 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: '/', 
-});
+import api from './client.js';
 
 export const getSocios = () => api.get('./api/socios');
 export const crearSocio = (data) => api.post('./api/socios', data);

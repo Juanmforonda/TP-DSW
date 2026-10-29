@@ -36,6 +36,7 @@ import AdministrarTiposEmbarcacion from './pages/admin/AdministrarTiposEmbarcaci
 import { AdministrarReservasTravelLift } from './pages/admin/AdministrarReservasTravelLift.jsx';
 import ListarAmarras from './pages/admin/ListarAmarras.jsx';
 import ListarBoxes from './pages/admin/ListarBoxes.jsx';
+import { AuthGuard } from './components/AuthGuard.jsx';
 
 export default function App() {
   return (
@@ -47,7 +48,8 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
 
-        <Route path="/admin" element={<AdminPanel />}>
+        <Route element={<AuthGuard role="admin" />}>
+          <Route path="/admin" element={<AdminPanel />}>
           <Route index element={<AdminDashboard />} />
           <Route path="perfil" element={<AdminPerfilPage />} />
           <Route path="socios" element={<MenuAdminSocios />} />
@@ -84,9 +86,11 @@ export default function App() {
             path="reservas/travel-lift"
             element={<AdministrarReservasTravelLift />}
           />
+          </Route>
         </Route>
 
-        <Route path="/socio" element={<SocioPanel />}>
+        <Route element={<AuthGuard role="socio" />}>
+          <Route path="/socio" element={<SocioPanel />}>
           <Route index element={<SocioDashboard />} />
           <Route path="perfil" element={<SocioPerfilPage />} />
           <Route path="embarcaciones" element={<SocioEmbarcacionesPage />} />
@@ -100,6 +104,7 @@ export default function App() {
             path="reservas/travel-lift"
             element={<SocioReservasTravelLiftPage />}
           />
+          </Route>
         </Route>
 
         <Route path="/pago/exito" element={<PagoResultado tipo="exito" />} />

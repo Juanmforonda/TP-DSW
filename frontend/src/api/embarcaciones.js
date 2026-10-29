@@ -1,8 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: '/', 
-});
+import api from './client.js';
 
 export const getEmbarcaciones = (params = {}) => api.get('/api/embarcaciones', { params });
 export const crearEmbarcacion= (data) => api.post ('/api/embarcaciones', data);

@@ -14,6 +14,8 @@ import {
   CAlert,
 } from '@coreui/react-pro';
 
+const MP_ENABLED = import.meta.env.VITE_MP_ENABLED === 'true';
+
 export function SocioCuotas({ idSocio }) {
   const [cuotas, setCuotas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -157,7 +159,7 @@ export function SocioCuotas({ idSocio }) {
                       </>
                     )}
 
-                    {!cuota.pagada && (
+                    {!cuota.pagada && MP_ENABLED && (
                       <div className="mt-2">
                         <CButton
                           color="primary"
@@ -172,6 +174,11 @@ export function SocioCuotas({ idSocio }) {
                           )}
                         </CButton>
                       </div>
+                    )}
+                    {!cuota.pagada && !MP_ENABLED && (
+                      <p className="text-muted mt-2">
+                        Podés abonar esta cuota en efectivo en el club.
+                      </p>
                     )}
 
                     {cuota.detalles?.length > 0 && (

@@ -1,8 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: '/', 
-});
+import api from './client.js';
 
 export const getAdministradores = () => api.get('./api/administradores');
 export const crearAdministrador = (data) => api.post('./api/administradores', data);

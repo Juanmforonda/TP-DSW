@@ -1,8 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: '/',
-});
+import api from './client.js';
 
 export const getBoxes = () => api.get('/api/boxes');
 export const crearBox = (boxData) => api.post('/api/boxes', boxData);

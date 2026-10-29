@@ -4,9 +4,9 @@ import { orm } from '../shared/orm.js';
 import { Socio } from '../socio/socio.entity.js';
 import { Administrador } from '../administrador/administrador.entity.js';
 import { AuthError, ValidationError } from './auth.errors.js';
+import { JWT_SECRET } from './auth.config.js';
 
 type Tipo = 'socio' | 'admin';
-const JWT_SECRET = process.env.JWT_SECRET ?? 'dev-only-secret-change-me';
 
 // Recibe unknown, el service no puede confiar en lo que le pase
 // el router (ni un test)
