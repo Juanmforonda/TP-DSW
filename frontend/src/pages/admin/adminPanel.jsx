@@ -22,7 +22,7 @@ export function AdminPanel() {
   return (
     <>
       <AdminNavbar />
-      <CContainer style={{ marginTop: '70px' }}>
+      <CContainer className="dashboard-page-content">
         <Outlet context={{ admin }} />
       </CContainer>
     </>

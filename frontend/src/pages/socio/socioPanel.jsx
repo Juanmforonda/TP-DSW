@@ -8,6 +8,7 @@ import { SocioPerfil } from './SocioPerfil.jsx';
 import { SocioAlquileres } from './SocioAlquileres.jsx';
 import { SocioReservasEmbarcacion } from './SocioReservasEmbarcacion.jsx';
 import { SocioReservasTravelLift } from './SocioReservasTravelLift.jsx';
+import '../../components/DashboardNavbar.css';
 
 export function SocioPanel() {
   const [socio, setSocio] = useState(null);
@@ -26,7 +27,9 @@ export function SocioPanel() {
   return (
     <>
       <SocioNavbar socio={socio} />
-      <Outlet context={{ socio }} />
+      <main className="socio-page-content">
+        <Outlet context={{ socio }} />
+      </main>
     </>
   );
 }

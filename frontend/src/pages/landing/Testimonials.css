@@ -1,5 +1,5 @@
 .testimonials-page {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   background: #f7f7f7;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -9,7 +9,7 @@
 }
 
 .testimonials-section {
-  padding: 100px 20px 80px 20px;
+  padding: clamp(5.5rem, 12vw, 6.25rem) clamp(0.75rem, 3vw, 1.25rem) 5rem;
   background: #f7f7f7;
   color: #2c3e50;
 }
@@ -31,7 +31,7 @@
 /* Formulario */
 .testimonial-form-container {
   background: white;
-  padding: 2.5rem;
+  padding: clamp(1rem, 5vw, 2.5rem);
   border-radius: 12px;
   margin-bottom: 50px;
   border: 1px solid #e9ecef;
@@ -444,5 +444,9 @@
   
   .testimonials-track {
     min-height: 280px;
+  }
+
+  .submit-button {
+    width: 100%;
   }
 }

@@ -11,7 +11,18 @@
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
+  width: 100%;
   margin: 0 auto;
   padding: 0;
 }
 
+.responsive-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.responsive-content {
+  width: 100%;
+  min-width: 0;
+  padding-inline: clamp(1rem, 3vw, 2rem);
+}

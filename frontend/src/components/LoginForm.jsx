@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './LoginForm.css';
+import { LoadingState } from './LoadingState.jsx';
 import {
   CCard,
   CCardHeader,
@@ -17,10 +19,12 @@ export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
       const res = await fetch(`${API_URL}/api/login`, {
@@ -54,13 +58,15 @@ export default function LoginForm() {
     } catch (err) {
       console.error('❌ Error en login:', err);
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <CRow className="d-flex justify-content-center">
+    <CRow className="login-row d-flex justify-content-center">
       <CCol xs={12} sm={8} md={6} lg={4}>
-        <CCard className="mt-5">
+        <CCard className="login-card mt-5">
           <CCardHeader>
             <h4>Iniciar Sesión</h4>
           </CCardHeader>
@@ -83,12 +89,13 @@ export default function LoginForm() {
                 className="mb-3"
               />
               <div className="d-grid gap-2">
-                <CButton color="primary" type="submit">
-                  Entrar
+                <CButton color="primary" type="submit" disabled={loading}>
+                  {loading ? 'Ingresando...' : 'Entrar'}
                 </CButton>
               </div>
+              {loading && <LoadingState message="Validando tus datos..." />}
               {error && (
-                <p className="mt-3" style={{ color: 'red' }}>
+                <p className="login-error mt-3" role="alert">
                   {error}
                 </p>
               )}

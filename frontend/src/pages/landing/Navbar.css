@@ -98,6 +98,49 @@ nav {
   font-size: 2rem;
   cursor: pointer;
   z-index: 1001;
+  border: 0;
+  background: transparent;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.mobile-menu {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(18rem, 88vw);
+  min-height: 100dvh;
+  overflow-y: auto;
+  background: #fff;
+  z-index: 9999;
+  padding: 1.25rem;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-menu-close {
+  display: block;
+  margin: 0 0 1rem auto;
+  padding: 0.65rem 0.9rem;
+  border: 0;
+  border-radius: 0.35rem;
+  background: #0d6efd;
+  color: #fff;
+  cursor: pointer;
+}
+
+.mobile-menu-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 3rem;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #e9ecef;
+  color: #212529;
+  text-decoration: none;
+}
+
+.mobile-menu-icon {
+  display: inline-flex;
+  color: #0d6efd;
 }
 
 /* Responsive */
@@ -130,7 +173,9 @@ nav {
   }
   
   .navbar-menu-container {
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 

@@ -1,7 +1,7 @@
 .home-container {
   position: relative;
-  width: 100vw; 
-  height: 100vh; 
+  width: 100%;
+  min-height: 100dvh;
   overflow: hidden;
   margin: 0;
   padding: 0;
@@ -38,12 +38,12 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  max-width: 800px;
-  padding: 0 2rem;
+  width: min(100% - 2rem, 800px);
+  padding: 0 1rem;
 }
 
 .home-content h1 {
-  font-size: 4.5rem;
+  font-size: clamp(2.4rem, 9vw, 4.5rem);
   font-weight: 300;
   margin-bottom: 1.5rem;
   letter-spacing: 2px;
@@ -53,7 +53,7 @@
 }
 
 .home-content p {
-  font-size: 1.4rem;
+  font-size: clamp(1rem, 3vw, 1.4rem);
   margin-bottom: 3rem;
   line-height: 1.6;
   font-weight: 300;
@@ -67,3 +67,12 @@ body {
   overflow-x: hidden;
 }
 
+@media (max-width: 480px) {
+  .home-content h1 {
+    letter-spacing: 1px;
+  }
+
+  .home-content p {
+    margin-bottom: 1.5rem;
+  }
+}

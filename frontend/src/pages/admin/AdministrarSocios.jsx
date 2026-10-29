@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { getSocios, crearSocio, actualizarSocio, bajaLogicaSocio } from '../../api/socios.js';
+import {
+  getSocios,
+  crearSocio,
+  actualizarSocio,
+  bajaLogicaSocio,
+} from '../../api/socios.js';
 import { TablaSocios } from '../../components/TablaSocios.jsx';
 import { EntityTable } from '../../components/TablaGenerica.jsx';
 import {
@@ -13,69 +18,99 @@ import {
   CButton,
 } from '@coreui/react';
 import { crearAfiliacion } from '../../api/afiliaciones.js';
+import { LoadingState } from '../../components/LoadingState.jsx';
+import { ErrorState } from '../../components/ErrorState.jsx';
 
 export default function AdministrarSocios() {
   const [sociosActivos, setSociosActivos] = useState([]);
   const [sociosInactivos, setSociosInactivos] = useState([]);
   const [nombre, setNombre] = useState('');
-  const[apellido, setApellido] = useState('');
+  const [apellido, setApellido] = useState('');
   const [dni, setDni] = useState('');
   const [telefono, setTelefono] = useState('');
   const [email, setEmail] = useState('');
 
   const [tipoAfiliacion, setTipoAfiliacion] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     cargarSocios();
   }, []);
 
-  const cargarSocios = async () =>{
-    const res = await getSocios();
-    const sociosData = res.data.data;
+  const cargarSocios = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await getSocios();
+      const sociosData = res?.data?.data ?? res?.data;
 
-    const activos = sociosData.filter((s) => Array.isArray(s.afiliaciones) && s.afiliaciones.some(a => a && a.fechaFin === null));
-    const inactivos = sociosData.filter((s) => !Array.isArray(s.afiliaciones) || !s.afiliaciones.some(a => a && a.fechaFin === null));
-    setSociosActivos(activos);
-    setSociosInactivos(inactivos);
+      if (!Array.isArray(sociosData)) {
+        throw new Error('La API devolvió un formato de socios inválido');
+      }
 
-    console.log('Socios cargados:', sociosData);
-    console.log('Socios activos:', activos);
+      const activos = sociosData.filter(
+        (s) =>
+          Array.isArray(s.afiliaciones) &&
+          s.afiliaciones.some((a) => a && a.fechaFin === null),
+      );
+      const inactivos = sociosData.filter(
+        (s) =>
+          !Array.isArray(s.afiliaciones) ||
+          !s.afiliaciones.some((a) => a && a.fechaFin === null),
+      );
+      setSociosActivos(activos);
+      setSociosInactivos(inactivos);
+    } catch (loadError) {
+      console.error('Error al cargar socios:', loadError);
+      console.error('Respuesta HTTP:', loadError.response);
+      console.error('Mensaje:', loadError.message);
+
+      setError(
+        'No se pudieron cargar los socios. Verificá la conexión con la API.',
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-const handleCrear = async (e) => {
-  try {
-  e.preventDefault();
+  const handleCrear = async (e) => {
+    try {
+      e.preventDefault();
 
-  if (!tipoAfiliacion.trim()) {
-    alert('Debés seleccionar un tipo de afiliación válido.');
-    return;
-  }
+      if (!tipoAfiliacion.trim()) {
+        alert('Debés seleccionar un tipo de afiliación válido.');
+        return;
+      }
 
-  const socioResp = await crearSocio({ nombre, apellido, dni, telefono, email });
-  const socioId = socioResp.data.data.id;
+      const socioResp = await crearSocio({
+        nombre,
+        apellido,
+        dni,
+        telefono,
+        email,
+      });
+      const socioId = socioResp.data.data.id;
 
-  await crearAfiliacion({
-    fechaInicio: new Date(),
-    fechaFin: null,
-    tipo: tipoAfiliacion,
-    socio: socioId,
-  });
+      await crearAfiliacion({
+        fechaInicio: new Date(),
+        fechaFin: null,
+        tipo: tipoAfiliacion,
+        socio: socioId,
+      });
 
-  await cargarSocios();
-  setNombre('');
-  setApellido('');
-  setDni('');
-  setTelefono('');
-  setEmail('');
-  setTipoAfiliacion('');
-}
-catch (error) {
-  console.log('Error al crear socio y afiliación', error.response?.data);
-}
-};
+      await cargarSocios();
+      setNombre('');
+      setApellido('');
+      setDni('');
+      setTelefono('');
+      setEmail('');
+      setTipoAfiliacion('');
+    } catch (error) {
+      console.log('Error al crear socio y afiliación', error.response?.data);
+    }
+  };
 
-
-  
   const handleEditar = async (id, socioEditar) => {
     try {
       await actualizarSocio(id, socioEditar);
@@ -93,6 +128,14 @@ catch (error) {
       alert('Error al dar de baja lógica al socio', error);
     }
   };
+
+  if (loading) {
+    return <LoadingState message="Cargando socios..." />;
+  }
+
+  if (error) {
+    return <ErrorState message={error} />;
+  }
 
   return (
     <div className="p-4">
@@ -155,7 +198,9 @@ catch (error) {
                   onChange={(e) => setTipoAfiliacion(e.target.value)}
                   required
                 >
-                  <option value="" disabled>Seleccione un tipo</option>
+                  <option value="" disabled>
+                    Seleccione un tipo
+                  </option>
                   <option value="Básica">Básica</option>
                 </select>
               </CCol>
@@ -169,26 +214,27 @@ catch (error) {
 
       <div className="mt-4">
         <CCard className="mb-4">
-        <CCardHeader>
-          <h4>Socios Activos</h4>
-        </CCardHeader>
-        <CCardBody>
-        <EntityTable
-          entityName="socio"
-          columns={[
-            { key: 'id', label: 'ID' },
-            { key: 'nombre', label: 'Nombre' },
-            { key: 'apellido', label: 'Apellido' },
-            { key: 'dni', label: 'DNI' },
-            { key: 'email', label: 'E-Mail' },
-            { key: 'telefono', label: 'Teléfono' },
-          ]}
-          data={sociosActivos}
-          onDelete={handleBajaLogica}
-          onEdit={handleEditar}
-        />
-        </CCardBody>
-      </CCard>
+          <CCardHeader>
+            <h4>Socios Activos</h4>
+          </CCardHeader>
+          <CCardBody>
+            <EntityTable
+              entityName="socio"
+              columns={[
+                { key: 'id', label: 'ID' },
+                { key: 'nombre', label: 'Nombre' },
+                { key: 'apellido', label: 'Apellido' },
+                { key: 'dni', label: 'DNI' },
+                { key: 'email', label: 'E-Mail' },
+                { key: 'telefono', label: 'Teléfono' },
+              ]}
+              data={sociosActivos}
+              loading={loading}
+              onDelete={handleBajaLogica}
+              onEdit={handleEditar}
+            />
+          </CCardBody>
+        </CCard>
       </div>
       <CCard className="mt-4">
         <CCardHeader>
@@ -206,6 +252,7 @@ catch (error) {
               { key: 'telefono', label: 'Teléfono' },
             ]}
             data={sociosInactivos}
+            loading={loading}
             onDelete={handleBajaLogica}
             onEdit={handleEditar}
           />
