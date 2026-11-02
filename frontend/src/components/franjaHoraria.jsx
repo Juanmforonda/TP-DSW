@@ -57,14 +57,34 @@ export default function TimeSlotPicker({
 
   function slotDisabled(slotLocal, durMin = durationMinutes) {
     if (!slotLocal) return true;
+
     const inicio = new Date(slotLocal);
     const fin = new Date(inicio.getTime() + durMin * 60000);
+
+    // No permitir horarios anteriores al momento actual.
+    const ahora = new Date();
+
+    if (inicio < ahora) return true;
+
+    // No permitir reservas de fechas anteriores a hoy.
+    const fechaHoy = [
+      ahora.getFullYear(),
+      String(ahora.getMonth() + 1).padStart(2, '0'),
+      String(ahora.getDate()).padStart(2, '0'),
+    ].join('-');
+
+    if (dateLocal < fechaHoy) return true;
+
+    // No permitir horarios que se superpongan con otras reservas activas.
     for (const r of reservasActivas) {
       const ri = new Date(r.fechaInicio);
       const rf = new Date(r.fechaFin);
+
       if (isNaN(ri.getTime()) || isNaN(rf.getTime())) continue;
+
       if (overlaps(inicio, fin, ri, rf)) return true;
     }
+
     return false;
   }
 

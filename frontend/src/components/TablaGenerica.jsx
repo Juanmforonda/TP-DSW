@@ -148,29 +148,55 @@ export function EntityTable({
             if (col.key === 'id') return null;
             if (col.readonly) return null;
 
+            if (
+              entityName === 'box' &&
+              ['embarcacion', 'socio'].includes(col.key)
+            ) {
+              return null;
+            }
+            
             if (col.key === 'estado') {
-              const opciones =
-                entityName === 'box'
-                  ? ['disponible', 'ocupado', 'mantenimiento']
+              const estadoActual = String(selected?.estado ?? '').toLowerCase();
+
+              const esBox = entityName === 'box';
+              const esAmarra = entityName === 'amarra';
+
+              const estaOcupado =
+                estadoActual === 'ocupado';
+
+              const opciones = esBox
+                ? ['disponible', 'mantenimiento']
+                : esAmarra
+                  ? ['libre', 'mantenimiento']
                   : ['libre', 'ocupado', 'mantenimiento'];
+
               return (
                 <div key={col.key} className="mb-3">
                   <label className="form-label">{col.label}</label>
-                  <select
-                    className="form-select"
-                    value={selected?.[col.key] || ''}
-                    onChange={(e) => handleChange(col.key, e.target.value)}
-                  >
-                    <option value="">Seleccione un estado</option>
-                    {opciones.map((op) => (
-                      <option key={op} value={op}>
-                        {op.charAt(0).toUpperCase() + op.slice(1)}
-                      </option>
-                    ))}
-                  </select>
+
+                  {((esBox || esAmarra) && estaOcupado) ? (
+                    <CFormInput
+                      value="Ocupado"
+                      disabled
+                    />
+                  ) : (
+                    <select
+                      className="form-select"
+                      value={estadoActual}
+                      onChange={(e) => handleChange(col.key, e.target.value)}
+                    >
+                      {opciones.map((op) => (
+                        <option key={op} value={op}>
+                          {op.charAt(0).toUpperCase() + op.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               );
             }
+
+
 
             if (col.key === 'zona') {
               return (

@@ -41,6 +41,33 @@ import {
   validateReservationRange,
 } from '../../utils/reservas.js';
 
+function getTodayLocalDate() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
+function validateFutureStart(startLocal) {
+  if (!startLocal) {
+    return 'Seleccioná una fecha y un horario.';
+  }
+
+  const start = new Date(startLocal);
+
+  if (Number.isNaN(start.getTime())) {
+    return 'La fecha y el horario seleccionados no son válidos.';
+  }
+
+  if (start.getTime() < Date.now()) {
+    return 'No se puede reservar en una fecha u horario pasado.';
+  }
+
+  return null;
+}
+
 export function AdministrarReservasEmbarcacionClub() {
   const [reservas, setReservas] = useState([]);
   const [embarcaciones, setEmbarcaciones] = useState([]);
@@ -76,6 +103,7 @@ export function AdministrarReservasEmbarcacionClub() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null); // 'cancel'|'finalizar'|'delete'
   const [confirmReserva, setConfirmReserva] = useState(null);
+  const todayLocal = getTodayLocalDate();
 
   async function loadInitial() {
     setError('');
@@ -180,6 +208,12 @@ export function AdministrarReservasEmbarcacionClub() {
       setError(v);
       return;
     }
+    const errorFecha = validateFutureStart(inicioCreate);
+
+    if (errorFecha) {
+      setError(errorFecha);
+      return;
+    }
     try {
       await crearReservaEmbarcacionClub({
         embarcacion: parseInt(createForm.embarcacionId, 10),
@@ -226,6 +260,11 @@ export function AdministrarReservasEmbarcacionClub() {
   const saveEdit = async () => {
     if (!editing) return;
     setEditError(null);
+    const errorFecha = validateFutureStart(editInicio);
+    if (errorFecha) {
+      setEditError(errorFecha);
+      return;
+    }
     const v = clientValidate(
       editInicio,
       editFin,
@@ -379,6 +418,7 @@ export function AdministrarReservasEmbarcacionClub() {
                     <CFormLabel>Fecha</CFormLabel>
                     <CFormInput
                       type="date"
+                      min={todayLocal}
                       value={dateSelectedCreate}
                       onChange={(e) => {
                         setDateSelectedCreate(e.target.value);
@@ -607,6 +647,7 @@ export function AdministrarReservasEmbarcacionClub() {
               <CFormLabel>Fecha</CFormLabel>
               <CFormInput
                 type="date"
+                min={todayLocal}
                 value={editDate}
                 onChange={(e) => {
                   setEditDate(e.target.value);

@@ -1,95 +1,81 @@
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { orm } from '../shared/orm.js';
 import { Socio } from '../socio/socio.entity.js';
 import { Administrador } from '../administrador/administrador.entity.js';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import { AuthError, ValidationError } from './auth.errors.js';
 
-export async function login(
-  email: string,
-  password: string
-) {
+type Tipo = 'socio' | 'admin';
+const JWT_SECRET = process.env.JWT_SECRET ?? 'dev-only-secret-change-me';
+
+// Recibe unknown, el service no puede confiar en lo que le pase
+// el router (ni un test)
+function sanitizeLoginInput(email: unknown, password: unknown) {
+  return {
+    email: typeof email === 'string' ? email.trim().toLowerCase() : '',
+    password: typeof password === 'string' ? password : '',
+  };
+}
+
+function firmarToken(id: unknown, tipo: Tipo) {
+  return jwt.sign({ id, tipo }, JWT_SECRET, { expiresIn: '1h' });
+}
+
+async function verificarPassword(plano: string, hash: string) {
+  const valida = await bcrypt.compare(plano, hash);
+  if (!valida) throw new AuthError();
+}
+
+export async function login(email: unknown, password: unknown) {
+  const input = sanitizeLoginInput(email, password);
+
+  if (
+    !input.email ||
+    !input.password ||
+    input.password.length < 6 ||
+    input.email.length > 255
+  ) {
+    throw new ValidationError();
+  }
 
   const em = orm.em.fork();
 
-  const socio = await em.findOne(Socio, { email });
+  const socio = await em.findOne(
+    Socio,
+    { email: input.email },
+    { populate: ['afiliaciones'] },
+  );
+  
+  if (socio) {
+    await verificarPassword(input.password, socio.password);
 
-  if (!socio) {
-
-    const admin = await em.findOne(
-      Administrador,
-      { email }
-    );
-
-    if (!admin) {
-      throw new Error('Usuario no encontrado');
-    }
-
-    const passwordValida =
-      await bcrypt.compare(
-        password,
-        admin.password
-      );
-
-    if (!passwordValida) {
-      throw new Error(
-        'Contraseña incorrecta'
-      );
-    }
-
-    const token = jwt.sign(
-      {
-        id: admin.id,
-        tipo: 'admin'
-      },
-      'clave_secreta',
-      {
-        expiresIn: '1h'
-      }
-    );
+    if (!socio.activo) throw new AuthError();
 
     return {
-      token,
-      tipo: 'admin',
-      admin: {
-        id: admin.id,
-        nombre: admin.nombre,
-        apellido: admin.apellido,
-        email: admin.email,
+      token: firmarToken(socio.id, 'socio'),
+      tipo: 'socio' as const,
+      socio: {
+        id: socio.id,
+        nombre: socio.nombre,
+        apellido: socio.apellido,
+        email: socio.email,
       },
     };
   }
 
-  const passwordValida =
-    await bcrypt.compare(
-      password,
-      socio.password
-    );
+  const admin = await em.findOne(Administrador, { email: input.email });
+  if (!admin) throw new AuthError();
 
-  if (!passwordValida) {
-    throw new Error(
-      'Contraseña incorrecta'
-    );
-  }
-
-  const token = jwt.sign(
-    {
-      id: socio.id,
-      tipo: 'socio'
-    },
-    'clave_secreta',
-    {
-      expiresIn: '1h'
-    }
-  );
+  await verificarPassword(input.password, admin.password);
 
   return {
-    token,
-    tipo: 'socio',
-    socio: {
-      id: socio.id,
-      nombre: socio.nombre,
-      apellido: socio.apellido,
-      email: socio.email,
+    token: firmarToken(admin.id, 'admin'),
+    tipo: 'admin' as const,
+    admin: {
+      id: admin.id,
+      nombre: admin.nombre,
+      apellido: admin.apellido,
+      email: admin.email,
     },
   };
 }
