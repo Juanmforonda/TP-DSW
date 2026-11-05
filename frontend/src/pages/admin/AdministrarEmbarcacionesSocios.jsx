@@ -81,14 +81,33 @@ export function AdministrarEmbarcacionesSocios() {
     }
   };
 
-  const handleEdit = async (id, datosActualizados) => {
-    try {
-      await actualizarEmbarcacion(id, datosActualizados);
-      cargarEmbarcaciones();
-    } catch (error) {
-      console.error('Error al actualizar embarcación:', error);
-    }
+const handleEdit = async (id, embarcacion) => {
+
+  const datosActualizados = {
+    nombre: embarcacion.nombre,
+    matricula: embarcacion.matricula,
+    eslora: embarcacion.eslora,
+    estadoBaja: embarcacion.estadoBaja,
+
+    tipoEmbarcacion:
+      embarcacion.tipoEmbarcacionId,
   };
+
+  try {
+    await actualizarEmbarcacion(
+      id,
+      datosActualizados
+    );
+
+    cargarEmbarcaciones();
+
+  } catch (error) {
+    console.error(
+      'Error al actualizar embarcación:',
+      error
+    );
+  }
+};
 
   const handleDelete = async (id) => {
     try {
@@ -381,17 +400,29 @@ function mapEmbarcacionToRow(embarcacion) {
     nombre: embarcacion.nombre,
     matricula: embarcacion.matricula,
     eslora: embarcacion.eslora,
+
     tipoEmbarcacion:
-      embarcacion.tipoEmbarcacion?.nombre ?? embarcacion.tipoEmbarcacion ?? '—',
+      embarcacion.tipoEmbarcacion?.nombre ??
+      embarcacion.tipoEmbarcacion ??
+      '—',
+
+    tipoEmbarcacionId:
+      embarcacion.tipoEmbarcacion?.id,
+
     socio: embarcacion.socio
       ? `${embarcacion.socio.nombre} ${embarcacion.socio.apellido}`
       : 'Club Náutico',
+
     esClub: embarcacion.socio == null,
-    estadoBaja: embarcacion.fechaFin ? 'inactiva' : 'activa',
-    reservasInfraestructura: embarcacion.reservasInfraestructura ?? [],
+
+    estadoBaja: embarcacion.fechaFin
+      ? 'inactiva'
+      : 'activa',
+
+    reservasInfraestructura:
+      embarcacion.reservasInfraestructura ?? [],
   };
 }
-
 
 
 export default AdministrarEmbarcacionesSocios

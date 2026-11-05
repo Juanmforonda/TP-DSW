@@ -120,6 +120,22 @@ export default function AdministrarSocios() {
     }
   };
 
+  try {
+
+    await actualizarSocio(
+      id,
+      datosActualizados
+    );
+
+    await cargarSocios();
+
+  } catch (error) {
+
+    alert('Error al actualizar socio');
+
+  }
+};
+
   const handleBajaLogica = async (id) => {
     try {
       await bajaLogicaSocio(id);
