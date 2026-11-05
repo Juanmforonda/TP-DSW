@@ -112,29 +112,22 @@ export default function AdministrarSocios() {
   };
 
   const handleEditar = async (id, socioEditar) => {
+    const datosActualizados = {
+      nombre: socioEditar.nombre,
+      apellido: socioEditar.apellido,
+      dni: socioEditar.dni,
+      email: socioEditar.email,
+      telefono: socioEditar.telefono,
+    };
+
     try {
-      await actualizarSocio(id, socioEditar);
-      cargarSocios();
+      await actualizarSocio(id, datosActualizados);
+
+      await cargarSocios();
     } catch (error) {
       alert('Error al actualizar socio', error);
     }
   };
-
-  try {
-
-    await actualizarSocio(
-      id,
-      datosActualizados
-    );
-
-    await cargarSocios();
-
-  } catch (error) {
-
-    alert('Error al actualizar socio');
-
-  }
-};
 
   const handleBajaLogica = async (id) => {
     try {
