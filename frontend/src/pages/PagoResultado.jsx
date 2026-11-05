@@ -4,6 +4,7 @@ import { CCard, CCardBody, CButton, CSpinner } from '@coreui/react';
 import { confirmarPagoMP } from '../api/cuotas';
 import { cilCheckAlt, cilWarning, cilTransfer } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
+import '../components/PaymentResult.css';
 
 const CONFIG_POR_TIPO = {
   exito: {
@@ -67,10 +68,9 @@ export function PagoResultado({ tipo }) {
 
   return (
     <div
-      className="d-flex justify-content-center align-items-center"
-      style={{ minHeight: '70vh' }}
+      className="payment-result-page d-flex justify-content-center align-items-center"
     >
-      <CCard className="shadow-sm text-center" style={{ maxWidth: '420px' }}>
+      <CCard className="payment-result-card shadow-sm text-center">
         <CCardBody className="p-4">
           {verificando ? (
             <>
@@ -93,7 +93,7 @@ export function PagoResultado({ tipo }) {
               <CButton color="primary" onClick={() => navigate('/socio')}>
                 Volver
               </CButton>
-              <p className="text-muted mt-2" style={{ fontSize: '0.85rem' }}>
+              <p className="text-muted payment-result-countdown mt-2">
                 Te vamos a redirigir automáticamente en {segundos}s...
               </p>
             </>

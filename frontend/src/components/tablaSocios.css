@@ -1,16 +1,43 @@
 .table-container {
+  width: 100%;
   max-width: 1700px;
-  margin: 20px ;
-  padding: 10px;
+  margin: 1rem auto;
+  padding: 0.65rem;
   background-color: #fff;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  overflow-x: auto;
 }
 
 .c-table-custom th,
 .c-table-custom td {
-  padding: 12px 15px;
+  min-width: 7rem;
+  padding: 0.75rem 0.9rem;
   font-size: 1rem;
   border: 1px solid #dee2e6 !important;
-  /* Forzar bordes */
+  vertical-align: middle;
+  white-space: normal;
+}
+
+.c-table-custom {
+  min-width: 42rem;
+  margin-bottom: 0;
+}
+
+@media (max-width: 575px) {
+  .table-container {
+    margin-inline: 0;
+    padding: 0.35rem;
+  }
+
+  .c-table-custom th,
+  .c-table-custom td {
+    min-width: 6rem;
+    padding: 0.6rem;
+    font-size: 0.88rem;
+  }
+
+  .c-table-custom .btn {
+    white-space: nowrap;
+  }
 }

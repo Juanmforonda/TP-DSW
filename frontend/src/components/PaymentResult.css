@@ -1,0 +1,25 @@
+.payment-result-page {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 1rem;
+}
+
+.payment-result-card {
+  width: min(100%, 26.25rem);
+}
+
+.payment-result-countdown {
+  font-size: 0.85rem;
+}
+
+@media (max-width: 575px) {
+  .payment-result-card .card-body {
+    padding: 1.25rem !important;
+  }
+
+  .payment-result-card .btn {
+    width: 100%;
+    min-height: 2.75rem;
+  }
+}

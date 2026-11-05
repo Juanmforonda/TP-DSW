@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './tablaSocios.css';
+import { LoadingState } from './LoadingState.jsx';
 
 import {
   CTable,
@@ -23,6 +24,7 @@ export function EntityTable({
   onDelete,
   onEdit,
   extraActions,
+  loading = false,
 }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalEditOpen, setModalEditOpen] = useState(false);
@@ -71,7 +73,9 @@ export function EntityTable({
 
   return (
     <div className="table-container">
-      <CTable
+      {loading ? (
+        <LoadingState message={`Cargando ${entityName}s...`} />
+      ) : <CTable
         striped
         hover
         bordered
@@ -124,7 +128,7 @@ export function EntityTable({
             </CTableRow>
           ))}
         </CTableBody>
-      </CTable>
+      </CTable>}
 
       <CModal visible={modalOpen} onClose={() => setModalOpen(false)}>
         <CModalHeader>Confirmar eliminación</CModalHeader>

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { HiOutlineBars3 } from 'react-icons/hi2';
+import { HiOutlineBars3, HiOutlineXMark } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
 import CommentRoundedIcon from '@mui/icons-material/CommentRounded';
 import PhoneRoundedIcon from '@mui/icons-material/PhoneRounded';
+import LoginIcon from '@mui/icons-material/Login';
 import './Navbar.css';
 import logo from '../../assets/logo.png';
 
@@ -20,6 +21,7 @@ const Navbar = () => {
       path: '/testimonials',
     },
     { text: 'Contact', icon: <PhoneRoundedIcon />, path: '/contact' },
+    { text: 'Iniciar sesión', icon: <LoginIcon />, path: '/login' },
   ];
 
   return (
@@ -40,38 +42,26 @@ const Navbar = () => {
         </Link>
       </div>
 
-      <div className="navbar-menu-container">
-        <HiOutlineBars3 onClick={() => setOpenMenu(true)} />
-      </div>
+      <button
+        type="button"
+        className="navbar-menu-container"
+        aria-label={openMenu ? 'Cerrar menú' : 'Abrir menú'}
+        aria-expanded={openMenu}
+        aria-controls="public-mobile-menu"
+        onClick={() => setOpenMenu((isOpen) => !isOpen)}
+      >
+        {openMenu ? <HiOutlineXMark /> : <HiOutlineBars3 />}
+      </button>
 
       {/* Menú móvil */}
       {openMenu && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            right: 0,
-            width: '250px',
-            height: '100%',
-            backgroundColor: 'white',
-            zIndex: 9999,
-            padding: '20px',
-            boxShadow: '-5px 0px 15px rgba(0,0,0,0.2)',
-          }}
-        >
+        <div className="mobile-menu" id="public-mobile-menu">
           <button
+            type="button"
+            className="mobile-menu-close"
             onClick={() => setOpenMenu(false)}
-            style={{
-              background: '#ff4444',
-              color: 'white',
-              border: 'none',
-              padding: '10px',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              marginBottom: '20px',
-            }}
           >
-            ✖ Cerrar
+            Cerrar
           </button>
 
           {/* Enlaces móviles con Link */}
@@ -79,19 +69,11 @@ const Navbar = () => {
             <Link
               key={item.text}
               to={item.path}
-              style={{
-                display: 'block',
-                padding: '15px 10px',
-                borderBottom: '1px solid #eee',
-                color: '#000',
-                textDecoration: 'none',
-                alignItems: 'center',
-                gap: '10px',
-              }}
+              className="mobile-menu-link"
               onClick={() => setOpenMenu(false)}
             >
-              <span style={{ fontSize: '1.2rem' }}>{item.icon}</span>
-              <span style={{ fontWeight: '500' }}>{item.text}</span>
+              <span className="mobile-menu-icon">{item.icon}</span>
+              <span>{item.text}</span>
             </Link>
           ))}
         </div>

@@ -1,0 +1,161 @@
+.dashboard-navbar {
+  min-height: 4.25rem;
+  z-index: 1030;
+}
+
+.dashboard-page-content {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 4.25rem;
+  padding-inline: clamp(0.75rem, 3vw, 2rem);
+}
+
+.socio-page-content {
+  min-width: 0;
+  padding-top: 7rem;
+}
+
+.dashboard-brand {
+  margin-right: 1rem;
+  color: #fff !important;
+  font-weight: 700;
+  white-space: normal;
+}
+
+.dashboard-nav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.dashboard-nav .nav-link {
+  color: #fff !important;
+  white-space: nowrap;
+}
+
+.dashboard-menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-left: auto;
+  margin-right: 0.5rem;
+  padding: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 0.35rem;
+  background: transparent;
+}
+
+.dashboard-menu-toggle span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #fff;
+}
+
+.dashboard-logout {
+  flex: 0 0 auto;
+}
+
+.socio-brand {
+  max-width: min(45vw, 22rem);
+  font-size: clamp(1.15rem, 3vw, 1.9rem);
+}
+
+.dashboard-subnav {
+  position: fixed;
+  top: 4.25rem;
+  left: 0;
+  right: 0;
+  z-index: 1029;
+  padding-inline: 1rem;
+  background: #146faf;
+}
+
+.dashboard-subnav-inner {
+  display: flex;
+  gap: 0.35rem;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-block: 0.45rem;
+}
+
+.dashboard-subnav a {
+  flex: 0 0 auto;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.35rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-nav .nav-link {
+    font-size: 0.85rem;
+    padding-inline: 0.4rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .dashboard-navbar {
+    min-height: 4rem;
+  }
+
+  .dashboard-menu-toggle {
+    display: flex;
+  }
+
+  .dashboard-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: none !important;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.5rem 1rem 0.75rem;
+    background: #0d6efd;
+    box-shadow: 0 0.4rem 0.75rem rgba(0, 0, 0, 0.15);
+  }
+
+  .dashboard-nav.is-open {
+    display: flex !important;
+  }
+
+  .dashboard-nav .nav-link {
+    min-height: 2.75rem;
+    padding: 0.7rem 0.5rem;
+    white-space: normal;
+  }
+
+  .dashboard-subnav {
+    top: 4rem;
+  }
+
+  .dashboard-page-content {
+    margin-top: 4rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .dashboard-navbar {
+    padding-inline: 0.75rem !important;
+  }
+
+  .dashboard-brand {
+    max-width: 42vw;
+    font-size: 1rem;
+  }
+
+  .dashboard-logout {
+    padding-inline: 0.5rem;
+    font-size: 0.78rem;
+  }
+
+  .dashboard-subnav {
+    padding-inline: 0.5rem;
+  }
+}

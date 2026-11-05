@@ -5,8 +5,11 @@ import {
   CButton,
 } from '@coreui/react';
 import { Link, NavLink } from 'react-router-dom';
+import { useState } from 'react';
+import './DashboardNavbar.css';
 
 export function SocioNavbar({ socio }) {
+  const [open, setOpen] = useState(false);
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = '/';
@@ -24,38 +27,46 @@ export function SocioNavbar({ socio }) {
   return (
     <>
       {/* Encabezado principal */}
-      <CNavbar colorScheme="light" className="px-3" style={{ backgroundColor: '#146fafff' }} expand="lg" fixed="top">
+      <CNavbar colorScheme="light" className="px-3 dashboard-navbar socio-navbar" expand="lg" fixed="top">
         <CContainer fluid className="d-flex justify-content-between align-items-center">
           <CNavbarBrand
             as={Link}
             to="/socio"
-            style={{
-              cursor: 'pointer',
-              color: 'white',
-              fontSize: '1.9rem',
-              fontWeight: 'bold',
-            }}
+            className="dashboard-brand socio-brand"
+            onClick={() => setOpen(false)}
           >
             {socio ? `${socio.apellido} ${socio.nombre}` : 'Socio'}
           </CNavbarBrand>
 
-          <CButton color="light" variant="outline" onClick={handleLogout}>
+          <button
+            type="button"
+            className="dashboard-menu-toggle"
+            aria-label={open ? 'Cerrar navegación' : 'Abrir navegación'}
+            aria-expanded={open}
+            aria-controls="socio-navigation"
+            onClick={() => setOpen((isOpen) => !isOpen)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+
+          <CButton color="light" variant="outline" className="dashboard-logout" onClick={handleLogout}>
             Cerrar sesión
           </CButton>
         </CContainer>
       </CNavbar>
 
       {/* Barra secundaria integrada */}
-      <div className="px-4" style={{ backgroundColor: '#146fafff' }}>
-        <div className="d-flex gap-3 pt-2">
+      <div className={`dashboard-subnav ${open ? 'is-open' : ''}`} id="socio-navigation">
+        <div className="dashboard-subnav-inner">
           {navItems.map((item) => (
             <NavLink
               key={item.key}
               to={`/socio/${item.key}`}
               className="text-decoration-none"
+              onClick={() => setOpen(false)}
               style={({ isActive }) => ({
-                padding: '6px 12px',
-                borderRadius: '6px 6px 0 0',
                 backgroundColor: isActive ? '#ffffff22' : 'transparent',
                 color: 'white',
                 fontWeight: isActive ? 'bold' : 'normal',

@@ -1,0 +1,42 @@
+.login-page {
+  display: grid;
+  min-height: 100dvh;
+  place-items: start center;
+  padding: clamp(1rem, 5vw, 3rem);
+  background: #f5f6f8;
+}
+
+.login-row {
+  width: 100%;
+  margin: 0;
+}
+
+.login-card {
+  width: 100%;
+}
+
+.login-error {
+  color: #b02a37;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 575px) {
+  .login-page {
+    place-items: center;
+    padding: 1rem;
+  }
+
+  .login-card {
+    margin-top: 0 !important;
+  }
+
+  .login-card .card-body,
+  .login-card .card-header {
+    padding: 1rem;
+  }
+
+  .login-card input,
+  .login-card button {
+    min-height: 2.75rem;
+  }
+}
