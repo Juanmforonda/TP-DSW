@@ -89,31 +89,57 @@ async function add(req: Request, res: Response) {
   }
 }
 
-// Actualizar socio
 async function update(req: Request, res: Response) {
   try {
+
     const id = Number.parseInt(req.params.id);
-    const socioToUpdate = await em.findOne(Socio, { id });
+    const socioToUpdate =
+      await em.findOne(Socio, { id });
 
     if (!socioToUpdate) {
-      return res.status(404).json({ message: 'Socio no encontrado' });
+      return res.status(404).json({
+        message: 'Socio no encontrado'
+      });
     }
 
-    // Validar datos nuevos
     const socioInstance = plainToInstance(Socio, req.body);
-    const errors = await validate(socioInstance, { skipMissingProperties: true });
+    const errors =
+      await validate(
+        socioInstance,
+        { skipMissingProperties: true }
+      );
 
     if (errors.length > 0) {
-      const messages = errors.map((err) => Object.values(err.constraints || {})).flat();
-      return res.status(400).json({ message: 'Error de validación', errors: messages });
+      const messages = errors
+        .map(err =>
+          Object.values(err.constraints || {})
+        )
+        .flat();
+
+      return res.status(400).json({
+        message: 'Error de validación',
+        errors: messages,
+      });
     }
 
-    em.assign(socioToUpdate, req.body);
-    await em.flush();
+    const {
+      afiliaciones,
+      embarcaciones,
+      ...datosSocio
+    } = req.body;
 
-    res.status(200).json({ message: 'Socio actualizado correctamente' });
+    em.assign(
+      socioToUpdate,
+      datosSocio
+    );
+    await em.flush();
+    res.status(200).json({
+      message: 'Socio actualizado correctamente'
+    });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: error.message
+    });
   }
 }
 
