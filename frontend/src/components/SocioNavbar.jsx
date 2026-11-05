@@ -2,6 +2,9 @@ import {
   CNavbar,
   CContainer,
   CNavbarBrand,
+  CNavbarNav,
+  CNavItem,
+  CNavLink,
   CButton,
 } from '@coreui/react';
 import { Link, NavLink } from 'react-router-dom';
@@ -26,57 +29,67 @@ export function SocioNavbar({ socio }) {
 
   return (
     <>
-      {/* Encabezado principal */}
-      <CNavbar colorScheme="light" className="px-3 dashboard-navbar socio-navbar" expand="lg" fixed="top">
-        <CContainer fluid className="d-flex justify-content-between align-items-center">
-          <CNavbarBrand
-            as={Link}
-            to="/socio"
-            className="dashboard-brand socio-brand"
-            onClick={() => setOpen(false)}
-          >
-            {socio ? `${socio.apellido} ${socio.nombre}` : 'Socio'}
-          </CNavbarBrand>
+      <CNavbar
+        colorScheme="dark"
+        className="bg-primary px-3 dashboard-navbar"
+        expand="lg"
+        fixed="top"
+      >
+        <CContainer
+          fluid
+          className="d-flex justify-content-between align-items-center"
+        >
+          <div className="d-flex align-items-center">
+            <CNavbarBrand
+              as={Link}
+              to="/socio"
+              className="dashboard-brand socio-brand"
+              onClick={() => setOpen(false)}
+            >
+              {socio ? `${socio.apellido} ${socio.nombre}` : 'Socio'}
+            </CNavbarBrand>
 
-          <button
-            type="button"
-            className="dashboard-menu-toggle"
-            aria-label={open ? 'Cerrar navegación' : 'Abrir navegación'}
-            aria-expanded={open}
-            aria-controls="socio-navigation"
-            onClick={() => setOpen((isOpen) => !isOpen)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
+            <button
+              type="button"
+              className="dashboard-menu-toggle"
+              aria-label={open ? 'Cerrar navegación' : 'Abrir navegación'}
+              aria-expanded={open}
+              aria-controls="socio-navigation"
+              onClick={() => setOpen((isOpen) => !isOpen)}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
 
-          <CButton color="light" variant="outline" className="dashboard-logout" onClick={handleLogout}>
+            <CNavbarNav
+              id="socio-navigation"
+              className={`dashboard-nav ${open ? 'is-open' : ''}`}
+            >
+              {navItems.map((item) => (
+                <CNavItem key={item.key}>
+                  <CNavLink
+                    as={NavLink}
+                    to={`/socio/${item.key}`}
+                    onClick={() => setOpen(false)}
+                  >
+                    {item.label}
+                  </CNavLink>
+                </CNavItem>
+              ))}
+            </CNavbarNav>
+          </div>
+
+          <CButton
+            color="light"
+            variant="outline"
+            className="dashboard-logout"
+            onClick={handleLogout}
+          >
             Cerrar sesión
           </CButton>
         </CContainer>
       </CNavbar>
-
-      {/* Barra secundaria integrada */}
-      <div className={`dashboard-subnav ${open ? 'is-open' : ''}`} id="socio-navigation">
-        <div className="dashboard-subnav-inner">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.key}
-              to={`/socio/${item.key}`}
-              className="text-decoration-none"
-              onClick={() => setOpen(false)}
-              style={({ isActive }) => ({
-                backgroundColor: isActive ? '#ffffff22' : 'transparent',
-                color: 'white',
-                fontWeight: isActive ? 'bold' : 'normal',
-              })}
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </div>
-      </div>
     </>
   );
 }
