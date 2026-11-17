@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import bcrypt from 'bcrypt';
 import { Socio } from './socio.entity.js';
 import { orm } from '../shared/orm.js';
 import { Afiliacion } from '../afiliacion/afiliacion.entity.js';
@@ -6,7 +7,9 @@ import { Embarcacion } from '../embarcacion/embarcacion.entity.js';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 
+
 const em = orm.em;
+
 
 // Middleware opcional de sanitización (limpia el body)
 function sanitizeSocioInput(req: Request, res: Response, next: NextFunction) {
@@ -19,14 +22,29 @@ function sanitizeSocioInput(req: Request, res: Response, next: NextFunction) {
     tipoAfiliacion: req.body.tipoAfiliacion,
   };
 
+
   Object.keys(req.body.sanitizedInput).forEach((key) => {
     if (req.body.sanitizedInput[key] === undefined) {
       delete req.body.sanitizedInput[key];
     }
   });
 
+
   next();
 }
+
+
+// Fortaleza de contraseña (misma regla que el frontend)
+function validarFortalezaPassword(pass: unknown): string | null {
+  if (typeof pass !== 'string' || pass.length < 8) {
+    return 'La nueva contraseña debe tener al menos 8 caracteres';
+  }
+  if (!/[A-Za-z]/.test(pass) || !/\d/.test(pass)) {
+    return 'La nueva contraseña debe incluir letras y números';
+  }
+  return null;
+}
+
 
 // Obtener todos los socios
 async function findAll(req: Request, res: Response) {
@@ -38,21 +56,25 @@ async function findAll(req: Request, res: Response) {
   }
 }
 
+
 // Obtener un socio por ID
 async function findOne(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
     const socio = await em.findOne(Socio, { id }, { populate: ['embarcaciones', 'afiliaciones'] });
 
+
     if (!socio) {
       return res.status(404).json({ message: 'Socio no encontrado' });
     }
+
 
     res.status(200).json({ message: 'Socio encontrado', data: socio });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 }
+
 
 // Crear nuevo socio
 async function add(req: Request, res: Response) {
@@ -61,14 +83,17 @@ async function add(req: Request, res: Response) {
     const socioInstance = plainToInstance(Socio, req.body);
     const errors = await validate(socioInstance);
 
+
     if (errors.length > 0) {
       const messages = errors.map((err) => Object.values(err.constraints || {})).flat();
       return res.status(400).json({ message: 'Error de validación', errors: messages });
     }
 
+
     // Crear el socio (el hook BeforeCreate se encarga del hash)
     const newSocio = em.create(Socio, req.body);
     await em.persistAndFlush(newSocio);
+
 
     // Crear afiliación automática si se envía tipoAfiliacion
     if (req.body.tipoAfiliacion) {
@@ -80,6 +105,7 @@ async function add(req: Request, res: Response) {
       await em.persistAndFlush(afiliacion);
     }
 
+
     res.status(201).json({
       message: 'Socio creado correctamente (contraseña generada a partir del DNI)',
       data: newSocio,
@@ -89,59 +115,96 @@ async function add(req: Request, res: Response) {
   }
 }
 
+
+// Actualizar datos generales del socio (NO permite cambiar la contraseña)
 async function update(req: Request, res: Response) {
   try {
-
     const id = Number.parseInt(req.params.id);
-    const socioToUpdate =
-      await em.findOne(Socio, { id });
+    const socioToUpdate = await em.findOne(Socio, { id });
+
 
     if (!socioToUpdate) {
-      return res.status(404).json({
-        message: 'Socio no encontrado'
-      });
+      return res.status(404).json({ message: 'Socio no encontrado' });
     }
 
-    const socioInstance = plainToInstance(Socio, req.body);
-    const errors =
-      await validate(
-        socioInstance,
-        { skipMissingProperties: true }
-      );
+
+    // La contraseña se excluye antes de validar y de asignar:
+    // solo se cambia por PATCH /:id/password
+    const {
+      afiliaciones,
+      embarcaciones,
+      password,
+      ...datosSocio
+    } = req.body;
+
+
+    const socioInstance = plainToInstance(Socio, datosSocio);
+    const errors = await validate(socioInstance, { skipMissingProperties: true });
+
 
     if (errors.length > 0) {
-      const messages = errors
-        .map(err =>
-          Object.values(err.constraints || {})
-        )
-        .flat();
-
+      const messages = errors.map((err) => Object.values(err.constraints || {})).flat();
       return res.status(400).json({
         message: 'Error de validación',
         errors: messages,
       });
     }
 
-    const {
-      afiliaciones,
-      embarcaciones,
-      ...datosSocio
-    } = req.body;
 
-    em.assign(
-      socioToUpdate,
-      datosSocio
-    );
+    em.assign(socioToUpdate, datosSocio);
     await em.flush();
-    res.status(200).json({
-      message: 'Socio actualizado correctamente'
-    });
+    res.status(200).json({ message: 'Socio actualizado correctamente' });
   } catch (error: any) {
-    res.status(500).json({
-      message: error.message
-    });
+    res.status(500).json({ message: error.message });
   }
 }
+
+
+// Cambiar contraseña: valida la actual, hashea la nueva, no toca otros campos
+async function cambiarPassword(req: Request, res: Response) {
+  try {
+    const id = Number.parseInt(req.params.id);
+    const { actual, nueva } = req.body ?? {};
+
+
+    if (!actual || !nueva) {
+      return res.status(400).json({ message: 'Debés enviar la contraseña actual y la nueva' });
+    }
+
+
+    const errorFortaleza = validarFortalezaPassword(nueva);
+    if (errorFortaleza) {
+      return res.status(400).json({ message: errorFortaleza });
+    }
+
+
+    const socio = await em.findOne(Socio, { id });
+    if (!socio) {
+      return res.status(404).json({ message: 'Socio no encontrado' });
+    }
+
+
+    const actualCoincide = await bcrypt.compare(actual, socio.password);
+    if (!actualCoincide) {
+      return res.status(401).json({ message: 'La contraseña actual es incorrecta' });
+    }
+
+
+    if (await bcrypt.compare(nueva, socio.password)) {
+      return res.status(400).json({ message: 'La nueva contraseña debe ser distinta de la actual' });
+    }
+
+
+    socio.password = await bcrypt.hash(nueva, 10);
+    await em.flush();
+
+
+    return res.status(200).json({ message: 'Contraseña actualizada correctamente' });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
 
 // Eliminar socio
 async function remove(req: Request, res: Response) {
@@ -149,9 +212,11 @@ async function remove(req: Request, res: Response) {
     const id = Number.parseInt(req.params.id);
     const socioToRemove = await em.findOne(Socio, { id });
 
+
     if (!socioToRemove) {
       return res.status(404).json({ message: 'Socio no encontrado' });
     }
+
 
     await em.removeAndFlush(socioToRemove);
     res.status(200).json({ message: 'Socio eliminado correctamente' });
@@ -160,8 +225,10 @@ async function remove(req: Request, res: Response) {
   }
 }
 
+
 async function bajaLogica(req: Request, res: Response) {
   const id = Number(req.params.id);
+
 
   try {
     const result = await em.transactional(async (em1) => {
@@ -171,6 +238,7 @@ async function bajaLogica(req: Request, res: Response) {
         return res.status(404).json({ message: 'Socio no encontrado' });
       }
 
+
       const afiliacionActiva = await em1.findOne(Afiliacion, {
         socio: id,
         fechaFin: null,
@@ -179,21 +247,27 @@ async function bajaLogica(req: Request, res: Response) {
         return res.status(400).json({ message: 'El socio no tiene una afiliación activa' });
       }
 
+
       //  cerrar afiliación
       afiliacionActiva.fechaFin = new Date();
       await em1.persist(afiliacionActiva);
 
+
       //  obtener embarcaciones del socio
       const embarcaciones = await em1.find(Embarcacion, { socio: id });
+
 
       // 4) eliminar embarcaciones (si existen)
       for (const e of embarcaciones) {
         em1.remove(e);
       }
 
+
       await em1.flush();
 
+
     });
+
 
     return res.status(200).json({
       message: 'Baja lógica realizada y embarcaciones eliminadas',
@@ -207,4 +281,7 @@ async function bajaLogica(req: Request, res: Response) {
 
 
 
-export { sanitizeSocioInput, findAll, findOne, add, update, remove, bajaLogica };
+
+
+
+export { sanitizeSocioInput, findAll, findOne, add, update, cambiarPassword, remove, bajaLogica };
