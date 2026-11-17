@@ -4,9 +4,14 @@ import { orm } from '../shared/orm.js';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { EstadoReservaInfraestructura } from '../reservaInfraestructura/reservaInfraestructura.entity.js';
+import { filtrarCampos, camposNoPermitidos } from '../shared/whitelist.js';
+
 
 const em = orm.em;
 em.getRepository(Amarra);
+
+const CAMPOS_EDITABLES_AMARRA = ['estado', 'precioMensualBase', 'longitudMax', 'zona', 'nroPilon'] as const;
+
 
 function sanitizeAmarraInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizedInput = {
@@ -17,6 +22,7 @@ function sanitizeAmarraInput(req: Request, res: Response, next: NextFunction) {
     nroPilon: Number(req.body.nroPilon),
   };
 
+
   Object.keys(req.body.sanitizedInput).forEach((key) => {
     if (req.body.sanitizedInput[key] === undefined || Number.isNaN(req.body.sanitizedInput[key])) {
       delete req.body.sanitizedInput[key];
@@ -25,10 +31,12 @@ function sanitizeAmarraInput(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+
 async function findAll(req: Request, res: Response) {
   try {
     const { zona, estado } = req.query;
     const where: any = {};
+
 
     if (zona) {
       where.zona = zona.toString();
@@ -37,6 +45,7 @@ async function findAll(req: Request, res: Response) {
       where.estado = estado.toString();
     }
 
+
     const amarras = await em.find(Amarra, where, {
       populate: [
         'reservasInfraestructura',
@@ -44,6 +53,7 @@ async function findAll(req: Request, res: Response) {
         'reservasInfraestructura.socio',
       ],
     });
+
 
     res.status(200).json({
       message:
@@ -59,6 +69,7 @@ async function findAll(req: Request, res: Response) {
     });
   }
 }
+
 
 async function findOne(req: Request, res: Response) {
   try {
@@ -80,17 +91,25 @@ async function findOne(req: Request, res: Response) {
   }
 }
 
+
 async function add(req: Request, res: Response) {
   try {
-    const amarraInstance = plainToInstance(Amarra, req.body);
+    const { datos, rechazados } = filtrarCampos(req.body, CAMPOS_EDITABLES_AMARRA);
+    if (rechazados.length > 0) {
+      return camposNoPermitidos(res, rechazados);
+    }
+
+    const amarraInstance = plainToInstance(Amarra, datos);
     const errors = await validate(amarraInstance);
+
 
     if (errors.length > 0) {
       const messages = errors.map((err) => Object.values(err.constraints || {})).flat();
       return res.status(400).json({ message: 'Error de validación', errors: messages });
     }
 
-    const amarra = em.create(Amarra, req.body);
+
+    const amarra = em.create(Amarra, datos as any);
     await em.flush();
     res.status(201).json({ message: 'Amarra creada correctamente', data: amarra });
   } catch (error: any) {
@@ -98,10 +117,12 @@ async function add(req: Request, res: Response) {
   }
 }
 
+
 async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
     const amarraToUpdate = await em.findOneOrFail(Amarra, { id }, { populate: ['reservasInfraestructura'] });
+
 
     if (req.body.embarcacion !== undefined) {
       return res.status(400).json({
@@ -109,24 +130,36 @@ async function update(req: Request, res: Response) {
       });
     }
 
-    const amarraInstance = plainToInstance(Amarra, req.body);
+    const { datos, rechazados } = filtrarCampos(req.body, CAMPOS_EDITABLES_AMARRA);
+    if (rechazados.length > 0) {
+      return camposNoPermitidos(res, rechazados);
+    }
+    if (Object.keys(datos).length === 0) {
+      return res.status(400).json({ message: 'No se enviaron campos para actualizar' });
+    }
+
+
+    const amarraInstance = plainToInstance(Amarra, datos);
     const errors = await validate(amarraInstance, { skipMissingProperties: true });
+
 
     if (errors.length > 0) {
       const messages = errors.map((err) => Object.values(err.constraints || {})).flat();
       return res.status(400).json({ message: 'Error de validación', errors: messages });
     }
 
+
     const hayReservaActiva = amarraToUpdate.reservasInfraestructura
       .getItems()
       .some((r) => r.estado === EstadoReservaInfraestructura.ACTIVA && !r.fechaFin);
-    if (hayReservaActiva && req.body.estado && req.body.estado !== EstadoAmarra.OCUPADO) {
+    if (hayReservaActiva && datos.estado && datos.estado !== EstadoAmarra.OCUPADO) {
       return res.status(400).json({
         message: 'No se puede cambiar estado: la amarra tiene una reserva activa',
       });
     }
 
-    em.assign(amarraToUpdate, req.body);
+
+    em.assign(amarraToUpdate, datos);
     await em.flush();
     res.status(200).json({ message: 'Amarra actualizada correctamente', data: amarraToUpdate });
   } catch (error: any) {
@@ -138,6 +171,7 @@ async function update(req: Request, res: Response) {
   }
 }
 
+
 async function remove(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
@@ -146,11 +180,13 @@ async function remove(req: Request, res: Response) {
       .getItems()
       .some((r) => r.estado === EstadoReservaInfraestructura.ACTIVA && !r.fechaFin);
 
+
     if (hayReservaActiva) {
       return res.status(409).json({
         message: 'No se puede eliminar una amarra con reserva activa',
       });
     }
+
 
     await em.removeAndFlush(amarraToRemove);
     res.status(200).json({ message: 'Amarra eliminada correctamente' });
@@ -163,5 +199,5 @@ async function remove(req: Request, res: Response) {
   }
 }
 
-export { sanitizeAmarraInput, findAll, findOne, add, update, remove };
 
+export { sanitizeAmarraInput, findAll, findOne, add, update, remove };

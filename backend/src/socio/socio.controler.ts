@@ -6,10 +6,13 @@ import { Afiliacion } from '../afiliacion/afiliacion.entity.js';
 import { Embarcacion } from '../embarcacion/embarcacion.entity.js';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import { filtrarCampos, camposNoPermitidos } from '../shared/whitelist.js';
+import { validarFortalezaPassword } from '../shared/password.js';
 
 
 const em = orm.em;
 
+const CAMPOS_EDITABLES_SOCIO = ['nombre', 'apellido', 'email', 'telefono'] as const;
 
 // Middleware opcional de sanitización (limpia el body)
 function sanitizeSocioInput(req: Request, res: Response, next: NextFunction) {
@@ -32,19 +35,6 @@ function sanitizeSocioInput(req: Request, res: Response, next: NextFunction) {
 
   next();
 }
-
-
-// Fortaleza de contraseña (misma regla que el frontend)
-function validarFortalezaPassword(pass: unknown): string | null {
-  if (typeof pass !== 'string' || pass.length < 8) {
-    return 'La nueva contraseña debe tener al menos 8 caracteres';
-  }
-  if (!/[A-Za-z]/.test(pass) || !/\d/.test(pass)) {
-    return 'La nueva contraseña debe incluir letras y números';
-  }
-  return null;
-}
-
 
 // Obtener todos los socios
 async function findAll(req: Request, res: Response) {
@@ -116,42 +106,33 @@ async function add(req: Request, res: Response) {
 }
 
 
-// Actualizar datos generales del socio (NO permite cambiar la contraseña)
+// Actualizar datos generales del socio (lista blanca; la contraseña va por /:id/password)
 async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
     const socioToUpdate = await em.findOne(Socio, { id });
 
-
     if (!socioToUpdate) {
       return res.status(404).json({ message: 'Socio no encontrado' });
     }
 
+    const { datos, rechazados } = filtrarCampos(req.body, CAMPOS_EDITABLES_SOCIO);
+    if (rechazados.length > 0) {
+      return camposNoPermitidos(res, rechazados);
+    }
+    if (Object.keys(datos).length === 0) {
+      return res.status(400).json({ message: 'No se enviaron campos para actualizar' });
+    }
 
-    // La contraseña se excluye antes de validar y de asignar:
-    // solo se cambia por PATCH /:id/password
-    const {
-      afiliaciones,
-      embarcaciones,
-      password,
-      ...datosSocio
-    } = req.body;
-
-
-    const socioInstance = plainToInstance(Socio, datosSocio);
+    const socioInstance = plainToInstance(Socio, datos);
     const errors = await validate(socioInstance, { skipMissingProperties: true });
-
 
     if (errors.length > 0) {
       const messages = errors.map((err) => Object.values(err.constraints || {})).flat();
-      return res.status(400).json({
-        message: 'Error de validación',
-        errors: messages,
-      });
+      return res.status(400).json({ message: 'Error de validación', errors: messages });
     }
 
-
-    em.assign(socioToUpdate, datosSocio);
+    em.assign(socioToUpdate, datos);
     await em.flush();
     res.status(200).json({ message: 'Socio actualizado correctamente' });
   } catch (error: any) {
@@ -278,10 +259,5 @@ async function bajaLogica(req: Request, res: Response) {
     return res.status(500).json({ message: 'Error en la baja lógica', error: error.message });
   }
 }
-
-
-
-
-
 
 export { sanitizeSocioInput, findAll, findOne, add, update, cambiarPassword, remove, bajaLogica };
