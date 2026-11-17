@@ -5,6 +5,16 @@ import { Afiliacion } from '../afiliacion/afiliacion.entity.js';
 import { Embarcacion } from '../embarcacion/embarcacion.entity.js';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import {
+  ReservaInfraestructura,
+  EstadoReservaInfraestructura,
+} from '../reservaInfraestructura/reservaInfraestructura.entity.js';
+import {
+  ReservaTravelLift,
+  EstadoReservaTravelLift,
+} from '../reservaTravelLift/reservaTravelLift.entity.js';
+import { ReservaEmbarcacionClub } from '../reservaEmbarcacionClub/reservaEmbarcacionClub.entity.js';
+import { procesarBajaLogicaSocio } from './socio.rules.js';
 
 const em = orm.em;
 
@@ -165,10 +175,10 @@ async function bajaLogica(req: Request, res: Response) {
 
   try {
     const result = await em.transactional(async (em1) => {
-      //  socio + afiliación activa
+      // 1. Socio y afiliación activa
       const socio = await em1.findOne(Socio, { id });
       if (!socio) {
-        return res.status(404).json({ message: 'Socio no encontrado' });
+        return { status: 404, message: 'Socio no encontrado' };
       }
 
       const afiliacionActiva = await em1.findOne(Afiliacion, {
@@ -176,29 +186,75 @@ async function bajaLogica(req: Request, res: Response) {
         fechaFin: null,
       });
       if (!afiliacionActiva) {
-        return res.status(400).json({ message: 'El socio no tiene una afiliación activa' });
+        return { status: 400, message: 'El socio no tiene una afiliación activa' };
       }
 
-      //  cerrar afiliación
-      afiliacionActiva.fechaFin = new Date();
-      await em1.persist(afiliacionActiva);
-
-      //  obtener embarcaciones del socio
+      // 2. Obtener embarcaciones del socio
       const embarcaciones = await em1.find(Embarcacion, { socio: id });
+      const embarcacionIds = embarcaciones
+        .map((e) => e.id)
+        .filter((id): id is number => id !== undefined);
 
-      // 4) eliminar embarcaciones (si existen)
-      for (const e of embarcaciones) {
-        em1.remove(e);
-      }
+      // 3. Obtener reservas de infraestructura activas (del socio o sus embarcaciones)
+      const filtroInfra: any = embarcacionIds.length > 0
+        ? {
+            $or: [
+              { socio: id },
+              { embarcacion: { $in: embarcacionIds } },
+            ],
+            estado: EstadoReservaInfraestructura.ACTIVA,
+          }
+        : {
+            socio: id,
+            estado: EstadoReservaInfraestructura.ACTIVA,
+          };
+
+      const reservasInfra = await em1.find(ReservaInfraestructura, filtroInfra, {
+        populate: ['amarra', 'box'],
+      });
+
+      // 4. Obtener reservas activas de Travel Lift
+      const filtroTL: any = embarcacionIds.length > 0
+        ? {
+            $or: [
+              { socio: id },
+              { embarcacion: { $in: embarcacionIds } },
+            ],
+            estado: EstadoReservaTravelLift.ACTIVA,
+          }
+        : {
+            socio: id,
+            estado: EstadoReservaTravelLift.ACTIVA,
+          };
+
+      const reservasTL = await em1.find(ReservaTravelLift, filtroTL);
+
+      // 5. Obtener reservas activas de embarcaciones del club
+      const reservasClub = await em1.find(ReservaEmbarcacionClub, {
+        socio: id,
+        estado: 'ACTIVA',
+      });
+
+      // 6. Aplicar la baja lógica: se cierran afiliación y reservas activas,
+      // se marcan embarcaciones como inactivas con fechaFin y se conservan
+      // intactas todas las entidades históricas (embarcaciones, reservas, cuotas).
+      procesarBajaLogicaSocio({
+        afiliacionActiva,
+        embarcaciones,
+        reservasInfraestructura: reservasInfra,
+        reservasTravelLift: reservasTL,
+        reservasClub,
+      });
 
       await em1.flush();
 
+      return {
+        status: 200,
+        message: 'Baja lógica realizada correctamente',
+      };
     });
 
-    return res.status(200).json({
-      message: 'Baja lógica realizada y embarcaciones eliminadas',
-      data: result,
-    });
+    return res.status(result.status).json({ message: result.message });
   } catch (error: any) {
     console.error(error);
     return res.status(500).json({ message: 'Error en la baja lógica', error: error.message });
