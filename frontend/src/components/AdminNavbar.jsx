@@ -9,12 +9,13 @@ import {
   CNavLink,
   CButton,
 } from '@coreui/react';
+import { clearSession } from '../utils/storage';
 import './DashboardNavbar.css';
 
 export function AdminNavbar() {
   const [open, setOpen] = useState(false);
   const handleLogout = () => {
-    localStorage.clear();
+    clearSession(); 
     window.location.href = '/';
   };
 

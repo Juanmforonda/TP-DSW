@@ -9,12 +9,13 @@ import {
 } from '@coreui/react';
 import { Link, NavLink } from 'react-router-dom';
 import { useState } from 'react';
+import { clearSession } from '../utils/storage';
 import './DashboardNavbar.css';
 
 export function SocioNavbar({ socio }) {
   const [open, setOpen] = useState(false);
   const handleLogout = () => {
-    localStorage.clear();
+    clearSession(); 
     window.location.href = '/';
   };
 
