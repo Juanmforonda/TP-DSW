@@ -42,13 +42,11 @@ export default function LoginForm() {
 
       if (data.tipo === 'socio' && data.socio) {
         localStorage.setItem('socio', JSON.stringify(data.socio));
-        console.log('✅ Socio guardado:', data.socio);
         setTimeout(() => {
           navigate('/socio');
         }, 100);
       } else if (data.tipo === 'admin' && data.admin) {
         localStorage.setItem('admin', JSON.stringify(data.admin));
-        console.log('✅ Admin guardado:', data.admin);
         setTimeout(() => {
           navigate('/admin');
         }, 100);

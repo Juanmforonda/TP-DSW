@@ -210,7 +210,6 @@ export default function ListaAmarras() {
   });
 
   if (loading) return <p>Cargando amarras...</p>;
-  console.log("holasd");
 
   return (
     <>
