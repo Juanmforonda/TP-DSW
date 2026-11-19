@@ -7,21 +7,12 @@ import {
 } from '../../api/amarras.js';
 import {
   CButton,
-  CModal,
-  CModalHeader,
-  CModalBody,
-  CModalFooter,
-  CTable,
-  CTableHead,
-  CTableBody,
-  CTableRow,
-  CTableHeaderCell,
-  CTableDataCell,
   CRow, 
   CCol,
   CFormSelect
 } from '@coreui/react';
 import { EntityTable } from '../../components/TablaGenerica.jsx';
+import HistorialReservasModal from '../../components/HistorialReservasModal.jsx';
 
 
 const columns = [
@@ -129,58 +120,11 @@ export default function ListaAmarras() {
         )}
       />
 
-      <CModal
+      <HistorialReservasModal
         visible={historialOpen}
         onClose={() => setHistorialOpen(false)}
-        size="lg"
-      >
-        <CModalHeader>Historial de reservas</CModalHeader>
-        <CModalBody>
-          {reservasSeleccionadas.length === 0 ? (
-            <p>Esta amarra no tiene reservas registradas.</p>
-          ) : (
-            <CTable striped bordered small>
-              <CTableHead>
-                <CTableRow>
-                  <CTableHeaderCell>Embarcación</CTableHeaderCell>
-                  <CTableHeaderCell>Socio</CTableHeaderCell>
-                  <CTableHeaderCell>Fecha Inicio</CTableHeaderCell>
-                  <CTableHeaderCell>Fecha Fin</CTableHeaderCell>
-                  <CTableHeaderCell>Estado</CTableHeaderCell>
-                  <CTableHeaderCell>Precio</CTableHeaderCell>
-                </CTableRow>
-              </CTableHead>
-              <CTableBody>
-                {reservasSeleccionadas.map((r) => (
-                  <CTableRow key={r.id}>
-                    <CTableDataCell>
-                      {r.embarcacion?.nombre ?? '—'}
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      {r.socio ? `${r.socio.nombre} ${r.socio.apellido}` : '—'}
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      {new Date(r.fechaInicio).toLocaleDateString()}
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      {r.fechaFin
-                        ? new Date(r.fechaFin).toLocaleDateString()
-                        : 'Vigente'}
-                    </CTableDataCell>
-                    <CTableDataCell>{r.estado}</CTableDataCell>
-                    <CTableDataCell>${r.precioMensualFinal}</CTableDataCell>
-                  </CTableRow>
-                ))}
-              </CTableBody>
-            </CTable>
-          )}
-        </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setHistorialOpen(false)}>
-            Cerrar
-          </CButton>
-        </CModalFooter>
-      </CModal>
+        reservas={reservasSeleccionadas}
+        tipo="amarra"/>
     </>
   );
 }
