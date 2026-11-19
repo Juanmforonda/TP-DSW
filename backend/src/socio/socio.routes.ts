@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { findAll, findOne, add, update, remove, bajaLogica } from './socio.controler.js'
+import { findAll, findOne, add, update, remove, bajaLogica } from './socio.controller.js'
 
 export const socioRouter = Router()
 

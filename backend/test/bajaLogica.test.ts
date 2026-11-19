@@ -19,7 +19,7 @@ vi.mock('../src/shared/orm.js', () => ({
 }));
 
 import { orm } from '../src/shared/orm.js';
-import { bajaLogica } from '../src/socio/socio.controler.js';
+import { bajaLogica } from '../src/socio/socio.controller.js';
 import { Socio } from '../src/socio/socio.entity.js';
 import { Afiliacion } from '../src/afiliacion/afiliacion.entity.js';
 import { Embarcacion } from '../src/embarcacion/embarcacion.entity.js';
