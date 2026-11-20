@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { getReservasInfraestructura } from '../../api/reservasInfraestructura.js';
+import { useCallback, useEffect, useState } from 'react';
+import { getMisReservasInfraestructura } from '../../api/reservasInfraestructura.js';
 import '../../components/SocioHome.css';
 import { EmptyState } from '../../components/EmptyState.jsx';
 import { ErrorState } from '../../components/ErrorState.jsx';
@@ -11,48 +11,50 @@ export function SocioAlquileres({ idSocio }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const cargarAlquileres = useCallback(async () => {
     if (!idSocio) {
       setError('No se pudo obtener el ID del socio');
       setLoading(false);
       return;
     }
 
-    getReservasInfraestructura()
-      .then((res) => {
-        const reservas = res.data?.data ?? [];
-        const reservasActivas = reservas.filter((reserva) => {
-          const socioId = Number(reserva.socio?.id ?? reserva.socio);
-          return socioId === Number(idSocio) && reserva.estado === 'ACTIVA';
-        });
+    setLoading(true);
+    setError(null);
 
-        const amarrasDelSocio = reservasActivas
-          .filter((reserva) => reserva.amarra)
-          .map((reserva) => ({
-            ...reserva.amarra,
-            embarcacion: reserva.embarcacion,
-            socio: reserva.socio,
-          }));
+    try {
+      const res = await getMisReservasInfraestructura();
+      const reservas = res.data?.data ?? [];
+      const reservasActivas = reservas.filter((reserva) => reserva.estado === 'ACTIVA');
 
-        const boxesDelSocio = reservasActivas
-          .filter((reserva) => reserva.box)
-          .map((reserva) => ({
-            ...reserva.box,
-            embarcacion: reserva.embarcacion,
-            socio: reserva.socio,
-          }));
+      const amarrasDelSocio = reservasActivas
+        .filter((reserva) => reserva.amarra)
+        .map((reserva) => ({
+          ...reserva.amarra,
+          embarcacion: reserva.embarcacion,
+          socio: reserva.socio,
+        }));
 
-        setAmarras(amarrasDelSocio);
-        setBoxes(boxesDelSocio);
-      })
-      .catch((err) => {
-        console.error('Error al cargar amarras/boxes:', err);
-        setError('Error al cargar tus alquileres');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      const boxesDelSocio = reservasActivas
+        .filter((reserva) => reserva.box)
+        .map((reserva) => ({
+          ...reserva.box,
+          embarcacion: reserva.embarcacion,
+          socio: reserva.socio,
+        }));
+
+      setAmarras(amarrasDelSocio);
+      setBoxes(boxesDelSocio);
+    } catch (err) {
+      console.error('Error al cargar amarras/boxes:', err);
+      setError('Error al cargar tus alquileres');
+    } finally {
+      setLoading(false);
+    }
   }, [idSocio]);
+
+  useEffect(() => {
+    cargarAlquileres();
+  }, [cargarAlquileres]);
 
   const sinAlquileres = amarras.length === 0 && boxes.length === 0;
 

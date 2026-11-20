@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { getEmbarcacionesActivasPorSocio } from '../../api/embarcaciones';
+import { useCallback, useEffect, useState } from 'react';
+import { getMisEmbarcaciones } from '../../api/embarcaciones';
 import '../../components/SocioHome.css'; 
 import { EmptyState } from '../../components/EmptyState.jsx';
 import { ErrorState } from '../../components/ErrorState.jsx';
@@ -10,27 +10,34 @@ export function SocioEmbarcaciones({ idSocio }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const cargarEmbarcaciones = useCallback(async () => {
     if (!idSocio) {
       setError('No se pudo obtener el ID del socio');
       setLoading(false);
       return;
     }
 
-    getEmbarcacionesActivasPorSocio(idSocio)
-      .then(res => {
-        const embarcaciones = res.data?.data;
-        if (!Array.isArray(embarcaciones)) throw new Error('Formato inesperado');
-        setEmbarcs(embarcaciones);
-      })
-      .catch(err => {
-        console.error('❌ Error al cargar embarcaciones:', err);
-        setError('Error al cargar embarcaciones');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await getMisEmbarcaciones();
+      const embarcaciones = res.data?.data;
+      if (!Array.isArray(embarcaciones)) {
+        throw new Error('Formato inesperado');
+      }
+      setEmbarcs(embarcaciones);
+    } catch (err) {
+      console.error('Error al cargar embarcaciones:', err);
+      setError('Error al cargar embarcaciones');
+    } finally {
+      setLoading(false);
+    }
   }, [idSocio]);
+
+  useEffect(() => {
+    cargarEmbarcaciones();
+  }, [cargarEmbarcaciones]);
 
   return (
     <div className="socio-container">

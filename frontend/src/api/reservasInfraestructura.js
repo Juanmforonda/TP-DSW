@@ -1,6 +1,8 @@
 import api from './client.js';
 
 export const getReservasInfraestructura = () => api.get('/api/reservasInfraestructura');
+export const getMisReservasInfraestructura = () =>
+  api.get('/api/reservasInfraestructura/me');
 export const getReservasInfraestructuraPorEmbarcacion = (idEmbarcacion) =>
   api.get(`/api/reservasInfraestructura/embarcacion/${idEmbarcacion}`);
 export const crearReservaInfraestructura = (data) => api.post('/api/reservasInfraestructura', data);

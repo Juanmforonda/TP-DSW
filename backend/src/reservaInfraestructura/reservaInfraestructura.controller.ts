@@ -412,6 +412,20 @@ async function findByEmbarcacion(req: Request, res: Response) {
   }
 }
 
+async function findBySocio(req: Request, res: Response) {
+  try {
+    const idSocio = Number.parseInt(req.params.idSocio);
+    const reservas = await em.find(
+      ReservaInfraestructura,
+      { socio: idSocio },
+      { populate: ['socio', 'embarcacion', 'amarra', 'box'] }
+    );
+    res.status(200).json({ message: 'found reservas by socio', data: reservas });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 export {
   sanitizeReservaInfraestructuraInput,
   findAll,
@@ -422,4 +436,5 @@ export {
   cancel,
   finalizar,
   findByEmbarcacion,
+  findBySocio,
 };

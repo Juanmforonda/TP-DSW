@@ -8,6 +8,7 @@ import { CUOTA_BASE_CLUB } from '../config/cuotas.config.js';
 import { Preference, Payment } from 'mercadopago';
 import { mpClient } from '../config/mercadopago.config.js';
 import 'dotenv/config';
+import { AuthenticatedRequest } from '../auth/auth.middleware.js';
 const em = orm.em;
 
 function sanitizeCuotaMensualInput(req: Request, res: Response, next: NextFunction) {
@@ -115,6 +116,10 @@ async function crearPreferenciaMP(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
     const cuota = await em.findOneOrFail(CuotaMensual, { id }, { populate: ['socio', 'detalles'] });
+    const user = (req as AuthenticatedRequest).user;
+    if (user.tipo === 'socio' && String(cuota.socio.id) !== String(user.id)) {
+      return res.status(403).json({ message: 'Permisos insuficientes' });
+    }
     if (cuota.pagada) {
       return res.status(409).json({ message: 'Esta cuota ya está pagada' });
     }
@@ -193,7 +198,11 @@ async function confirmarPagoMP(req: Request, res: Response) {
     const pagoInfo = await paymentClient.get({ id: String(paymentId) });
 
     const cuotaId = Number(pagoInfo.external_reference);
-    const cuota = await em.findOneOrFail(CuotaMensual, { id: cuotaId });
+    const cuota = await em.findOneOrFail(CuotaMensual, { id: cuotaId }, { populate: ['socio'] });
+    const user = (req as AuthenticatedRequest).user;
+    if (user.tipo === 'socio' && String(cuota.socio.id) !== String(user.id)) {
+      return res.status(403).json({ message: 'Permisos insuficientes' });
+    }
 
     if (pagoInfo.status === 'approved') {
       await aplicarPagoAprobado(cuota, String(pagoInfo.id));

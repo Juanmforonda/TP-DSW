@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { getCuotasPorSocio, crearPreferenciaMP } from '../../api/cuotas';
+import { useCallback, useEffect, useState } from 'react';
+import { getMisCuotas, crearPreferenciaMP } from '../../api/cuotas';
 import '../../components/SocioHome.css';
 import {
   CCard,
@@ -24,25 +24,33 @@ export function SocioCuotas({ idSocio }) {
   const [detalleAbierto, setDetalleAbierto] = useState({});
   const [pagando, setPagando] = useState({});
 
-  const cargarCuotas = () => {
-    if (!idSocio) return;
+  const cargarCuotas = useCallback(async () => {
+    if (!idSocio) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
-    getCuotasPorSocio(idSocio)
-      .then((res) => {
-        const data = res.data?.data;
-        if (!Array.isArray(data)) throw new Error('Formato inesperado');
-        setCuotas(data);
-      })
-      .catch((err) => {
-        console.error('❌ Error al cargar cuotas:', err);
-        setError('Error al cargar cuotas');
-      })
-      .finally(() => setLoading(false));
-  };
+    setError(null);
+
+    try {
+      const res = await getMisCuotas();
+      const data = res.data?.data;
+      if (!Array.isArray(data)) {
+        throw new Error('Formato inesperado');
+      }
+      setCuotas(data);
+    } catch (err) {
+      console.error('Error al cargar cuotas:', err);
+      setError('Error al cargar cuotas');
+    } finally {
+      setLoading(false);
+    }
+  }, [idSocio]);
 
   useEffect(() => {
     cargarCuotas();
-  }, [idSocio]);
+  }, [cargarCuotas]);
 
   const handlePagarMP = async (cuota) => {
     setPagando((prev) => ({ ...prev, [cuota.id]: true }));

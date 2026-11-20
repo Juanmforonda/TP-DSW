@@ -9,16 +9,18 @@ import {
   cancel,
   finalizar,
   findByEmbarcacion,
+  findBySocio,
 } from './reservaInfraestructura.controller.js';
+import { requireRole, setAuthenticatedId } from '../auth/auth.middleware.js';
 
 export const reservaInfraestructuraRouter = Router();
 
-reservaInfraestructuraRouter.get('/', findAll);
-reservaInfraestructuraRouter.get('/embarcacion/:idEmbarcacion', findByEmbarcacion);
-reservaInfraestructuraRouter.post('/:id/cancelar', cancel);
-reservaInfraestructuraRouter.post('/:id/finalizar', finalizar);
-reservaInfraestructuraRouter.get('/:id', findOne);
-reservaInfraestructuraRouter.post('/', sanitizeReservaInfraestructuraInput, add);
-reservaInfraestructuraRouter.put('/:id', sanitizeReservaInfraestructuraInput, update);
-reservaInfraestructuraRouter.delete('/:id', remove);
-
+reservaInfraestructuraRouter.get('/me', setAuthenticatedId('idSocio'), findBySocio);
+reservaInfraestructuraRouter.get('/', requireRole('admin'), findAll);
+reservaInfraestructuraRouter.get('/embarcacion/:idEmbarcacion', requireRole('admin'), findByEmbarcacion);
+reservaInfraestructuraRouter.post('/:id/cancelar', requireRole('admin'), cancel);
+reservaInfraestructuraRouter.post('/:id/finalizar', requireRole('admin'), finalizar);
+reservaInfraestructuraRouter.get('/:id', requireRole('admin'), findOne);
+reservaInfraestructuraRouter.post('/', requireRole('admin'), sanitizeReservaInfraestructuraInput, add);
+reservaInfraestructuraRouter.put('/:id', requireRole('admin'), sanitizeReservaInfraestructuraInput, update);
+reservaInfraestructuraRouter.delete('/:id', requireRole('admin'), remove);

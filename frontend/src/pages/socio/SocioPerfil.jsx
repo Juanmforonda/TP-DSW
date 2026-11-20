@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   CButton,
   CModal,
@@ -7,10 +7,10 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react';
-import { getSocios, actualizarSocio } from '../../api/socios';
+import { getMiPerfil, actualizarMiPerfil } from '../../api/socios';
 import '../../components/SocioHome.css';
 
-export function SocioPerfil({ idSocio }) {
+export function SocioPerfil() {
   const [socio, setSocio] = useState(null);
   const [form, setForm] = useState({ email: '', telefono: '' });
   const [editando, setEditando] = useState({ email: false, telefono: false });
@@ -18,27 +18,31 @@ export function SocioPerfil({ idSocio }) {
   const [passForm, setPassForm] = useState({ actual: '', nueva: '', repetir: '' });
   const [mensaje, setMensaje] = useState(null);
 
+  const cargarPerfil = useCallback(async () => {
+    try {
+      const res = await getMiPerfil();
+      const actual = res.data?.data;
+      if (actual) {
+        setSocio(actual);
+        setForm({ email: actual.email, telefono: actual.telefono });
+      }
+    } catch (err) {
+      console.error('Error al cargar perfil:', err);
+    }
+  }, []);
+
   useEffect(() => {
-    getSocios()
-      .then((res) => {
-        const todos = res.data?.data ?? [];
-        const actual = todos.find((s) => s.id === idSocio);
-        if (actual) {
-          setSocio(actual);
-          setForm({ email: actual.email, telefono: actual.telefono });
-        }
-      })
-      .catch((err) => console.error('❌ Error al cargar perfil:', err));
-  }, [idSocio]);
+    cargarPerfil();
+  }, [cargarPerfil]);
 
   const handleGuardarCampo = async (campo) => {
     try {
-      await actualizarSocio(idSocio, { [campo]: form[campo] });
+      await actualizarMiPerfil({ [campo]: form[campo] });
       setEditando((prev) => ({ ...prev, [campo]: false }));
       setMensaje(`✅ ${campo} actualizado`);
     } catch (error) {
-      console.error(`❌ Error al actualizar ${campo}:`, error);
-      setMensaje(`❌ Error al actualizar ${campo}`);
+      console.error(` Error al actualizar ${campo}:`, error);
+      setMensaje(` Error al actualizar ${campo}`);
     }
   };
 
@@ -58,7 +62,7 @@ export function SocioPerfil({ idSocio }) {
     }
 
     try {
-      await actualizarSocio(idSocio, { password: nueva });
+      await actualizarMiPerfil({ password: nueva });
       alert('Contraseña actualizada');
       setModalVisible(false);
       setPassForm({ actual: '', nueva: '', repetir: '' });

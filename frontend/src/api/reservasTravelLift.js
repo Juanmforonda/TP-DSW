@@ -4,6 +4,8 @@ export const getReservasTravelLift = (params = {}) =>
   api.get('/api/reservasTravelLift', { params });
 export const getReservasTravelLiftPorSocio = (idSocio) =>
   api.get(`/api/reservasTravelLift/socio/${idSocio}`);
+export const getMisReservasTravelLift = () =>
+  api.get('/api/reservasTravelLift/me');
 export const crearReservaTravelLift = (data) =>
   api.post('/api/reservasTravelLift', data);
 export const actualizarReservaTravelLift = (id, data) =>

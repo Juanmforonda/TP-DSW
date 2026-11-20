@@ -1,11 +1,14 @@
 import { Router } from 'express'
 import { findAll, findOne, add, update, remove, bajaLogica } from './socio.controler.js'
+import { requireRole, setAuthenticatedId } from '../auth/auth.middleware.js'
 
 export const socioRouter = Router()
 
-socioRouter.get('/', findAll)
-socioRouter.get('/:id', findOne)
-socioRouter.post('/', add)
-socioRouter.put('/baja-logica/:id', bajaLogica)
-socioRouter.put('/:id', update)
-socioRouter.delete('/:id', remove)
+socioRouter.get('/me', setAuthenticatedId('id'), findOne)
+socioRouter.put('/me', setAuthenticatedId('id'), update)
+socioRouter.get('/', requireRole('admin'), findAll)
+socioRouter.get('/:id', requireRole('admin'), findOne)
+socioRouter.post('/', requireRole('admin'), add)
+socioRouter.put('/baja-logica/:id', requireRole('admin'), bajaLogica)
+socioRouter.put('/:id', requireRole('admin'), update)
+socioRouter.delete('/:id', requireRole('admin'), remove)

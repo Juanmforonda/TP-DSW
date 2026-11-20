@@ -68,12 +68,12 @@ app.use((req, res, next) => {
 
 app.use('/api', authRouter);
 app.use('/api/socios', requireAuth, socioRouter);
-app.use('/api/tiposEmbarcacion', requireAuth, tipoEmbarcacionRouter);
+app.use('/api/tiposEmbarcacion', requireAuth, requireRole('admin'), tipoEmbarcacionRouter);
 app.use('/api/embarcaciones', requireAuth, embarcacionRouter);
 app.use('/api/administradores', requireAuth, requireRole('admin'), administradorRouter);
-app.use('/api/boxes', requireAuth, boxRouter);
-app.use('/api/amarras', requireAuth, amarraRouter);
-app.use('/api/afiliaciones', requireAuth, afiliacionRouter);
+app.use('/api/boxes', requireAuth, requireRole('admin'), boxRouter);
+app.use('/api/amarras', requireAuth, requireRole('admin'), amarraRouter);
+app.use('/api/afiliaciones', requireAuth, requireRole('admin'), afiliacionRouter);
 app.use('/api/cuotasMensuales', requireAuth, cuotaMensualRouter);
 app.use('/api/reservasEmbarcacionClub', requireAuth, reservaEmbarcacionClubRouter);
 app.use('/api/reservasInfraestructura', requireAuth, reservaInfraestructuraRouter);

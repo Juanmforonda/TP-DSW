@@ -1,6 +1,7 @@
 import api from './client.js';
 
 export const getCuotas= () => api.get('/api/cuotasMensuales');
+export const getMisCuotas = () => api.get('/api/cuotasMensuales/me');
 export const eliminarCuota = (id) => api.delete(`/api/cuotasMensuales/${id}`);
 export const actualizarCuota = (id, data) => api.put(`/api/cuotasMensuales/${id}`, data);
 export const getCuotasPorSocio = (idSocio) =>api.get(`/api/cuotasMensuales/socio/${idSocio}`);

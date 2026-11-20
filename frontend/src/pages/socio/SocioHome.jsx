@@ -7,10 +7,9 @@ import {
   CRow,
   CCol,
 } from '@coreui/react'
-import { useEffect, useState } from 'react'
-import { getCuotasPorSocio } from '../../api/cuotas'
-import { getAfiliaciones } from '../../api/afiliaciones'
-import { getEmbarcacionesActivasPorSocio } from '../../api/embarcaciones'
+import { useCallback, useEffect, useState } from 'react'
+import { getMisCuotas } from '../../api/cuotas'
+import { getMisEmbarcaciones } from '../../api/embarcaciones'
 
 export default function SocioHome({ idSocio, onSeleccion }) {
   const [cuotas, setCuotas] = useState([])
@@ -18,37 +17,28 @@ export default function SocioHome({ idSocio, onSeleccion }) {
   const [embarcaciones, setEmbarcaciones] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  const cargarDatos = useCallback(async () => {
     if (!idSocio) return
 
-    const fetchData = async () => {
-      try {
-        const safe = (fn) => fn.catch(() => ({ data: { data: [] } })) 
-        const [cuotasRes, afiliacionesRes, embarcacionesRes] = await Promise.all([
-          safe(getCuotasPorSocio(idSocio)),
-          safe(getAfiliaciones()),
-          safe(getEmbarcacionesActivasPorSocio(idSocio)),
-        ])
+    try {
+      const [cuotasRes, embarcacionesRes] = await Promise.all([
+        getMisCuotas(),
+        getMisEmbarcaciones(),
+      ])
 
-        setCuotas(cuotasRes.data?.data || [])
-
-        const afiliacionesSocio = afiliacionesRes.data?.data?.filter(
-          (a) => a.socio?.id === idSocio
-        ) || []
-
-        const afiliacionActiva = afiliacionesSocio.find((a) => !a.fechaFin)
-        setAfiliacion(afiliacionActiva || null)
-
-        setEmbarcaciones(embarcacionesRes.data?.data || [])
-      } catch (err) {
-        console.error('❌ Error cargando datos del socio:', err)
-      } finally {
-        setLoading(false)
-      }
+      setCuotas(cuotasRes.data?.data || [])
+      setEmbarcaciones(embarcacionesRes.data?.data || [])
+      setAfiliacion(null)
+    } catch (err) {
+      console.error('Error cargando datos del socio:', err)
+    } finally {
+      setLoading(false)
     }
-
-    fetchData()
   }, [idSocio])
+
+  useEffect(() => {
+    cargarDatos()
+  }, [cargarDatos])
 
   if (loading) return <p>Cargando datos del socio...</p>
 
