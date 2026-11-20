@@ -7,19 +7,30 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react';
-import { getSocios, actualizarSocio, cambiarPasswordSocio } from '../../api/socios';
+import {
+  getSocios,
+  actualizarSocio,
+  cambiarPasswordSocio,
+} from '../../api/socios';
 import '../../components/SocioHome.css';
 
 const PASS_VACIO = { actual: '', nueva: '', repetir: '' };
 
 function validarFortaleza(pass) {
-  if (pass.length < 8) return 'La nueva contraseña debe tener al menos 8 caracteres';
-  if (!/[A-Za-z]/.test(pass) || !/\d/.test(pass)) {
-    return 'La nueva contraseña debe incluir letras y números';
+  if (typeof pass !== 'string') {
+    return 'La contraseña debe ser una cadena de texto válida';
   }
+
+  if (pass.trim().length < 6) {
+    return 'La nueva contraseña debe tener al menos 6 caracteres';
+  }
+
+  if (pass.length > 64) {
+    return 'La nueva contraseña no puede superar los 64 caracteres';
+  }
+
   return null;
 }
-
 export function SocioPerfil({ idSocio }) {
   const [socio, setSocio] = useState(null);
   const [form, setForm] = useState({ email: '', telefono: '' });
@@ -40,7 +51,7 @@ export function SocioPerfil({ idSocio }) {
           setForm({ email: actual.email, telefono: actual.telefono });
         }
       })
-      .catch((err) => console.error('❌ Error al cargar perfil:', err));
+      .catch((err) => console.error(' Error al cargar perfil:', err));
   }, [idSocio]);
 
   const handleGuardarCampo = async (campo) => {
@@ -48,10 +59,10 @@ export function SocioPerfil({ idSocio }) {
       await actualizarSocio(idSocio, { [campo]: form[campo] });
       setSocio((prev) => ({ ...prev, [campo]: form[campo] }));
       setEditando((prev) => ({ ...prev, [campo]: false }));
-      setMensaje(`✅ ${campo} actualizado`);
+      setMensaje(` ${campo} actualizado`);
     } catch (error) {
-      console.error(`❌ Error al actualizar ${campo}:`, error);
-      setMensaje(`❌ Error al actualizar ${campo}`);
+      console.error(` Error al actualizar ${campo}:`, error);
+      setMensaje(` Error al actualizar ${campo}`);
     }
   };
 
@@ -87,11 +98,11 @@ export function SocioPerfil({ idSocio }) {
       setPassLoading(true);
       await cambiarPasswordSocio(idSocio, { actual, nueva });
       cerrarModal();
-      setMensaje('✅ Contraseña actualizada');
+      setMensaje(' Contraseña actualizada');
     } catch (error) {
-      console.error('❌ Error al actualizar contraseña:', error);
+      console.error(' Error al actualizar contraseña:', error);
       setPassError(
-        error.response?.data?.message ?? 'No se pudo actualizar la contraseña'
+        error.response?.data?.message ?? 'No se pudo actualizar la contraseña',
       );
     } finally {
       setPassLoading(false);
@@ -128,16 +139,27 @@ export function SocioPerfil({ idSocio }) {
               type="email"
               className="form-control"
               value={form.email}
-              onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, email: e.target.value }))
+              }
             />
-            <CButton size="sm" color="info" onClick={() => handleGuardarCampo('email')}>
+            <CButton
+              size="sm"
+              color="info"
+              onClick={() => handleGuardarCampo('email')}
+            >
               Guardar
             </CButton>
           </div>
         ) : (
           <div className="d-flex justify-content-between align-items-center">
             <span>{socio.email}</span>
-            <CButton size="sm" color="info" variant="outline" onClick={() => setEditando((prev) => ({ ...prev, email: true }))}>
+            <CButton
+              size="sm"
+              color="info"
+              variant="outline"
+              onClick={() => setEditando((prev) => ({ ...prev, email: true }))}
+            >
               Modificar
             </CButton>
           </div>
@@ -153,16 +175,29 @@ export function SocioPerfil({ idSocio }) {
               type="text"
               className="form-control"
               value={form.telefono}
-              onChange={(e) => setForm((prev) => ({ ...prev, telefono: e.target.value }))}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, telefono: e.target.value }))
+              }
             />
-            <CButton size="sm" color="info" onClick={() => handleGuardarCampo('telefono')}>
+            <CButton
+              size="sm"
+              color="info"
+              onClick={() => handleGuardarCampo('telefono')}
+            >
               Guardar
             </CButton>
           </div>
         ) : (
           <div className="d-flex justify-content-between align-items-center">
             <span>{socio.telefono}</span>
-            <CButton size="sm" color="info" variant="outline" onClick={() => setEditando((prev) => ({ ...prev, telefono: true }))}>
+            <CButton
+              size="sm"
+              color="info"
+              variant="outline"
+              onClick={() =>
+                setEditando((prev) => ({ ...prev, telefono: true }))
+              }
+            >
               Modificar
             </CButton>
           </div>
@@ -174,7 +209,12 @@ export function SocioPerfil({ idSocio }) {
         <label className="fw-bold">Contraseña</label>
         <div className="d-flex justify-content-between align-items-center">
           <span>••••••••</span>
-          <CButton size="sm" color="info" variant="outline" onClick={() => setModalVisible(true)}>
+          <CButton
+            size="sm"
+            color="info"
+            variant="outline"
+            onClick={() => setModalVisible(true)}
+          >
             Cambiar contraseña
           </CButton>
         </div>
@@ -184,7 +224,9 @@ export function SocioPerfil({ idSocio }) {
 
       {/* Modal contraseña */}
       <CModal visible={modalVisible} onClose={cerrarModal}>
-        <CModalHeader><CModalTitle>Cambiar contraseña</CModalTitle></CModalHeader>
+        <CModalHeader>
+          <CModalTitle>Cambiar contraseña</CModalTitle>
+        </CModalHeader>
         <CModalBody>
           <div className="mb-3">
             <label className="fw-bold">Contraseña actual</label>
@@ -193,7 +235,9 @@ export function SocioPerfil({ idSocio }) {
               className="form-control"
               autoComplete="current-password"
               value={passForm.actual}
-              onChange={(e) => setPassForm((prev) => ({ ...prev, actual: e.target.value }))}
+              onChange={(e) =>
+                setPassForm((prev) => ({ ...prev, actual: e.target.value }))
+              }
             />
           </div>
 
@@ -204,9 +248,13 @@ export function SocioPerfil({ idSocio }) {
               className="form-control"
               autoComplete="new-password"
               value={passForm.nueva}
-              onChange={(e) => setPassForm((prev) => ({ ...prev, nueva: e.target.value }))}
+              onChange={(e) =>
+                setPassForm((prev) => ({ ...prev, nueva: e.target.value }))
+              }
             />
-            <small className="text-muted">Mínimo 8 caracteres, con letras y números.</small>
+            <small className="text-muted">
+              Mínimo 6 caracteres.
+            </small>
           </div>
 
           <div className="mb-3">
@@ -216,17 +264,27 @@ export function SocioPerfil({ idSocio }) {
               className="form-control"
               autoComplete="new-password"
               value={passForm.repetir}
-              onChange={(e) => setPassForm((prev) => ({ ...prev, repetir: e.target.value }))}
+              onChange={(e) =>
+                setPassForm((prev) => ({ ...prev, repetir: e.target.value }))
+              }
             />
           </div>
 
           {passError && <p className="text-danger mb-0">{passError}</p>}
         </CModalBody>
         <CModalFooter>
-          <CButton color="secondary" onClick={cerrarModal} disabled={passLoading}>
+          <CButton
+            color="secondary"
+            onClick={cerrarModal}
+            disabled={passLoading}
+          >
             Cancelar
           </CButton>
-          <CButton color="info" onClick={validarYGuardarPassword} disabled={passLoading}>
+          <CButton
+            color="info"
+            onClick={validarYGuardarPassword}
+            disabled={passLoading}
+          >
             {passLoading ? 'Guardando...' : 'Guardar'}
           </CButton>
         </CModalFooter>
