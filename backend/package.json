@@ -10,6 +10,9 @@
   "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/src/app.js\"",
   "start": "node dist/src/app.js",
   "seed": "pnpm build && node ./dist/seed.js",
+  "migration:create": "pnpm build && mikro-orm migration:create --config ./dist/mikro-orm.config.js",
+  "migration:up": "pnpm build && mikro-orm migration:up --config ./dist/mikro-orm.config.js",
+  "migration:down": "pnpm build && mikro-orm migration:down --config ./dist/mikro-orm.config.js",
   "test": "vitest --run"
 },
   "keywords": [],

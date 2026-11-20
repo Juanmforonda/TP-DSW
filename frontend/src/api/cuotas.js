@@ -8,4 +8,3 @@ export const getCuotasPorSocio = (idSocio) =>api.get(`/api/cuotasMensuales/socio
 export const registrarPagoCuota = (id, data) => api.post(`/api/cuotasMensuales/${id}/pago`, data);
 export const generarCuotas = (mes, anio) => api.post('/api/cuotasMensuales/generar', { mes, anio });
 export const crearPreferenciaMP = (idCuota) => api.post(`/api/cuotasMensuales/${idCuota}/mercadopago/preferencia`);
-export const confirmarPagoMP = (paymentId) => api.post('/api/cuotasMensuales/mercadopago/confirmar', { paymentId });

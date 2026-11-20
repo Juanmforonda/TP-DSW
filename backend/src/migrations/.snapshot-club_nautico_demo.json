@@ -1,0 +1,1558 @@
+{
+  "namespaces": [],
+  "tables": [
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "dni": {
+          "name": "dni",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "apellido": {
+          "name": "apellido",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "administrador",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "estado": {
+          "name": "estado",
+          "type": "enum('libre','ocupado','mantenimiento')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "libre",
+            "ocupado",
+            "mantenimiento"
+          ],
+          "mappedType": "enum"
+        },
+        "precio_mensual_base": {
+          "name": "precio_mensual_base",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "longitud_max": {
+          "name": "longitud_max",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "zona": {
+          "name": "zona",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "nro_pilon": {
+          "name": "nro_pilon",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "amarra",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "estado": {
+          "name": "estado",
+          "type": "enum('disponible','ocupado','mantenimiento')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "disponible",
+            "ocupado",
+            "mantenimiento"
+          ],
+          "mappedType": "enum"
+        },
+        "nro_box": {
+          "name": "nro_box",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "precio_mensual_base": {
+          "name": "precio_mensual_base",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "box",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "apellido": {
+          "name": "apellido",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "dni": {
+          "name": "dni",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "telefono": {
+          "name": "telefono",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "socio",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "fecha_vencimiento": {
+          "name": "fecha_vencimiento",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "mes": {
+          "name": "mes",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "anio": {
+          "name": "anio",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "monto": {
+          "name": "monto",
+          "type": "numeric(10,2)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "precision": 10,
+          "scale": 2,
+          "mappedType": "decimal"
+        },
+        "pagada": {
+          "name": "pagada",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 1,
+          "default": "false",
+          "mappedType": "boolean"
+        },
+        "fecha_pago": {
+          "name": "fecha_pago",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "metodo_pago": {
+          "name": "metodo_pago",
+          "type": "enum('efectivo','mercado_pago')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "enumItems": [
+            "efectivo",
+            "mercado_pago"
+          ],
+          "mappedType": "enum"
+        },
+        "socio_id": {
+          "name": "socio_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "mercado_pago_preference_id": {
+          "name": "mercado_pago_preference_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "mercado_pago_payment_id": {
+          "name": "mercado_pago_payment_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "cuota_mensual",
+      "indexes": [
+        {
+          "columnNames": [
+            "socio_id"
+          ],
+          "composite": false,
+          "keyName": "cuota_mensual_socio_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "cuota_mensual_socio_id_mes_anio_unique",
+          "columnNames": [
+            "socio_id",
+            "mes",
+            "anio"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "cuota_mensual_socio_id_foreign": {
+          "constraintName": "cuota_mensual_socio_id_foreign",
+          "columnNames": [
+            "socio_id"
+          ],
+          "localTableName": "cuota_mensual",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "socio",
+          "createForeignKeyConstraint": true,
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "fecha": {
+          "name": "fecha",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "estado_anterior": {
+          "name": "estado_anterior",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 1,
+          "mappedType": "boolean"
+        },
+        "estado_nuevo": {
+          "name": "estado_nuevo",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 1,
+          "mappedType": "boolean"
+        },
+        "importe": {
+          "name": "importe",
+          "type": "numeric(10,2)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "precision": 10,
+          "scale": 2,
+          "mappedType": "decimal"
+        },
+        "moneda": {
+          "name": "moneda",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "fuente": {
+          "name": "fuente",
+          "type": "enum('manual','mercado_pago')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "manual",
+            "mercado_pago"
+          ],
+          "mappedType": "enum"
+        },
+        "payment_id": {
+          "name": "payment_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "motivo": {
+          "name": "motivo",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "cuota_id": {
+          "name": "cuota_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "administrador_id": {
+          "name": "administrador_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "pago_auditoria",
+      "indexes": [
+        {
+          "columnNames": [
+            "cuota_id"
+          ],
+          "composite": false,
+          "keyName": "pago_auditoria_cuota_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "administrador_id"
+          ],
+          "composite": false,
+          "keyName": "pago_auditoria_administrador_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "pago_auditoria_cuota_id_foreign": {
+          "constraintName": "pago_auditoria_cuota_id_foreign",
+          "columnNames": [
+            "cuota_id"
+          ],
+          "localTableName": "pago_auditoria",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "cuota_mensual",
+          "createForeignKeyConstraint": true,
+          "updateRule": "cascade"
+        },
+        "pago_auditoria_administrador_id_foreign": {
+          "constraintName": "pago_auditoria_administrador_id_foreign",
+          "columnNames": [
+            "administrador_id"
+          ],
+          "localTableName": "pago_auditoria",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "administrador",
+          "createForeignKeyConstraint": true,
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "fecha_inicio": {
+          "name": "fecha_inicio",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "fecha_fin": {
+          "name": "fecha_fin",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "socio_id": {
+          "name": "socio_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "afiliacion",
+      "indexes": [
+        {
+          "columnNames": [
+            "socio_id"
+          ],
+          "composite": false,
+          "keyName": "afiliacion_socio_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "afiliacion_socio_id_foreign": {
+          "constraintName": "afiliacion_socio_id_foreign",
+          "columnNames": [
+            "socio_id"
+          ],
+          "localTableName": "afiliacion",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "socio",
+          "createForeignKeyConstraint": true,
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "eslora_maxima": {
+          "name": "eslora_maxima",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "tipo_embarcacion",
+      "indexes": [
+        {
+          "columnNames": [
+            "nombre"
+          ],
+          "composite": false,
+          "keyName": "tipo_embarcacion_nombre_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "matricula": {
+          "name": "matricula",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "eslora": {
+          "name": "eslora",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "tipo_embarcacion_id": {
+          "name": "tipo_embarcacion_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "socio_id": {
+          "name": "socio_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "fecha_fin": {
+          "name": "fecha_fin",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "embarcacion",
+      "indexes": [
+        {
+          "columnNames": [
+            "tipo_embarcacion_id"
+          ],
+          "composite": false,
+          "keyName": "embarcacion_tipo_embarcacion_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "socio_id"
+          ],
+          "composite": false,
+          "keyName": "embarcacion_socio_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "embarcacion_tipo_embarcacion_id_foreign": {
+          "constraintName": "embarcacion_tipo_embarcacion_id_foreign",
+          "columnNames": [
+            "tipo_embarcacion_id"
+          ],
+          "localTableName": "embarcacion",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "tipo_embarcacion",
+          "createForeignKeyConstraint": true,
+          "updateRule": "cascade"
+        },
+        "embarcacion_socio_id_foreign": {
+          "constraintName": "embarcacion_socio_id_foreign",
+          "columnNames": [
+            "socio_id"
+          ],
+          "localTableName": "embarcacion",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "socio",
+          "createForeignKeyConstraint": true,
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "fecha_hora_inicio": {
+          "name": "fecha_hora_inicio",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "fecha_hora_fin": {
+          "name": "fecha_hora_fin",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "estado": {
+          "name": "estado",
+          "type": "enum('ACTIVA','FINALIZADA','CANCELADA')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "'ACTIVA'",
+          "enumItems": [
+            "ACTIVA",
+            "FINALIZADA",
+            "CANCELADA"
+          ],
+          "mappedType": "enum"
+        },
+        "socio_id": {
+          "name": "socio_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "embarcacion_id": {
+          "name": "embarcacion_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "reserva_travel_lift",
+      "indexes": [
+        {
+          "columnNames": [
+            "socio_id"
+          ],
+          "composite": false,
+          "keyName": "reserva_travel_lift_socio_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "embarcacion_id"
+          ],
+          "composite": false,
+          "keyName": "reserva_travel_lift_embarcacion_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "reserva_travel_lift_socio_id_foreign": {
+          "constraintName": "reserva_travel_lift_socio_id_foreign",
+          "columnNames": [
+            "socio_id"
+          ],
+          "localTableName": "reserva_travel_lift",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "socio",
+          "createForeignKeyConstraint": true,
+          "updateRule": "cascade"
+        },
+        "reserva_travel_lift_embarcacion_id_foreign": {
+          "constraintName": "reserva_travel_lift_embarcacion_id_foreign",
+          "columnNames": [
+            "embarcacion_id"
+          ],
+          "localTableName": "reserva_travel_lift",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "embarcacion",
+          "createForeignKeyConstraint": true,
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "fecha_inicio": {
+          "name": "fecha_inicio",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "fecha_fin": {
+          "name": "fecha_fin",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "estado": {
+          "name": "estado",
+          "type": "enum('ACTIVA','FINALIZADA','CANCELADA')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "'ACTIVA'",
+          "enumItems": [
+            "ACTIVA",
+            "FINALIZADA",
+            "CANCELADA"
+          ],
+          "mappedType": "enum"
+        },
+        "precio_mensual_final": {
+          "name": "precio_mensual_final",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "socio_id": {
+          "name": "socio_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "embarcacion_id": {
+          "name": "embarcacion_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "amarra_id": {
+          "name": "amarra_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "box_id": {
+          "name": "box_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "reserva_infraestructura",
+      "indexes": [
+        {
+          "columnNames": [
+            "socio_id"
+          ],
+          "composite": false,
+          "keyName": "reserva_infraestructura_socio_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "embarcacion_id"
+          ],
+          "composite": false,
+          "keyName": "reserva_infraestructura_embarcacion_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "amarra_id"
+          ],
+          "composite": false,
+          "keyName": "reserva_infraestructura_amarra_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "box_id"
+          ],
+          "composite": false,
+          "keyName": "reserva_infraestructura_box_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "reserva_infraestructura_socio_id_foreign": {
+          "constraintName": "reserva_infraestructura_socio_id_foreign",
+          "columnNames": [
+            "socio_id"
+          ],
+          "localTableName": "reserva_infraestructura",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "socio",
+          "createForeignKeyConstraint": true,
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "reserva_infraestructura_embarcacion_id_foreign": {
+          "constraintName": "reserva_infraestructura_embarcacion_id_foreign",
+          "columnNames": [
+            "embarcacion_id"
+          ],
+          "localTableName": "reserva_infraestructura",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "embarcacion",
+          "createForeignKeyConstraint": true,
+          "updateRule": "cascade"
+        },
+        "reserva_infraestructura_amarra_id_foreign": {
+          "constraintName": "reserva_infraestructura_amarra_id_foreign",
+          "columnNames": [
+            "amarra_id"
+          ],
+          "localTableName": "reserva_infraestructura",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "amarra",
+          "createForeignKeyConstraint": true,
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "reserva_infraestructura_box_id_foreign": {
+          "constraintName": "reserva_infraestructura_box_id_foreign",
+          "columnNames": [
+            "box_id"
+          ],
+          "localTableName": "reserva_infraestructura",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "box",
+          "createForeignKeyConstraint": true,
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "concepto": {
+          "name": "concepto",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "monto": {
+          "name": "monto",
+          "type": "numeric(10,2)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "precision": 10,
+          "scale": 2,
+          "mappedType": "decimal"
+        },
+        "cuota_id": {
+          "name": "cuota_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "reserva_infraestructura_id": {
+          "name": "reserva_infraestructura_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "detalle_cuota",
+      "indexes": [
+        {
+          "columnNames": [
+            "cuota_id"
+          ],
+          "composite": false,
+          "keyName": "detalle_cuota_cuota_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "reserva_infraestructura_id"
+          ],
+          "composite": false,
+          "keyName": "detalle_cuota_reserva_infraestructura_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "detalle_cuota_cuota_id_foreign": {
+          "constraintName": "detalle_cuota_cuota_id_foreign",
+          "columnNames": [
+            "cuota_id"
+          ],
+          "localTableName": "detalle_cuota",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "cuota_mensual",
+          "createForeignKeyConstraint": true,
+          "updateRule": "cascade"
+        },
+        "detalle_cuota_reserva_infraestructura_id_foreign": {
+          "constraintName": "detalle_cuota_reserva_infraestructura_id_foreign",
+          "columnNames": [
+            "reserva_infraestructura_id"
+          ],
+          "localTableName": "detalle_cuota",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "reserva_infraestructura",
+          "createForeignKeyConstraint": true,
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "fecha_inicio": {
+          "name": "fecha_inicio",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "fecha_fin": {
+          "name": "fecha_fin",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "estado": {
+          "name": "estado",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "embarcacion_id": {
+          "name": "embarcacion_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "socio_id": {
+          "name": "socio_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "reserva_embarcacion_club",
+      "indexes": [
+        {
+          "columnNames": [
+            "embarcacion_id"
+          ],
+          "composite": false,
+          "keyName": "reserva_embarcacion_club_embarcacion_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "socio_id"
+          ],
+          "composite": false,
+          "keyName": "reserva_embarcacion_club_socio_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "reserva_embarcacion_club_embarcacion_id_foreign": {
+          "constraintName": "reserva_embarcacion_club_embarcacion_id_foreign",
+          "columnNames": [
+            "embarcacion_id"
+          ],
+          "localTableName": "reserva_embarcacion_club",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "embarcacion",
+          "createForeignKeyConstraint": true,
+          "updateRule": "cascade"
+        },
+        "reserva_embarcacion_club_socio_id_foreign": {
+          "constraintName": "reserva_embarcacion_club_socio_id_foreign",
+          "columnNames": [
+            "socio_id"
+          ],
+          "localTableName": "reserva_embarcacion_club",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "socio",
+          "createForeignKeyConstraint": true,
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    }
+  ],
+  "nativeEnums": {}
+}
