@@ -66,3 +66,28 @@ export function requireRole(...roles: Tipo[]) {
     return next();
   };
 }
+
+export function requireSelf(paramName: string) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as AuthenticatedRequest).user;
+    const requestedId = req.params[paramName];
+
+    if (!user || String(requestedId) !== String(user.id)) {
+      return res.status(403).json({ message: 'Permisos insuficientes' });
+    }
+
+    return next();
+  };
+}
+
+export function setAuthenticatedId(paramName: string) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as AuthenticatedRequest).user;
+    if (!user) {
+      return res.status(401).json({ message: 'Autenticación requerida' });
+    }
+
+    req.params[paramName] = String(user.id);
+    return next();
+  };
+}

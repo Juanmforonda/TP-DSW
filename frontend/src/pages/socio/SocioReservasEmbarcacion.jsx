@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   CContainer,
   CRow,
@@ -24,7 +24,7 @@ import {
 } from '@coreui/react';
 import { getEmbarcacionesClub } from '../../api/embarcaciones.js';
 import {
-  getReservasPorSocio,
+  getMisReservasEmbarcacionClub,
   getReservasPorEmbarcacion,
   crearReservaEmbarcacionClub,
   actualizarReservaEmbarcacionClub,
@@ -78,7 +78,6 @@ export function SocioReservasEmbarcacion({ idSocio }) {
   useEffect(() => {
     cargarEmbarcaciones();
     cargarReservasSocio();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -99,14 +98,14 @@ export function SocioReservasEmbarcacion({ idSocio }) {
     }
   }
 
-  async function cargarReservasSocio() {
+  const cargarReservasSocio = useCallback(async () => {
     try {
-      const res = await getReservasPorSocio(idSocio);
+      const res = await getMisReservasEmbarcacionClub();
       setReservasSocio(listFromResponse(res));
     } catch {
       setReservasSocio([]);
     }
-  }
+  }, []);
 
   async function cargarReservasEmbarcacion(id) {
     try {

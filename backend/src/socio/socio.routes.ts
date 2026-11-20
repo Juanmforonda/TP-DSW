@@ -1,12 +1,25 @@
-import { Router } from 'express'
-import { findAll, findOne, add, update, cambiarPassword, remove, bajaLogica } from './socio.controller.js'
+import { Router } from 'express';
 
-export const socioRouter = Router()
+import {
+  findAll,
+  findOne,
+  add,
+  update,
+  remove,
+  bajaLogica,
+  cambiarPassword,
+} from './socio.controller.js';
+import { requireRole, setAuthenticatedId } from '../auth/auth.middleware.js';
 
-socioRouter.get('/', findAll)
-socioRouter.get('/:id', findOne)
-socioRouter.post('/', add)
-socioRouter.put('/baja-logica/:id', bajaLogica)
-socioRouter.patch('/:id/password', cambiarPassword)
-socioRouter.put('/:id', update)
-socioRouter.delete('/:id', remove)
+export const socioRouter = Router();
+
+socioRouter.get('/me', setAuthenticatedId('id'), findOne);
+socioRouter.put('/me', setAuthenticatedId('id'), update);
+socioRouter.patch('/me/password', setAuthenticatedId('id'), cambiarPassword);
+
+socioRouter.get('/', requireRole('admin'), findAll);
+socioRouter.get('/:id', requireRole('admin'), findOne);
+socioRouter.post('/', requireRole('admin'), add);
+socioRouter.put('/baja-logica/:id', requireRole('admin'), bajaLogica);
+socioRouter.put('/:id', requireRole('admin'), update);
+socioRouter.delete('/:id', requireRole('admin'), remove);

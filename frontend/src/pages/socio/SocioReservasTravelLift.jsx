@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   CAlert, CButton, CCard, CCardBody, CCardHeader, CForm, CFormInput,
   CFormLabel, CFormSelect, CTable, CTableBody, CTableDataCell, CTableHead,
   CTableHeaderCell, CTableRow,
 } from '@coreui/react';
-import { getEmbarcacionesActivasPorSocio } from '../../api/embarcaciones.js';
+import { getMisEmbarcaciones } from '../../api/embarcaciones.js';
 import {
   cancelarReservaTravelLift, crearReservaTravelLift, finalizarReservaTravelLift,
-  getReservasTravelLift, getReservasTravelLiftPorSocio,
+  getMisReservasTravelLift,
 } from '../../api/reservasTravelLift.js';
 import TravelLiftTimePicker from '../../components/TravelLiftTimePicker.jsx';
 import { formatReservationDate, listFromResponse } from '../../utils/reservas.js';
@@ -24,21 +24,23 @@ export function SocioReservasTravelLift({ idSocio }) {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
 
-  async function load() {
-    const [boats, own, all] = await Promise.all([
-      getEmbarcacionesActivasPorSocio(idSocio),
-      getReservasTravelLiftPorSocio(idSocio),
-      getReservasTravelLift(),
-    ]);
-    setEmbarcaciones(unwrap(boats));
-    setReservas(unwrap(own));
-    setTodasLasReservas(unwrap(all));
-  }
+  const cargarReservas = useCallback(async () => {
+    try {
+      const [boats, own] = await Promise.all([
+        getMisEmbarcaciones(),
+        getMisReservasTravelLift(),
+      ]);
+      setEmbarcaciones(unwrap(boats));
+      setReservas(unwrap(own));
+      setTodasLasReservas(unwrap(own));
+    } catch (err) {
+      setError(err.response?.data?.message ?? 'No se pudieron cargar las reservas');
+    }
+  }, [idSocio]);
 
   useEffect(() => {
-    load().catch((err) => setError(err.response?.data?.message ?? 'No se pudieron cargar las reservas'));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idSocio]);
+    cargarReservas();
+  }, [cargarReservas]);
 
   async function crear(event) {
     event.preventDefault();
@@ -60,7 +62,7 @@ export function SocioReservasTravelLift({ idSocio }) {
       setEmbarcacion('');
       setFecha('');
       setHorario(null);
-      await load();
+      await cargarReservas();
     } catch (err) {
       setError(err.response?.data?.message ?? 'No se pudo crear la reserva.');
     }
@@ -70,7 +72,7 @@ export function SocioReservasTravelLift({ idSocio }) {
     try {
       await accion(reserva.id);
       setMessage('Reserva actualizada.');
-      await load();
+      await cargarReservas();
     } catch (err) {
       setError(err.response?.data?.message ?? 'No se pudo actualizar la reserva.');
     }

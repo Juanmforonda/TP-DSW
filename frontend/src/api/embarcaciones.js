@@ -6,6 +6,8 @@ export const eliminarEmbarcacion = (id) => api.delete(`/api/embarcaciones/${id}`
 export const reactivarEmbarcacion = (id) => api.post(`/api/embarcaciones/${id}/reactivar`);
 export const actualizarEmbarcacion = (id, data) => api.put(`/api/embarcaciones/${id}`, data);
 export const getEmbarcacionesClub = () => api.get('/api/embarcaciones/club');
+export const getMisEmbarcaciones = () =>
+  api.get('/api/embarcaciones/me');
 export const getEmbarcacionesActivasPorSocio = (idSocio) => {
   if (!idSocio || idSocio === 'null' || idSocio === 'club') {
     // Si el id es null, undefined o 'club', obtenemos las del club

@@ -2,6 +2,7 @@ import { ReservaEmbarcacionClub } from './reservaEmbarcacionClub.entity.js';
 import { orm } from '../shared/orm.js';
 import { NextFunction, Request, Response } from 'express';
 import { Embarcacion } from '../embarcacion/embarcacion.entity.js';
+import { AuthenticatedRequest } from '../auth/auth.middleware.js';
 
 const em = orm.em;
 function sanitizeReservaEmbarcacionClubInput(
@@ -112,6 +113,11 @@ async function findOne(req: Request, res: Response) {
 }
 
 async function add(req: Request, res: Response) {
+  const user = (req as AuthenticatedRequest).user;
+  if (user.tipo === 'socio') {
+    req.body.sanitizedInput.socio = user.id;
+  }
+
   const embarcacionExists = await em.findOne(Embarcacion, {
     id: req.body.sanitizedInput.embarcacion,
   });
@@ -153,10 +159,21 @@ async function add(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
+    const user = (req as AuthenticatedRequest).user;
     const reservaEmbarcacionClub = await em.findOneOrFail(
       ReservaEmbarcacionClub,
-      { id }
+      { id },
+      { populate: ['socio'] }
     );
+    if (
+      user.tipo === 'socio' &&
+      String(reservaEmbarcacionClub.socio?.id) !== String(user.id)
+    ) {
+      return res.status(403).json({ message: 'Permisos insuficientes' });
+    }
+    if (user.tipo === 'socio') {
+      req.body.sanitizedInput.socio = user.id;
+    }
 
     if (req.body.sanitizedInput.embarcacion) {
       const embarcacionExists = await em.findOne(Embarcacion, {
@@ -207,7 +224,18 @@ async function remove(req: Request, res: Response) {
 async function cancel (req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const reservaEmbarcacionClub = await em.findOneOrFail(ReservaEmbarcacionClub, {id});
+    const user = (req as AuthenticatedRequest).user;
+    const reservaEmbarcacionClub = await em.findOneOrFail(
+      ReservaEmbarcacionClub,
+      { id },
+      { populate: ['socio'] }
+    );
+    if (
+      user.tipo === 'socio' &&
+      String(reservaEmbarcacionClub.socio?.id) !== String(user.id)
+    ) {
+      return res.status(403).json({ message: 'Permisos insuficientes' });
+    }
     reservaEmbarcacionClub.estado = 'CANCELADA';
     await em.flush();
     res.status(200).json({message: 'ReservaEmbarcacionClub cancelled', data: reservaEmbarcacionClub});

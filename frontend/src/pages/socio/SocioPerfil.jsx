@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   CButton,
   CModal,
@@ -7,11 +7,6 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react';
-import {
-  getSocios,
-  actualizarSocio,
-  cambiarPasswordSocio,
-} from '../../api/socios';
 import '../../components/SocioHome.css';
 
 const PASS_VACIO = { actual: '', nueva: '', repetir: '' };
@@ -31,7 +26,9 @@ function validarFortaleza(pass) {
 
   return null;
 }
-export function SocioPerfil({ idSocio }) {
+import { getMiPerfil, actualizarMiPerfil, cambiarPasswordSocio } from '../../api/socios';
+
+export function SocioPerfil() {
   const [socio, setSocio] = useState(null);
   const [form, setForm] = useState({ email: '', telefono: '' });
   const [editando, setEditando] = useState({ email: false, telefono: false });
@@ -41,23 +38,26 @@ export function SocioPerfil({ idSocio }) {
   const [passLoading, setPassLoading] = useState(false);
   const [mensaje, setMensaje] = useState(null);
 
+  const cargarPerfil = useCallback(async () => {
+    try {
+      const res = await getMiPerfil();
+      const actual = res.data?.data;
+      if (actual) {
+        setSocio(actual);
+        setForm({ email: actual.email, telefono: actual.telefono });
+      }
+    } catch (err) {
+      console.error('Error al cargar perfil:', err);
+    }
+  }, []);
+
   useEffect(() => {
-    getSocios()
-      .then((res) => {
-        const todos = res.data?.data ?? [];
-        const actual = todos.find((s) => s.id === idSocio);
-        if (actual) {
-          setSocio(actual);
-          setForm({ email: actual.email, telefono: actual.telefono });
-        }
-      })
-      .catch((err) => console.error(' Error al cargar perfil:', err));
-  }, [idSocio]);
+    cargarPerfil();
+  }, [cargarPerfil]);
 
   const handleGuardarCampo = async (campo) => {
     try {
-      await actualizarSocio(idSocio, { [campo]: form[campo] });
-      setSocio((prev) => ({ ...prev, [campo]: form[campo] }));
+      await actualizarMiPerfil({ [campo]: form[campo] });
       setEditando((prev) => ({ ...prev, [campo]: false }));
       setMensaje(` ${campo} actualizado`);
     } catch (error) {
@@ -96,7 +96,7 @@ export function SocioPerfil({ idSocio }) {
 
     try {
       setPassLoading(true);
-      await cambiarPasswordSocio(idSocio, { actual, nueva });
+      await cambiarPasswordSocio({ actual, nueva });
       cerrarModal();
       setMensaje(' Contraseña actualizada');
     } catch (error) {

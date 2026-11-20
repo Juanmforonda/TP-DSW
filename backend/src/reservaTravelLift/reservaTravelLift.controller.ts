@@ -6,6 +6,7 @@ import {
   EstadoReservaTravelLift,
   ReservaTravelLift,
 } from './reservaTravelLift.entity.js';
+import { AuthenticatedRequest } from '../auth/auth.middleware.js';
 
 const em = orm.em;
 const HORA_EN_MILISEGUNDOS = 60 * 60 * 1000;
@@ -122,6 +123,10 @@ async function findOne(req: Request, res: Response) {
 async function add(req: Request, res: Response) {
   try {
     const input = req.body.sanitizedInput;
+    const user = (req as AuthenticatedRequest).user;
+    if (user.tipo === 'socio') {
+      input.socio = user.id;
+    }
     const { start, end, socio, embarcacion } = await validateReservation(input);
     const reserva = em.create(ReservaTravelLift, {
       fechaHoraInicio: start,
@@ -140,8 +145,18 @@ async function add(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id, 10);
-    const reserva = await em.findOneOrFail(ReservaTravelLift, { id });
+    const user = (req as AuthenticatedRequest).user;
+    const reserva = await em.findOneOrFail(ReservaTravelLift, { id }, { populate: ['socio'] });
+    if (
+      user.tipo === 'socio' &&
+      String(reserva.socio?.id) !== String(user.id)
+    ) {
+      return res.status(403).json({ message: 'Permisos insuficientes' });
+    }
     const input = { ...req.body.sanitizedInput };
+    if (user.tipo === 'socio') {
+      input.socio = user.id;
+    }
     const merged = {
       fechaHoraInicio: input.fechaHoraInicio ?? reserva.fechaHoraInicio,
       fechaHoraFin: input.fechaHoraFin ?? reserva.fechaHoraFin,
@@ -179,9 +194,16 @@ async function remove(req: Request, res: Response) {
 
 async function changeStatus(req: Request, res: Response, estado: EstadoReservaTravelLift) {
   try {
+    const user = (req as AuthenticatedRequest).user;
     const reserva = await em.findOneOrFail(ReservaTravelLift, {
       id: Number.parseInt(req.params.id, 10),
-    });
+    }, { populate: ['socio'] });
+    if (
+      user.tipo === 'socio' &&
+      String(reserva.socio?.id) !== String(user.id)
+    ) {
+      return res.status(403).json({ message: 'Permisos insuficientes' });
+    }
     reserva.estado = estado;
     await em.flush();
     res.status(200).json({ message: `ReservaTravelLift ${estado.toLowerCase()}`, data: reserva });

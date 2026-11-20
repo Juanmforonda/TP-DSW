@@ -1,20 +1,58 @@
-//en desarrollo nunca va a entrar porque se comunica con MP directamente
 
+import crypto from 'node:crypto';
 import { Request, Response } from 'express';
-import { Payment } from 'mercadopago';
-import { orm } from '../shared/orm.js';
-import { mpClient } from '../config/mercadopago.config.js';
-import {
-  CuotaMensual,
-  MetodoPago,
-} from '../cuotaMensual/cuotaMensual.entity.js';
+import { validateAndApplyMercadoPago } from '../cuotaMensual/cuotaMensual.payment.service.js';
 
-const em = orm.em;
+const WEBHOOK_MAX_AGE_SECONDS = 5 * 60;
+
+function getSignaturePart(signature: string, key: string) {
+  return signature
+    .split(',')
+    .map((part) => part.trim().split('='))
+    .find(([partKey]) => partKey === key)?.[1];
+}
+
+function isValidSignature(req: Request, paymentId: string) {
+  const secret = process.env.MP_WEBHOOK_SECRET;
+  const signature = req.header('x-signature');
+  const requestId = req.header('x-request-id');
+  const timestamp = signature
+    ? getSignaturePart(signature, 'ts')
+    : undefined;
+  const receivedHash = signature
+    ? getSignaturePart(signature, 'v1')
+    : undefined;
+
+  if (!secret || !signature || !requestId || !timestamp || !receivedHash) {
+    return false;
+  }
+
+  const timestampNumber = Number(timestamp);
+  if (
+    !Number.isInteger(timestampNumber) ||
+    Math.abs(Math.floor(Date.now() / 1000) - timestampNumber) >
+      WEBHOOK_MAX_AGE_SECONDS
+  ) {
+    return false;
+  }
+
+  const manifest = `id:${paymentId};request-id:${requestId};ts:${timestamp};`;
+  const expectedHash = crypto
+    .createHmac('sha256', secret)
+    .update(manifest)
+    .digest('hex');
+  const expectedBuffer = Buffer.from(expectedHash, 'utf8');
+  const receivedBuffer = Buffer.from(receivedHash, 'utf8');
+
+  return (
+    expectedBuffer.length === receivedBuffer.length &&
+    crypto.timingSafeEqual(expectedBuffer, receivedBuffer)
+  );
+}
 
 async function webhookMercadoPago(req: Request, res: Response) {
 
   try {
-    console.log('ENTRASYTE AL WEBHOOOOOOOOOOK');
     let paymentId = (req.query['data.id'] as string) || req.body?.data?.id;
     let topic = (req.query['type'] as string) || req.body?.type;
 
@@ -37,20 +75,11 @@ async function webhookMercadoPago(req: Request, res: Response) {
       return res.status(200).send(); // no es un evento de pago, igual respondemos 200
     }
 
-    const paymentClient = new Payment(mpClient);
-    const pagoInfo = await paymentClient.get({ id: String(paymentId) });
-
-    const cuotaId = Number(pagoInfo.external_reference);
-    const cuota = await em.findOne(CuotaMensual, { id: cuotaId });
-    if (!cuota) return res.status(200).send();
-
-    if (pagoInfo.status === 'approved' && !cuota.pagada) {
-      cuota.pagada = true;
-      cuota.metodoPago = MetodoPago.MERCADO_PAGO;
-      cuota.fechaPago = new Date();
-      cuota.mercadoPagoPaymentId = String(pagoInfo.id);
-      await em.flush();
+    if (!isValidSignature(req, String(paymentId))) {
+      return res.status(401).json({ message: 'Firma de webhook inválida' });
     }
+
+    await validateAndApplyMercadoPago(String(paymentId));
 
     res.status(200).send();
   } catch (error: any) {
@@ -59,4 +88,4 @@ async function webhookMercadoPago(req: Request, res: Response) {
   }
 }
 
-export { webhookMercadoPago };
+export { isValidSignature, webhookMercadoPago };

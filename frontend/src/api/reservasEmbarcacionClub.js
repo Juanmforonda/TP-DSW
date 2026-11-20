@@ -13,5 +13,7 @@ export const finalizarReservaEmbarcacionClub = (id) =>
   api.post(`/api/reservasEmbarcacionClub/${id}/finalizar`);
 export const getReservasPorSocio = (idSocio) =>
   api.get(`/api/reservasEmbarcacionClub/socio/${idSocio}`);
+export const getMisReservasEmbarcacionClub = () =>
+  api.get('/api/reservasEmbarcacionClub/me');
 export const getReservasPorEmbarcacion = (idEmbarcacion) =>
   api.get(`/api/reservasEmbarcacionClub/embarcacion/${idEmbarcacion}`);
