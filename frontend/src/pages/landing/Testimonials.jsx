@@ -1,5 +1,6 @@
 import Navbar from "./Navbar";
 import React, { useState, useEffect } from 'react';
+import { getUserTestimonials, saveUserTestimonials } from '../../utils/storage';
 import './Testimonials.css';
 
 const Testimonials = () => {
@@ -35,10 +36,7 @@ const Testimonials = () => {
 
   // Cargar testimonios desde localStorage al iniciar
   useEffect(() => {
-    const savedTestimonials = localStorage.getItem('userTestimonials');
-    if (savedTestimonials) {
-      setTestimonials(JSON.parse(savedTestimonials));
-    }
+    setTestimonials(getUserTestimonials());
   }, []);
 
   // Calcular el ancho de cada tarjeta basado en testimoniosPerView
@@ -112,7 +110,7 @@ const Testimonials = () => {
 
     const updatedTestimonials = [...testimonials, testimonial];
     setTestimonials(updatedTestimonials);
-    localStorage.setItem('userTestimonials', JSON.stringify(updatedTestimonials));
+    saveUserTestimonials(updatedTestimonials);
     
     // Resetear formulario
     setNewTestimonial({

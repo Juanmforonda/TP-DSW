@@ -50,3 +50,4 @@ Content-Type: application/json
 @idToDelete = {{createSocioToDelete.response.body.data.id}}
 DELETE http://localhost:3000/api/socios/{{idToDelete}}
 
+
