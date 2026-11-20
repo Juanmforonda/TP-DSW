@@ -194,24 +194,28 @@ export function SocioReservasEmbarcacion({ idSocio }) {
     }
     try {
       const payload = {
-        fechaInicio: toISO(editInicio),
-        fechaFin: toISO(editFin),
-      };
-      const res = await actualizarReservaEmbarcacionClub(
-        editingReserva.id,
-        payload
+       fechaInicio: toISO(editInicio),
+       fechaFin: toISO(editFin),
+    };
+
+    await actualizarReservaEmbarcacionClub(
+      editingReserva.id,
+      payload
+    );
+
+    setEditModalOpen(false);
+    await cargarReservasSocio();
+
+    if (selectedEmb) {
+      await cargarReservasEmbarcacion(selectedEmb);
+    }
+
+    } catch (error) {
+      setEditError(
+        error.response?.data?.message ??
+        error.message ??
+        'Error de conexión'
       );
-      if (res.ok) {
-        setEditModalOpen(false);
-        cargarReservasSocio();
-        if (selectedEmb) cargarReservasEmbarcacion(selectedEmb);
-      } else {
-        const msg =
-          res.data?.message ?? res.message ?? `Error ${res.status ?? ''}`;
-        setEditError(msg);
-      }
-    } catch {
-      setEditError('Error de conexión');
     }
   }
 

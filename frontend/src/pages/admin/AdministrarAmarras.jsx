@@ -155,7 +155,6 @@ export default function AdministrarAmarras(){
           </div>
         ) : (
           <>
-            {console.log('datos acuales', amarras)}
             <EntityTable
               entityName="amarra"
               entityNamePlural="amarras"

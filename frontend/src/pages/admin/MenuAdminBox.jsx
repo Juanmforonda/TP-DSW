@@ -1,14 +1,13 @@
-import { useNavigate } from 'react-router-dom';
-import { MenuButton } from '../../components/MenuButton.jsx';
-import { MenuPadre } from '../../components/MenuPadre.jsx';
+import { MenuAdminEntidad } from '../../components/MenuAdminEntidad.jsx';
 
-export function MenuAdminBox(){
-  const navigate = useNavigate();
-
+export function MenuAdminBox() {
   return (
-    <MenuPadre label = 'Menú de administración de Boxes'>
-      <MenuButton label = 'Administrar Boxes' onClick={() => navigate('/admin/boxes/administrar')} />
-      <MenuButton label = 'Listar Boxes' onClick={() => navigate('/admin/boxes/listar')} />
-    </MenuPadre>
+    <MenuAdminEntidad
+      titulo="Menú de administración de Boxes"
+      textoAdministrar="Administrar Boxes"
+      textoListar="Listar Boxes"
+      rutaAdministrar="/admin/boxes/administrar"
+      rutaListar="/admin/boxes/listar"
+    />
   );
 }
