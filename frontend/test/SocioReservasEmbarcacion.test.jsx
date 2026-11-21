@@ -21,7 +21,7 @@ vi.mock(
 vi.mock(
   '../src/api/reservasEmbarcacionClub.js',
   () => ({
-    getReservasPorSocio: vi.fn(() =>
+    getMisReservasEmbarcacionClub: vi.fn(() =>
       Promise.resolve({
         data: {
           data: [

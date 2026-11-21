@@ -14,7 +14,7 @@ import { formatReservationDate, listFromResponse } from '../../utils/reservas.js
 
 const unwrap = listFromResponse;
 
-export function SocioReservasTravelLift({ idSocio }) {
+export function SocioReservasTravelLift() {
   const [embarcaciones, setEmbarcaciones] = useState([]);
   const [reservas, setReservas] = useState([]);
   const [todasLasReservas, setTodasLasReservas] = useState([]);
@@ -36,7 +36,7 @@ export function SocioReservasTravelLift({ idSocio }) {
     } catch (err) {
       setError(err.response?.data?.message ?? 'No se pudieron cargar las reservas');
     }
-  }, [idSocio]);
+  }, []);
 
   useEffect(() => {
     cargarReservas();
@@ -52,7 +52,6 @@ export function SocioReservasTravelLift({ idSocio }) {
     }
     try {
       await crearReservaTravelLift({
-        socio: idSocio,
         embarcacion: Number(embarcacion),
         fechaHoraInicio: horario.inicioLocal,
         fechaHoraFin: horario.finLocal,

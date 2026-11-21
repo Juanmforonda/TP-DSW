@@ -49,7 +49,7 @@ function getTodayLocalDate() {
   return `${year}-${month}-${day}`;
 }
 
-export function SocioReservasEmbarcacion({ idSocio }) {
+export function SocioReservasEmbarcacion() {
   const todayLocal = getTodayLocalDate();
   const [embarcacionesClub, setEmbarcacionesClub] = useState([]);
   const [reservasSocio, setReservasSocio] = useState([]);
@@ -144,7 +144,6 @@ export function SocioReservasEmbarcacion({ idSocio }) {
         fechaInicio: toISO(inicio),
         fechaFin: toISO(fin),
         estado: 'ACTIVA',
-        socio: idSocio,
       };
 
       const res = await crearReservaEmbarcacionClub(payload);

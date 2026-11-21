@@ -16,7 +16,7 @@ import {
 
 const MP_ENABLED = import.meta.env.VITE_MP_ENABLED === 'true';
 
-export function SocioCuotas({ idSocio }) {
+export function SocioCuotas() {
   const [cuotas, setCuotas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,11 +25,6 @@ export function SocioCuotas({ idSocio }) {
   const [pagando, setPagando] = useState({});
 
   const cargarCuotas = useCallback(async () => {
-    if (!idSocio) {
-      setLoading(false);
-      return;
-    }
-
     setLoading(true);
     setError(null);
 
@@ -46,7 +41,7 @@ export function SocioCuotas({ idSocio }) {
     } finally {
       setLoading(false);
     }
-  }, [idSocio]);
+  }, []);
 
   useEffect(() => {
     cargarCuotas();

@@ -5,6 +5,7 @@ import { Socio } from '../socio/socio.entity.js';
 import { Administrador } from '../administrador/administrador.entity.js';
 import { AuthError, ValidationError } from './auth.errors.js';
 import { JWT_SECRET } from './auth.config.js';
+import type { AuthenticatedRequest } from './auth.middleware.js';
 
 type Tipo = 'socio' | 'admin';
 
@@ -24,6 +25,43 @@ function firmarToken(id: unknown, tipo: Tipo) {
 async function verificarPassword(plano: string, hash: string) {
   const valida = await bcrypt.compare(plano, hash);
   if (!valida) throw new AuthError();
+}
+
+export async function getAuthenticatedProfile(
+  user: AuthenticatedRequest['user'],
+) {
+  const em = orm.em.fork();
+
+  if (user.tipo === 'socio') {
+    const socio = await em.findOne(
+      Socio,
+      { id: Number(user.id) },
+      { populate: ['afiliaciones'] },
+    );
+    if (!socio) throw new AuthError('Usuario no encontrado');
+    return {
+      tipo: 'socio' as const,
+      perfil: {
+        id: socio.id,
+        nombre: socio.nombre,
+        apellido: socio.apellido,
+        email: socio.email,
+        telefono: socio.telefono,
+      },
+    };
+  }
+
+  const admin = await em.findOne(Administrador, { id: Number(user.id) });
+  if (!admin) throw new AuthError('Usuario no encontrado');
+  return {
+    tipo: 'admin' as const,
+    perfil: {
+      id: admin.id,
+      nombre: admin.nombre,
+      apellido: admin.apellido,
+      email: admin.email,
+    },
+  };
 }
 
 export async function login(email: unknown, password: unknown) {
@@ -54,12 +92,6 @@ export async function login(email: unknown, password: unknown) {
     return {
       token: firmarToken(socio.id, 'socio'),
       tipo: 'socio' as const,
-      socio: {
-        id: socio.id,
-        nombre: socio.nombre,
-        apellido: socio.apellido,
-        email: socio.email,
-      },
     };
   }
 
@@ -71,11 +103,5 @@ export async function login(email: unknown, password: unknown) {
   return {
     token: firmarToken(admin.id, 'admin'),
     tipo: 'admin' as const,
-    admin: {
-      id: admin.id,
-      nombre: admin.nombre,
-      apellido: admin.apellido,
-      email: admin.email,
-    },
   };
 }

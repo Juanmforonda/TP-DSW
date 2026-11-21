@@ -77,4 +77,18 @@ describe('Autorización de recursos propios', () => {
     expect(req.params).toEqual({ idSocio: '7' });
     expect(next).toHaveBeenCalledOnce();
   });
+
+  it('reemplaza un ID manipulable con el ID del token', () => {
+    const req = makeRequest(
+      { id: 12, tipo: 'socio' },
+      { idSocio: '99' },
+    );
+    const res = makeResponse();
+    const next = vi.fn();
+
+    setAuthenticatedId('idSocio')(req, res, next);
+
+    expect(req.params.idSocio).toBe('12');
+    expect(next).toHaveBeenCalledOnce();
+  });
 });

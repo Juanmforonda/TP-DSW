@@ -1,33 +1,48 @@
+import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-
-function getTokenPayload(token) {
-  try {
-    const payload = token.split('.')[1];
-    return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
-  } catch {
-    return null;
-  }
-}
-
-function clearSession() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('tipo');
-  localStorage.removeItem('admin');
-  localStorage.removeItem('socio');
-}
+import { getAuthenticatedProfile } from '../api/auth';
+import { clearSession } from '../utils/storage';
 
 export function AuthGuard({ role }) {
   const token = localStorage.getItem('token');
-  const tipo = localStorage.getItem('tipo');
-  const payload = token ? getTokenPayload(token) : null;
-  const hasValidToken = Boolean(
-    payload &&
-      typeof payload.exp === 'number' &&
-      payload.exp * 1000 > Date.now() &&
-      payload.tipo === tipo,
-  );
+  const [checking, setChecking] = useState(Boolean(token));
+  const [allowed, setAllowed] = useState(false);
 
-  if (!hasValidToken || (role && tipo !== role)) {
+  useEffect(() => {
+    if (!token) {
+      clearSession();
+      setChecking(false);
+      return;
+    }
+
+    let activo = true;
+    getAuthenticatedProfile()
+      .then((res) => {
+        if (!activo) return;
+        const tipo = res.data?.data?.tipo;
+        setAllowed(!role || tipo === role);
+      })
+      .catch(() => {
+        if (!activo) return;
+        clearSession();
+        setAllowed(false);
+      })
+      .finally(() => {
+        if (activo) setChecking(false);
+      });
+
+    return () => {
+      activo = false;
+    };
+  }, [role, token]);
+
+  if (!token) {
+    clearSession();
+    return <Navigate to="/login" replace />;
+  }
+
+  if (checking) return null;
+  if (!allowed) {
     clearSession();
     return <Navigate to="/login" replace />;
   }

@@ -33,25 +33,22 @@ export default function LoginForm() {
         body: JSON.stringify({ email, password }),
       });
 
+
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión');
 
       localStorage.setItem('token', data.token);
-      localStorage.setItem('tipo', data.tipo);
-
-      if (data.tipo === 'socio' && data.socio) {
-        localStorage.setItem('socio', JSON.stringify(data.socio));
+      if (data.tipo === 'socio') {
         setTimeout(() => {
           navigate('/socio');
         }, 100);
-      } else if (data.tipo === 'admin' && data.admin) {
-        localStorage.setItem('admin', JSON.stringify(data.admin));
+      } else if (data.tipo === 'admin') {
         setTimeout(() => {
           navigate('/admin');
         }, 100);
       } else {
-        throw new Error('No se recibió el objeto del usuario');
+        throw new Error('Tipo de usuario no válido');
       }
     } catch (err) {
       console.error('❌ Error en login:', err);

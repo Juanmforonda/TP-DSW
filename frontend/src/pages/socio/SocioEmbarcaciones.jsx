@@ -5,18 +5,12 @@ import { EmptyState } from '../../components/EmptyState.jsx';
 import { ErrorState } from '../../components/ErrorState.jsx';
 import { LoadingState } from '../../components/LoadingState.jsx';
 
-export function SocioEmbarcaciones({ idSocio }) {
+export function SocioEmbarcaciones() {
   const [embarcs, setEmbarcs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const cargarEmbarcaciones = useCallback(async () => {
-    if (!idSocio) {
-      setError('No se pudo obtener el ID del socio');
-      setLoading(false);
-      return;
-    }
-
     setLoading(true);
     setError(null);
 
@@ -33,7 +27,7 @@ export function SocioEmbarcaciones({ idSocio }) {
     } finally {
       setLoading(false);
     }
-  }, [idSocio]);
+  }, []);
 
   useEffect(() => {
     cargarEmbarcaciones();

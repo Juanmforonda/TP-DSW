@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { login } from './auth.service.js';
+import { getAuthenticatedProfile, login } from './auth.service.js';
 import { AuthError, ValidationError } from './auth.errors.js';
+import { requireAuth, AuthenticatedRequest } from './auth.middleware.js';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET ?? 'dev-only-secret-change-me';
@@ -30,6 +31,21 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 
     console.error('Error en login:', error);
+    return res.status(500).json({ message: 'Error interno del servidor' });
+  }
+});
+
+router.get('/auth/me', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const profile = await getAuthenticatedProfile(
+      (req as AuthenticatedRequest).user,
+    );
+    return res.json({ message: 'Perfil encontrado', data: profile });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return res.status(401).json({ message: error.message });
+    }
+    console.error('Error al obtener perfil:', error);
     return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });

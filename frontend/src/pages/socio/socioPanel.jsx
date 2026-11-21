@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useOutletContext } from 'react-router-dom';
+import { getMiPerfil } from '../../api/socios';
 import { SocioNavbar } from '../../components/SocioNavbar.jsx';
 import { SocioHome2 } from './SocioHome2.jsx';
 import { SocioEmbarcaciones } from './SocioEmbarcaciones.jsx';
@@ -14,14 +15,18 @@ export function SocioPanel() {
   const [socio, setSocio] = useState(null);
 
   useEffect(() => {
-    const socioGuardado = localStorage.getItem('socio');
-    if (!socioGuardado) return;
+    let activo = true;
+    getMiPerfil()
+      .then((res) => {
+        if (activo) setSocio(res.data?.data?.perfil ?? res.data?.data);
+      })
+      .catch((error) => {
+        console.error('Error al cargar el perfil del socio:', error);
+      });
 
-    try {
-      setSocio(JSON.parse(socioGuardado));
-    } catch (error) {
-      console.error('Error al parsear socio:', error);
-    }
+    return () => {
+      activo = false;
+    };
   }, []);
 
   return (
@@ -50,31 +55,25 @@ export function SocioDashboard() {
 }
 
 export function SocioPerfilPage() {
-  const { socio } = useSocioRoute();
-  return socio ? <SocioPerfil idSocio={socio.id} /> : null;
+  return <SocioPerfil />;
 }
 
 export function SocioEmbarcacionesPage() {
-  const { socio } = useSocioRoute();
-  return socio ? <SocioEmbarcaciones idSocio={socio.id} /> : null;
+  return <SocioEmbarcaciones />;
 }
 
 export function SocioCuotasPage() {
-  const { socio } = useSocioRoute();
-  return socio ? <SocioCuotas idSocio={socio.id} /> : null;
+  return <SocioCuotas />;
 }
 
 export function SocioAlquileresPage() {
-  const { socio } = useSocioRoute();
-  return socio ? <SocioAlquileres idSocio={socio.id} /> : null;
+  return <SocioAlquileres />;
 }
 
 export function SocioReservasEmbarcacionPage() {
-  const { socio } = useSocioRoute();
-  return socio ? <SocioReservasEmbarcacion idSocio={socio.id} /> : null;
+  return <SocioReservasEmbarcacion />;
 }
 
 export function SocioReservasTravelLiftPage() {
-  const { socio } = useSocioRoute();
-  return socio ? <SocioReservasTravelLift idSocio={socio.id} /> : null;
+  return <SocioReservasTravelLift />;
 }

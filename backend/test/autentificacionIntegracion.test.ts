@@ -10,7 +10,7 @@ vi.mock('./../src/shared/orm.js', () => ({
   },
 }))
 
-import { login } from './../src/auth/auth.service.js'
+import { getAuthenticatedProfile, login } from './../src/auth/auth.service.js'
 import { AuthError } from './../src/auth/auth.errors.js'
 import { orm } from './../src/shared/orm.js'
 import { Socio } from './../src/socio/socio.entity.js'
@@ -46,12 +46,6 @@ describe('Integración Login', () => {
     expect(resultado).toEqual({
       token: 'token-prueba',
       tipo: 'socio',
-      socio: {
-        id: 1,
-        nombre: 'Juan',
-        apellido: 'Pérez',
-        email: 'juan@gmail.com',
-      },
     })
     expect(findOne).toHaveBeenCalledWith(
       Socio,
@@ -85,12 +79,6 @@ describe('Integración Login', () => {
     expect(resultado).toEqual({
       token: 'token-admin',
       tipo: 'admin',
-      admin: {
-        id: 2,
-        nombre: 'Ana',
-        apellido: 'Gómez',
-        email: 'ana@gmail.com',
-      },
     })
     expect(findOne).toHaveBeenNthCalledWith(
       1,
@@ -141,5 +129,69 @@ describe('Integración Login', () => {
 
     await expect(login('juan@gmail.com', '123456')).rejects.toThrow(AuthError)
     expect(jwt.sign).not.toHaveBeenCalled()
+  })
+})
+
+describe('Perfil autenticado', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+    vi.mocked(orm.em.fork).mockReset()
+  })
+
+  it('devuelve el perfil del socio desde el ID del JWT', async () => {
+    const socio = Object.assign(new Socio(), {
+      id: 7,
+      nombre: 'Juan',
+      apellido: 'Pérez',
+      email: 'juan@gmail.com',
+      telefono: '123456',
+    })
+    const findOne = vi.fn().mockResolvedValue(socio)
+    vi.mocked(orm.em.fork).mockReturnValue({
+      findOne,
+    } as unknown as ReturnType<typeof orm.em.fork>)
+
+    const resultado = await getAuthenticatedProfile({ id: 7, tipo: 'socio' })
+
+    expect(resultado).toEqual({
+      tipo: 'socio',
+      perfil: {
+        id: 7,
+        nombre: 'Juan',
+        apellido: 'Pérez',
+        email: 'juan@gmail.com',
+        telefono: '123456',
+      },
+    })
+    expect(findOne).toHaveBeenCalledWith(
+      Socio,
+      { id: 7 },
+      { populate: ['afiliaciones'] },
+    )
+  })
+
+  it('devuelve el perfil del administrador desde el ID del JWT', async () => {
+    const administrador = Object.assign(new Administrador(), {
+      id: 3,
+      nombre: 'Ana',
+      apellido: 'Gómez',
+      email: 'ana@gmail.com',
+    })
+    const findOne = vi.fn().mockResolvedValue(administrador)
+    vi.mocked(orm.em.fork).mockReturnValue({
+      findOne,
+    } as unknown as ReturnType<typeof orm.em.fork>)
+
+    const resultado = await getAuthenticatedProfile({ id: 3, tipo: 'admin' })
+
+    expect(resultado).toEqual({
+      tipo: 'admin',
+      perfil: {
+        id: 3,
+        nombre: 'Ana',
+        apellido: 'Gómez',
+        email: 'ana@gmail.com',
+      },
+    })
   })
 })

@@ -2,7 +2,7 @@
 // valida el JSON y versiona el formato.
 
 // Claves de SESIÓN (se borran al cerrar sesión).
-export const SESSION_KEYS = ['token', 'socio', 'tipo','admin'];
+export const SESSION_KEYS = ['token', 'socio', 'tipo', 'admin'];
 
 // Claves de CONTENIDO PÚBLICO (nunca se borran en el logout).
 export const CONTENT_KEYS = {
@@ -56,7 +56,6 @@ export function clearSession() {
   SESSION_KEYS.forEach(removeItem);
 }
 
-// --- Testimonios del visitante ---------------------------------------------
 // Formato guardado: { v: 1, data: [ ...testimonios ] }
 // También acepta el formato anterior (un array directo).
 

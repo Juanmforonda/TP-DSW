@@ -7,11 +7,15 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react';
-import { getAdministradores, actualizarAdministrador } from '../../api/administradores';
+import {
+  getMiPerfilAdministrador,
+  actualizarMiPerfilAdministrador,
+  cambiarMiPasswordAdministrador,
+} from '../../api/administradores';
 import '../../components/AdminHome.css';
 
 
-export function AdminPerfil({ idAdmin }) {
+export function AdminPerfil() {
   const [admin, setAdmin] = useState(null);
   const [form, setForm] = useState({ email: '', nombre: '', apellido: '' });
   const [editando, setEditando] = useState({ email: false, nombre: false, apellido: false });
@@ -20,31 +24,35 @@ export function AdminPerfil({ idAdmin }) {
   const [mensaje, setMensaje] = useState(null);
 
   useEffect(() => {
-    getAdministradores()
+    let activo = true;
+    getMiPerfilAdministrador()
       .then((res) => {
-        const todos = res.data?.data ?? [];
-        const actual = todos.find((s) => s.id === idAdmin);
-        if (actual) {
-          setAdmin(actual);
-          setForm({
-            email: actual.email,
-            nombre: actual.nombre,
-            apellido: actual.apellido,
-          });
-        }
+        if (!activo) return;
+        const actual = res.data?.data;
+        if (!actual) return;
+        setAdmin(actual);
+        setForm({
+          email: actual.email,
+          nombre: actual.nombre,
+          apellido: actual.apellido,
+        });
       })
-      .catch((err) => console.error('❌ Error al cargar perfil:', err));
-  }, [idAdmin]);
+      .catch((err) => console.error(' Error al cargar perfil:', err));
+
+    return () => {
+      activo = false;
+    };
+  }, []);
 
   const handleGuardarCampo = async (campo) => {
     try {
-      await actualizarAdministrador(idAdmin, { [campo]: form[campo] });
+      await actualizarMiPerfilAdministrador({ [campo]: form[campo] });
       setEditando((prev) => ({ ...prev, [campo]: false }));
       setAdmin((prev) => ({ ...prev, [campo]: form[campo] }));
-      setMensaje(`✅ ${campo} actualizado`);
+      setMensaje(` ${campo} actualizado`);
     } catch (error) {
-      console.error(`❌ Error al actualizar ${campo}:`, error);
-      setMensaje(`❌ Error al actualizar ${campo}`);
+      console.error(` Error al actualizar ${campo}:`, error);
+      setMensaje(` Error al actualizar ${campo}`);
     }
   };
 
@@ -64,12 +72,12 @@ export function AdminPerfil({ idAdmin }) {
     }
 
     try {
-      await actualizarAdministrador(idAdmin, { password: nueva });
+      await cambiarMiPasswordAdministrador({ actual: passForm.actual, nueva });
       alert('Contraseña actualizada');
       setModalVisible(false);
       setPassForm({ actual: '', nueva: '', repetir: '' });
     } catch (error) {
-      console.error('❌ Error al actualizar contraseña:', error);
+      console.error(' Error al actualizar contraseña:', error);
       alert('Error al actualizar contraseña');
     }
   };

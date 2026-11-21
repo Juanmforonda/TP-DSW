@@ -31,10 +31,6 @@ describe('Login integración', () => {
           Promise.resolve({
             token: 'token-prueba',
             tipo: 'socio',
-            socio: {
-              id: 1,
-              nombre: 'Juan'
-            }
           })
       })
     )
@@ -75,9 +71,8 @@ describe('Login integración', () => {
         localStorage.getItem('token')
       ).toBe('token-prueba')
 
-      expect(
-        localStorage.getItem('tipo')
-      ).toBe('socio')
+      expect(localStorage.getItem('tipo')).toBeNull()
+      expect(localStorage.getItem('socio')).toBeNull()
 
     })
 

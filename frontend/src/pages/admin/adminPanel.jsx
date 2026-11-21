@@ -1,22 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useNavigate, useOutletContext } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { CContainer } from '@coreui/react';
 import { AdminNavbar } from '../../components/AdminNavbar.jsx';
 import AdminHome from './AdminHome.jsx';
 import { AdminPerfil } from './AdminPerfil.jsx';
+import { getMiPerfilAdministrador } from '../../api/administradores';
 
 export function AdminPanel() {
   const [admin, setAdmin] = useState(null);
 
   useEffect(() => {
-    const adminGuardado = localStorage.getItem('admin');
-    if (!adminGuardado) return;
+    let activo = true;
+    getMiPerfilAdministrador()
+      .then((res) => {
+        if (activo) setAdmin(res.data?.data);
+      })
+      .catch((error) => {
+        console.error('Error al cargar el perfil del administrador:', error);
+      });
 
-    try {
-      setAdmin(JSON.parse(adminGuardado));
-    } catch (error) {
-      console.error('Error al parsear admin:', error);
-    }
+    return () => {
+      activo = false;
+    };
   }, []);
 
   return (
@@ -40,6 +45,5 @@ export function AdminDashboard() {
 }
 
 export function AdminPerfilPage() {
-  const { admin } = useOutletContext();
-  return admin ? <AdminPerfil idAdmin={admin.id} /> : null;
+  return <AdminPerfil />;
 }

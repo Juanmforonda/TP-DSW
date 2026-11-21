@@ -5,19 +5,13 @@ import { EmptyState } from '../../components/EmptyState.jsx';
 import { ErrorState } from '../../components/ErrorState.jsx';
 import { LoadingState } from '../../components/LoadingState.jsx';
 
-export function SocioAlquileres({ idSocio }) {
+export function SocioAlquileres() {
   const [amarras, setAmarras] = useState([]);
   const [boxes, setBoxes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const cargarAlquileres = useCallback(async () => {
-    if (!idSocio) {
-      setError('No se pudo obtener el ID del socio');
-      setLoading(false);
-      return;
-    }
-
     setLoading(true);
     setError(null);
 
@@ -50,7 +44,7 @@ export function SocioAlquileres({ idSocio }) {
     } finally {
       setLoading(false);
     }
-  }, [idSocio]);
+  }, []);
 
   useEffect(() => {
     cargarAlquileres();
