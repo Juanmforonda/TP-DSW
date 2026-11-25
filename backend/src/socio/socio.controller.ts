@@ -18,6 +18,7 @@ import { ReservaEmbarcacionClub } from '../reservaEmbarcacionClub/reservaEmbarca
 import { procesarBajaLogicaSocio } from './socio.rules.js';
 import { filtrarCampos, camposNoPermitidos } from '../shared/whitelist.js';
 import { validarFortalezaPassword } from '../shared/password.js';
+import { sendHttpError } from '../shared/http-errors.js';
 
 
 const em = orm.em;
@@ -52,7 +53,7 @@ async function findAll(req: Request, res: Response) {
     const socios = await em.find(Socio, {}, { populate: ['embarcaciones', 'afiliaciones'] });
     res.status(200).json({ message: 'Socios encontrados', data: socios });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -71,7 +72,7 @@ async function findOne(req: Request, res: Response) {
 
     res.status(200).json({ message: 'Socio encontrado', data: socio });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -111,7 +112,7 @@ async function add(req: Request, res: Response) {
       data: newSocio,
     });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -146,7 +147,7 @@ async function update(req: Request, res: Response) {
     await em.flush();
     res.status(200).json({ message: 'Socio actualizado correctamente' });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -192,7 +193,7 @@ async function cambiarPassword(req: Request, res: Response) {
 
     return res.status(200).json({ message: 'Contraseña actualizada correctamente' });
   } catch (error: any) {
-    return res.status(500).json({ message: error.message });
+    return sendHttpError(error, req, res);
   }
 }
 
@@ -212,7 +213,7 @@ async function remove(req: Request, res: Response) {
     await em.removeAndFlush(socioToRemove);
     res.status(200).json({ message: 'Socio eliminado correctamente' });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -306,8 +307,7 @@ async function bajaLogica(req: Request, res: Response) {
 
     return res.status(result.status).json({ message: result.message });
   } catch (error: any) {
-    console.error(error);
-    return res.status(500).json({ message: 'Error en la baja lógica', error: error.message });
+    return sendHttpError(error, req, res);
   }
 }
 

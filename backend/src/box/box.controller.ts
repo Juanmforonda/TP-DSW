@@ -4,6 +4,7 @@ import { Box, Estado as EstadoBox } from './box.entity.js';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { EstadoReservaInfraestructura } from '../reservaInfraestructura/reservaInfraestructura.entity.js';
+import { sendHttpError } from '../shared/http-errors.js';
 
 function sanitizeBoxInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizedInput = {
@@ -49,10 +50,7 @@ async function findAll(req: Request, res: Response) {
       data: boxes
     });
   } catch (error: any) {
-    res.status(500).json({
-      message: 'Error al buscar boxes',
-      error: error.message,
-    });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -71,7 +69,7 @@ async function findOne(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       res.status(404).json({ message: 'Box no encontrado' });
     } else {
-      res.status(500).json({ message: error.message });
+      sendHttpError(error, req, res);
     }
   }
 }
@@ -91,10 +89,7 @@ async function add(req: Request, res: Response) {
     await em.persistAndFlush(newBox);
     res.status(201).json({ message: 'Box creado correctamente', data: newBox });
   } catch (error: any) {
-    res.status(500).json({
-      message: 'Error al crear box',
-      error: error.message,
-    });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -134,7 +129,7 @@ async function update(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       res.status(404).json({ message: 'Box no encontrado' });
     } else {
-      res.status(500).json({ message: error.message });
+      sendHttpError(error, req, res);
     }
   }
 }
@@ -159,7 +154,7 @@ async function remove(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       res.status(404).json({ message: 'Box no encontrado' });
     } else {
-      res.status(500).json({ message: error.message });
+      sendHttpError(error, req, res);
     }
   }
 }
