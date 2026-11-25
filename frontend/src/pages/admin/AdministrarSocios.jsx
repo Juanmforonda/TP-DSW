@@ -17,7 +17,6 @@ import {
   CFormInput,
   CButton,
 } from '@coreui/react';
-import { crearAfiliacion } from '../../api/afiliaciones.js';
 import { LoadingState } from '../../components/LoadingState.jsx';
 import { ErrorState } from '../../components/ErrorState.jsx';
 
@@ -83,20 +82,13 @@ export default function AdministrarSocios() {
         return;
       }
 
-      const socioResp = await crearSocio({
+      await crearSocio({
         nombre,
         apellido,
         dni,
         telefono,
         email,
-      });
-      const socioId = socioResp.data.data.id;
-
-      await crearAfiliacion({
-        fechaInicio: new Date(),
-        fechaFin: null,
-        tipo: tipoAfiliacion,
-        socio: socioId,
+        tipoAfiliacion,
       });
 
       await cargarSocios();
@@ -106,8 +98,10 @@ export default function AdministrarSocios() {
       setTelefono('');
       setEmail('');
       setTipoAfiliacion('');
-    } catch (error) {
-      console.log('Error al crear socio y afiliación', error.response?.data);
+    } catch (error) { alert(
+     error.response?.data?.message ??
+      'Error al crear socio'
+     );
     }
   };
 

@@ -79,39 +79,48 @@ async function findOne(req: Request, res: Response) {
 // Crear nuevo socio
 async function add(req: Request, res: Response) {
   try {
-    // Validar datos antes de crear el socio
     const socioInstance = plainToInstance(Socio, req.body);
     const errors = await validate(socioInstance);
 
-
     if (errors.length > 0) {
-      const messages = errors.map((err) => Object.values(err.constraints || {})).flat();
-      return res.status(400).json({ message: 'Error de validación', errors: messages });
-    }
+      const messages = errors
+        .map((err) => Object.values(err.constraints || {}))
+        .flat();
 
-
-    // Crear el socio (el hook BeforeCreate se encarga del hash)
-    const newSocio = em.create(Socio, req.body);
-    await em.persistAndFlush(newSocio);
-
-
-    // Crear afiliación automática si se envía tipoAfiliacion
-    if (req.body.tipoAfiliacion) {
-      const afiliacion = em.create(Afiliacion, {
-        fechaInicio: new Date(),
-        tipo: req.body.tipoAfiliacion,
-        socio: newSocio,
+      return res.status(400).json({
+        message: 'Error de validación',
+        errors: messages,
       });
-      await em.persistAndFlush(afiliacion);
     }
 
+    const nuevoSocio = await em.transactional(async (emTx) => {
 
-    res.status(201).json({
-      message: 'Socio creado correctamente (contraseña generada a partir del DNI)',
-      data: newSocio,
+      const socio = emTx.create(Socio, req.body);
+      await emTx.persistAndFlush(socio);
+
+      if (req.body.tipoAfiliacion) {
+        const afiliacion = emTx.create(Afiliacion, {
+          fechaInicio: new Date(),
+          tipo: req.body.tipoAfiliacion,
+          socio,
+        });
+
+        await emTx.persistAndFlush(afiliacion);
+      }
+
+      return socio;
     });
+
+    return res.status(201).json({
+      message:
+        'Socio creado correctamente (contraseña generada a partir del DNI)',
+      data: nuevoSocio,
+    });
+
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({
+      message: error.message,
+    });
   }
 }
 

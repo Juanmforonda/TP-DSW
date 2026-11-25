@@ -60,9 +60,19 @@ DB_NAME=club_nautico
 DB_USER=root
 DB_PASSWORD=tu_password
 MP_ACCESS_TOKEN=TEST-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxx
+NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
 BACKEND_URL=http://localhost:3000
 ```
+
+Las siguientes variables son obligatorias para el correcto funcionamiento del sistema:
+
+NODE_ENV
+BACKEND_URL
+FRONTEND_URL
+BACKEND_URL y FRONTEND_URL son utilizadas por la integración con Mercado Pago para generar URLs de retorno y webhooks.
+
+ALLOWED_ORIGINS define los orígenes permitidos por CORS y debe ajustarse según el entorno donde se despliegue la aplicación.
 
 `MP_ACCESS_TOKEN` solo es necesario para probar pagos con Mercado Pago. Para probar login, socios, embarcaciones, cuotas y reservas alcanza con configurar la conexión a MySQL.
 
@@ -107,7 +117,7 @@ cd backend
 pnpm start:dev
 ```
 
-La API queda disponible en <http://localhost:3000>. El backend también actualiza el esquema al iniciar durante el desarrollo.
+La API queda disponible en <http://localhost:3000>. La sincronización automática del esquema sólo se ejecuta cuando: NODE_ENV=development
 
 ### Frontend
 
