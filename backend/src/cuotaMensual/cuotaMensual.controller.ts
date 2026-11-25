@@ -15,6 +15,18 @@ import {
 } from './cuotaMensual.payment.service.js';
 const em = orm.em;
 
+function requireEnv(name: string): string {
+  const value = process.env[name];
+
+  if (!value) {
+    throw new Error(
+      `Variable de entorno requerida: ${name}`
+    );
+  }
+
+  return value;
+}
+
 function sanitizeCuotaMensualInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizedInput = {
     fechaVencimiento: req.body.fechaVencimiento,
@@ -119,6 +131,9 @@ async function crearPreferenciaMP(req: Request, res: Response) {
       return res.status(409).json({ message: 'Esta cuota ya está pagada' });
     }
 
+    const backendUrl = requireEnv('BACKEND_URL');
+    const frontendUrl = requireEnv('FRONTEND_URL');
+
     const detalles = cuota.detalles.getItems();
     const items =
       detalles.length > 0
@@ -140,7 +155,7 @@ async function crearPreferenciaMP(req: Request, res: Response) {
           ];
 
     const preference = new Preference(mpClient);
-    const notificationUrl =`${process.env.BACKEND_URL}/api/webhooks/mercadopago`;
+    const notificationUrl =`${backendUrl}/api/webhooks/mercadopago`;
 
     console.log('WEBHOOK URL:', notificationUrl); 
     const resultado = await preference.create({
@@ -152,9 +167,9 @@ async function crearPreferenciaMP(req: Request, res: Response) {
           surname: cuota.socio.apellido,
         },
         back_urls: {
-          success: `${process.env.FRONTEND_URL}/pago/exito`,
-          failure: `${process.env.FRONTEND_URL}/pago/error`,
-          pending: `${process.env.FRONTEND_URL}/pago/pendiente`,
+          success: `${frontendUrl}/pago/exito`,
+          failure: `${frontendUrl}/pago/error`,
+          pending: `${frontendUrl}/pago/pendiente`,
         },
         notification_url: notificationUrl, 
       },

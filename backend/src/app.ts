@@ -20,6 +20,9 @@ import { authRouter } from './auth/auth.routes.js';
 import { webhookRouter } from './webhook/webhook.routes.js';
 import { requireAuth, requireRole } from './auth/auth.middleware.js';
 
+const isDevelopment =
+  process.env.NODE_ENV === 'development';
+
 const app = express();
 app.set('trust proxy', 1); //para que no detecte el proxy de Render como un cliente(y no haya problemas con el rate limit)
 
@@ -31,6 +34,10 @@ const allowedOrigins = (
   .filter(Boolean);
 
 const port = process.env.PORT || 3000;
+
+if (isDevelopment) {
+  await syncSchema();
+}
 
 app.disable('x-powered-by');
 app.use(
