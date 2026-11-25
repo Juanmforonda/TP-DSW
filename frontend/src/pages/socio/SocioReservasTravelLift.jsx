@@ -7,7 +7,7 @@ import {
 import { getMisEmbarcaciones } from '../../api/embarcaciones.js';
 import {
   cancelarReservaTravelLift, crearReservaTravelLift, finalizarReservaTravelLift,
-  getMisReservasTravelLift,
+  getDisponibilidadTravelLift, getMisReservasTravelLift,
 } from '../../api/reservasTravelLift.js';
 import TravelLiftTimePicker from '../../components/TravelLiftTimePicker.jsx';
 import { formatReservationDate, listFromResponse } from '../../utils/reservas.js';
@@ -26,13 +26,14 @@ export function SocioReservasTravelLift() {
 
   const cargarReservas = useCallback(async () => {
     try {
-      const [boats, own] = await Promise.all([
+      const [boats, own, availability] = await Promise.all([
         getMisEmbarcaciones(),
         getMisReservasTravelLift(),
+        getDisponibilidadTravelLift(),
       ]);
       setEmbarcaciones(unwrap(boats));
       setReservas(unwrap(own));
-      setTodasLasReservas(unwrap(own));
+      setTodasLasReservas(unwrap(availability));
     } catch (err) {
       setError(err.response?.data?.message ?? 'No se pudieron cargar las reservas');
     }

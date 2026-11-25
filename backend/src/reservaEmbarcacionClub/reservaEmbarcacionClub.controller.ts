@@ -115,6 +115,7 @@ async function add(req: Request, res: Response) {
     const user = (req as AuthenticatedRequest).user;
     if (user.tipo === 'socio') {
       req.body.sanitizedInput.socio = user.id;
+      req.body.sanitizedInput.estado = 'ACTIVA';
     }
 
     const embarcacionExists = await em.findOne(Embarcacion, {
@@ -165,8 +166,21 @@ async function update(req: Request, res: Response) {
     ) {
       return res.status(403).json({ message: 'Permisos insuficientes' });
     }
+    if (user.tipo === 'socio' && reservaEmbarcacionClub.estado !== 'ACTIVA') {
+      return res.status(409).json({ message: 'Solo se pueden editar reservas activas' });
+    }
     if (user.tipo === 'socio') {
       req.body.sanitizedInput.socio = user.id;
+      if (req.body.sanitizedInput.estado !== undefined) {
+        return res.status(403).json({ message: 'No tenés permiso para cambiar el estado de la reserva' });
+      }
+    }
+    const estadosValidos = ['ACTIVA', 'CANCELADA', 'FINALIZADA'];
+    if (
+      req.body.sanitizedInput.estado !== undefined &&
+      !estadosValidos.includes(req.body.sanitizedInput.estado)
+    ) {
+      return res.status(400).json({ message: 'Estado de reserva inválido' });
     }
 
     if (req.body.sanitizedInput.embarcacion) {
@@ -230,6 +244,9 @@ async function cancel (req: Request, res: Response) {
     ) {
       return res.status(403).json({ message: 'Permisos insuficientes' });
     }
+    if (reservaEmbarcacionClub.estado !== 'ACTIVA') {
+      return res.status(409).json({ message: 'Solo se pueden cancelar reservas activas' });
+    }
     reservaEmbarcacionClub.estado = 'CANCELADA';
     await em.flush();
     res.status(200).json({message: 'ReservaEmbarcacionClub cancelled', data: reservaEmbarcacionClub});
@@ -241,7 +258,21 @@ async function cancel (req: Request, res: Response) {
 async function finalizar (req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const reservaEmbarcacionClub = await em.findOneOrFail(ReservaEmbarcacionClub, {id});
+    const user = (req as AuthenticatedRequest).user;
+    const reservaEmbarcacionClub = await em.findOneOrFail(
+      ReservaEmbarcacionClub,
+      { id },
+      { populate: ['socio'] }
+    );
+    if (
+      user.tipo === 'socio' &&
+      String(reservaEmbarcacionClub.socio?.id) !== String(user.id)
+    ) {
+      return res.status(403).json({ message: 'Permisos insuficientes' });
+    }
+    if (reservaEmbarcacionClub.estado !== 'ACTIVA') {
+      return res.status(409).json({ message: 'Solo se pueden finalizar reservas activas' });
+    }
     reservaEmbarcacionClub.estado = 'FINALIZADA';
     await em.flush();
     res.status(200).json({message: 'ReservaEmbarcacionClub finalized', data: reservaEmbarcacionClub});
@@ -270,6 +301,32 @@ async function getReservasPorEmbarcacion(req: Request, res: Response) {
   }
 }
 
+async function getDisponibilidadPorEmbarcacion(req: Request, res: Response) {
+  try {
+    const idEmbarcacion = Number.parseInt(req.params.idEmbarcacion, 10);
+    if (!Number.isInteger(idEmbarcacion) || idEmbarcacion <= 0) {
+      return res.status(400).json({ message: 'El identificador de embarcación no es válido' });
+    }
+
+    const reservas = await em.find(
+      ReservaEmbarcacionClub,
+      { embarcacion: idEmbarcacion, estado: 'ACTIVA' },
+      { orderBy: { fechaInicio: 'ASC' } }
+    );
+    return res.status(200).json({
+      message: 'Disponibilidad de la embarcación encontrada',
+      data: reservas.map(({ id, fechaInicio, fechaFin, estado }) => ({
+        id,
+        fechaInicio,
+        fechaFin,
+        estado,
+      })),
+    });
+  } catch (error: any) {
+    return sendHttpError(error, req, res);
+  }
+}
+
 export {
   sanitizeReservaEmbarcacionClubInput,
   findAll,
@@ -279,6 +336,7 @@ export {
   remove,
   getReservasPorSocio,
   getReservasPorEmbarcacion,
+  getDisponibilidadPorEmbarcacion,
   cancel,
   finalizar
 };

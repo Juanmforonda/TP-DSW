@@ -7,6 +7,7 @@ export function AuthGuard({ role }) {
   const token = localStorage.getItem('token');
   const [checking, setChecking] = useState(Boolean(token));
   const [allowed, setAllowed] = useState(false);
+  const [authenticatedRole, setAuthenticatedRole] = useState(null);
 
   useEffect(() => {
     if (!token) {
@@ -20,6 +21,7 @@ export function AuthGuard({ role }) {
       .then((res) => {
         if (!activo) return;
         const tipo = res.data?.data?.tipo;
+        setAuthenticatedRole(tipo);
         setAllowed(!role || tipo === role);
       })
       .catch(() => {
@@ -43,7 +45,8 @@ export function AuthGuard({ role }) {
 
   if (checking) return null;
   if (!allowed) {
-    clearSession();
+    if (authenticatedRole === 'admin') return <Navigate to="/admin" replace />;
+    if (authenticatedRole === 'socio') return <Navigate to="/socio" replace />;
     return <Navigate to="/login" replace />;
   }
 

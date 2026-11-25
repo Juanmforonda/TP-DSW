@@ -127,6 +127,7 @@ async function add(req: Request, res: Response) {
     const user = (req as AuthenticatedRequest).user;
     if (user.tipo === 'socio') {
       input.socio = user.id;
+      input.estado = EstadoReservaTravelLift.ACTIVA;
     }
     const { start, end, socio, embarcacion } = await validateReservation(input);
     const reserva = em.create(ReservaTravelLift, {
@@ -154,9 +155,15 @@ async function update(req: Request, res: Response) {
     ) {
       return res.status(403).json({ message: 'Permisos insuficientes' });
     }
+    if (user.tipo === 'socio' && reserva.estado !== EstadoReservaTravelLift.ACTIVA) {
+      return res.status(409).json({ message: 'Solo se pueden editar reservas activas' });
+    }
     const input = { ...req.body.sanitizedInput };
     if (user.tipo === 'socio') {
       input.socio = user.id;
+      if (input.estado !== undefined) {
+        return res.status(403).json({ message: 'No tenés permiso para cambiar el estado de la reserva' });
+      }
     }
     const merged = {
       fechaHoraInicio: input.fechaHoraInicio ?? reserva.fechaHoraInicio,
@@ -167,6 +174,9 @@ async function update(req: Request, res: Response) {
     const { start, end, socio, embarcacion } = await validateReservation(merged, id);
     const nextStatus =
       input.estado !== undefined ? validateStatus(input.estado) : reserva.estado;
+    if (nextStatus !== reserva.estado && reserva.estado !== EstadoReservaTravelLift.ACTIVA) {
+      return res.status(409).json({ message: 'Solo se puede cambiar el estado de una reserva activa' });
+    }
     em.assign(reserva, {
       fechaHoraInicio: start,
       fechaHoraFin: end,
@@ -205,6 +215,9 @@ async function changeStatus(req: Request, res: Response, estado: EstadoReservaTr
     ) {
       return res.status(403).json({ message: 'Permisos insuficientes' });
     }
+    if (reserva.estado !== EstadoReservaTravelLift.ACTIVA) {
+      return res.status(409).json({ message: 'Solo se puede cambiar el estado de una reserva activa' });
+    }
     reserva.estado = estado;
     await em.flush();
     res.status(200).json({ message: `ReservaTravelLift ${estado.toLowerCase()}`, data: reserva });
@@ -234,6 +247,27 @@ async function findBySocio(req: Request, res: Response) {
   }
 }
 
+async function findAvailability(req: Request, res: Response) {
+  try {
+    const reservas = await em.find(
+      ReservaTravelLift,
+      { estado: EstadoReservaTravelLift.ACTIVA },
+      { orderBy: { fechaHoraInicio: 'ASC' } }
+    );
+    res.status(200).json({
+      message: 'Disponibilidad del Travel Lift encontrada',
+      data: reservas.map(({ id, fechaHoraInicio, fechaHoraFin }) => ({
+        id,
+        fechaHoraInicio,
+        fechaHoraFin,
+        estado: EstadoReservaTravelLift.ACTIVA,
+      })),
+    });
+  } catch (error: any) {
+    sendHttpError(error, req, res);
+  }
+}
+
 export {
   sanitizeReservaTravelLiftInput,
   findAll,
@@ -244,4 +278,5 @@ export {
   cancel,
   finalizar,
   findBySocio,
+  findAvailability,
 };

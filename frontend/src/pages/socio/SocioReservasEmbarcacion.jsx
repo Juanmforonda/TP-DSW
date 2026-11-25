@@ -25,7 +25,7 @@ import {
 import { getEmbarcacionesClub } from '../../api/embarcaciones.js';
 import {
   getMisReservasEmbarcacionClub,
-  getReservasPorEmbarcacion,
+  getDisponibilidadPorEmbarcacion,
   crearReservaEmbarcacionClub,
   actualizarReservaEmbarcacionClub,
   cancelarReservaEmbarcacionClub,
@@ -109,7 +109,7 @@ export function SocioReservasEmbarcacion() {
 
   async function cargarReservasEmbarcacion(id) {
     try {
-      const res = await getReservasPorEmbarcacion(id);
+      const res = await getDisponibilidadPorEmbarcacion(id);
       setReservasEmb(listFromResponse(res));
     } catch {
       setReservasEmb([]);

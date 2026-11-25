@@ -39,7 +39,7 @@ vi.mock(
       })
     ),
 
-    getReservasPorEmbarcacion: vi.fn(() =>
+    getDisponibilidadPorEmbarcacion: vi.fn(() =>
       Promise.resolve({
         data: {
           data: []
