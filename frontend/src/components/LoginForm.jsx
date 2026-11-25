@@ -12,8 +12,8 @@ import {
   CFormInput,
   CButton,
 } from '@coreui/react';
+import { loginUser } from '../api/auth.js';
 
-const API_URL = import.meta.env.VITE_API_URL ?? '';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -27,16 +27,12 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await loginUser(
+        email,
+        password
+      );
 
-
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión');
+      const data = res.data;
 
       localStorage.setItem('token', data.token);
       if (data.tipo === 'socio') {
@@ -51,11 +47,14 @@ export default function LoginForm() {
         throw new Error('Tipo de usuario no válido');
       }
     } catch (err) {
-      console.error('❌ Error en login:', err);
-      setError(err.message);
-    } finally {
+      setError(
+        err.response?.data?.message ??
+        err.message ??
+        'Error al iniciar sesión'
+      );
+      } finally {
       setLoading(false);
-    }
+      }
   };
 
   return (
