@@ -15,7 +15,7 @@ import { requireRole, setAuthenticatedId } from '../auth/auth.middleware.js';
 
 export const reservaInfraestructuraRouter = Router();
 
-reservaInfraestructuraRouter.get('/me', setAuthenticatedId('idSocio'), findBySocio);
+reservaInfraestructuraRouter.get('/me', requireRole('socio'), setAuthenticatedId('idSocio'), findBySocio);
 reservaInfraestructuraRouter.get('/', requireRole('admin'), findAll);
 reservaInfraestructuraRouter.get('/embarcacion/:idEmbarcacion', requireRole('admin'), findByEmbarcacion);
 reservaInfraestructuraRouter.post('/:id/cancelar', requireRole('admin'), cancel);

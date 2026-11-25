@@ -13,6 +13,7 @@ import {
   MercadoPagoValidationError,
   registerManualCashPayment,
 } from './cuotaMensual.payment.service.js';
+import { sendHttpError } from '../shared/http-errors.js';
 const em = orm.em;
 
 function sanitizeCuotaMensualInput(req: Request, res: Response, next: NextFunction) {
@@ -102,7 +103,7 @@ async function generarCuotasDelMes(req: Request, res: Response) {
       data: resultado.cuotasCreadas,
     });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -175,10 +176,7 @@ async function crearPreferenciaMP(req: Request, res: Response) {
 
     res.status(200).json({ message: 'Preferencia creada', data: { checkoutUrl } });
   } catch (error: any) {
-    console.error('Error en crearPreferenciaMP:', error);
-    console.error('Detalle MP (si existe):', error?.cause ?? error?.response?.data ?? 'sin detalle adicional');
-    console.error(error);
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -221,7 +219,7 @@ async function registrarPago(req: Request, res: Response){ //para registrar pago
       return res.status(error.statusCode).json({ message: error.message });
     }
     if (error.name === 'NotFoundError') return res.status(404).json({ message: 'Cuota no encontrada' });
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 
 }
@@ -232,7 +230,7 @@ async function findAll(req: Request, res: Response) {
     const cuotasMensuales = await em.find(CuotaMensual, {}, {populate: ['socio', 'detalles'] }); 
     res.status(200).json({message: 'found all cuotas mensuales', data: cuotasMensuales});
   }catch (error:any) {
-    res.status(500).send({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -242,7 +240,7 @@ async function findOne(req: Request, res: Response) {
     const cuotaMensual = await em.findOneOrFail(CuotaMensual, { id }, {populate: ['socio', 'detalles'] });
     res.status(200).json({message: 'found cuota mensual', data: cuotaMensual});
   } catch (error: any) {
-    res.status(500).send({ message: error.message });
+    sendHttpError(error, req, res);
     
   }
 }
@@ -261,8 +259,7 @@ async function update(req: Request, res: Response) {
 
     res.status(200).json({ message: 'Cuota mensual updated', data: cuotaMensualToUpdate });
   } catch (error: any) {
-    console.error(error);
-    return res.status(500).send({ message: error.message });  
+    return sendHttpError(error, req, res);
   }
 }
 
@@ -280,7 +277,7 @@ async function remove(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       return res.status(404).json({ message: 'Cuota mensual no encontrada' });
     }
-    return res.status(500).send({ message: error.message });
+    return sendHttpError(error, req, res);
     }
 }
 
@@ -290,8 +287,7 @@ async function findBySocio(req: Request, res: Response) {
     const cuotas = await em.find(CuotaMensual, { socio: idSocio }, { populate: ['detalles'], orderBy: {anio: 'desc', mes: 'desc'} });
     res.status(200).json({ message: 'Cuotas del socio encontradas', data: cuotas });
   } catch (error: any) {
-    console.error(' Error en findBySocio:', error);
-    res.status(500).send({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 

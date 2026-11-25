@@ -37,7 +37,7 @@ describe('AuthGuard', () => {
     });
   });
 
-  it('rechaza el acceso si el rol recibido no coincide', async () => {
+  it('redirige al panel del rol autenticado sin cerrar la sesión', async () => {
     localStorage.setItem('token', 'token-valido');
     localStorage.setItem('tipo', 'socio');
     getAuthenticatedProfile.mockResolvedValue({
@@ -50,14 +50,17 @@ describe('AuthGuard', () => {
           <Route element={<AuthGuard role="socio" />}>
             <Route path="/socio" element={<div>Panel socio</div>} />
           </Route>
+          <Route element={<AuthGuard role="admin" />}>
+            <Route path="/admin" element={<div>Panel admin</div>} />
+          </Route>
           <Route path="/login" element={<div>Login</div>} />
         </Routes>
       </MemoryRouter>,
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Login')).toBeInTheDocument();
+      expect(screen.getByText('Panel admin')).toBeInTheDocument();
     });
-    expect(localStorage.getItem('token')).toBeNull();
+    expect(localStorage.getItem('token')).toBe('token-valido');
   });
 });

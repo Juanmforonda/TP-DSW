@@ -1,3 +1,5 @@
+import { HttpError } from '../shared/http-errors.js';
+
 export function validarUbicacionExclusiva(
   amarraId: unknown,
   boxId: unknown
@@ -6,13 +8,13 @@ export function validarUbicacionExclusiva(
   const tieneBox = boxId !== undefined && boxId !== null;
 
   if (!tieneAmarra && !tieneBox) {
-    throw new Error(
+    throw new HttpError(400,
       'Debes asignar una amarra o un box para crear la embarcación'
     );
   }
 
   if (tieneAmarra && tieneBox) {
-    throw new Error(
+    throw new HttpError(400,
       'La embarcación no puede asignarse simultáneamente a amarra y box'
     );
   }
@@ -22,8 +24,8 @@ export function validarReactivacion(
   fechaFin?: Date
 ) {
   if (!fechaFin) {
-    throw new Error(
+    throw new HttpError(400,
       'La embarcación ya está activa'
-    )
+    );
   }
 }

@@ -17,3 +17,5 @@ export const getMisReservasEmbarcacionClub = () =>
   api.get('/api/reservasEmbarcacionClub/me');
 export const getReservasPorEmbarcacion = (idEmbarcacion) =>
   api.get(`/api/reservasEmbarcacionClub/embarcacion/${idEmbarcacion}`);
+export const getDisponibilidadPorEmbarcacion = (idEmbarcacion) =>
+  api.get(`/api/reservasEmbarcacionClub/embarcacion/${idEmbarcacion}/disponibilidad`);

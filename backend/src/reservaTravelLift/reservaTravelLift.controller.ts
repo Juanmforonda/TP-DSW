@@ -7,6 +7,7 @@ import {
   ReservaTravelLift,
 } from './reservaTravelLift.entity.js';
 import { AuthenticatedRequest } from '../auth/auth.middleware.js';
+import { HttpError, sendHttpError } from '../shared/http-errors.js';
 
 const em = orm.em;
 const HORA_EN_MILISEGUNDOS = 60 * 60 * 1000;
@@ -29,7 +30,7 @@ function sanitizeReservaTravelLiftInput(req: Request, res: Response, next: NextF
 function parseDate(value: unknown, label: string): Date {
   const date = new Date(String(value));
   if (!value || Number.isNaN(date.getTime())) {
-    throw new Error(`La ${label} es inválida`);
+    throw new HttpError(400, `La ${label} es inválida`);
   }
   return date;
 }
@@ -37,7 +38,7 @@ function parseDate(value: unknown, label: string): Date {
 function validateTimeWindow(startValue: unknown, start: Date, end: Date) {
   const duration = end.getTime() - start.getTime();
   if (duration !== HORA_EN_MILISEGUNDOS) {
-    throw new Error('La reserva del Travel Lift debe durar exactamente 1 hora');
+    throw new HttpError(400, 'La reserva del Travel Lift debe durar exactamente 1 hora');
   }
 
   // El frontend envía la hora local sin zona; para valores con zona se usa la
@@ -47,14 +48,14 @@ function validateTimeWindow(startValue: unknown, start: Date, end: Date) {
   const hour = timeMatch ? Number(timeMatch[1]) : start.getHours();
   const minute = timeMatch ? Number(timeMatch[2]) : start.getMinutes();
   if (hour < 8 || hour > 17 || minute !== 0) {
-    throw new Error('El Travel Lift solo puede reservarse entre las 08:00 y las 18:00');
+    throw new HttpError(400, 'El Travel Lift solo puede reservarse entre las 08:00 y las 18:00');
   }
 }
 
 function validateStatus(value: unknown): EstadoReservaTravelLift {
   const status = (value ?? EstadoReservaTravelLift.ACTIVA) as EstadoReservaTravelLift;
   if (!Object.values(EstadoReservaTravelLift).includes(status)) {
-    throw new Error('El estado debe ser ACTIVA, FINALIZADA o CANCELADA');
+    throw new HttpError(400, 'El estado debe ser ACTIVA, FINALIZADA o CANCELADA');
   }
   return status;
 }
@@ -68,12 +69,12 @@ async function validateReservation(
   validateTimeWindow(input.fechaHoraInicio, start, end);
 
   const socio = await em.findOne(Socio, { id: Number(input.socio) });
-  if (!socio) throw new Error('El socio indicado no existe');
+  if (!socio) throw new HttpError(400, 'El socio indicado no existe');
 
   const embarcacion = await em.findOne(Embarcacion, { id: Number(input.embarcacion) });
-  if (!embarcacion) throw new Error('La embarcación indicada no existe');
+  if (!embarcacion) throw new HttpError(400, 'La embarcación indicada no existe');
   if (!embarcacion.socio || embarcacion.socio.id !== socio.id) {
-    throw new Error('La embarcación debe pertenecer al socio de la reserva');
+    throw new HttpError(400, 'La embarcación debe pertenecer al socio de la reserva');
   }
 
   const where: any = {
@@ -85,7 +86,7 @@ async function validateReservation(
   const overlapping = await em.findOne(ReservaTravelLift, where);
   if (overlapping) {
     const conflictStart = overlapping.fechaHoraInicio.toLocaleString('es-AR');
-    throw new Error(`El Travel Lift ya está reservado en ese horario (${conflictStart})`);
+    throw new HttpError(409, `El Travel Lift ya está reservado en ese horario (${conflictStart})`);
   }
 
   return { start, end, socio, embarcacion };
@@ -103,7 +104,7 @@ async function findAll(req: Request, res: Response) {
     });
     res.status(200).json({ message: 'found all reservasTravelLift', data: reservas });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -116,7 +117,7 @@ async function findOne(req: Request, res: Response) {
     );
     res.status(200).json({ message: 'found reservaTravelLift', data: reserva });
   } catch (error: any) {
-    res.status(error.name === 'NotFoundError' ? 404 : 500).json({ message: error.message });
+    sendHttpError(error, req, res, 'Reserva de Travel Lift no encontrada');
   }
 }
 
@@ -126,6 +127,7 @@ async function add(req: Request, res: Response) {
     const user = (req as AuthenticatedRequest).user;
     if (user.tipo === 'socio') {
       input.socio = user.id;
+      input.estado = EstadoReservaTravelLift.ACTIVA;
     }
     const { start, end, socio, embarcacion } = await validateReservation(input);
     const reserva = em.create(ReservaTravelLift, {
@@ -138,7 +140,7 @@ async function add(req: Request, res: Response) {
     await em.flush();
     res.status(201).json({ message: 'ReservaTravelLift created', data: reserva });
   } catch (error: any) {
-    res.status(error.name === 'NotFoundError' ? 404 : 400).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -153,9 +155,15 @@ async function update(req: Request, res: Response) {
     ) {
       return res.status(403).json({ message: 'Permisos insuficientes' });
     }
+    if (user.tipo === 'socio' && reserva.estado !== EstadoReservaTravelLift.ACTIVA) {
+      return res.status(409).json({ message: 'Solo se pueden editar reservas activas' });
+    }
     const input = { ...req.body.sanitizedInput };
     if (user.tipo === 'socio') {
       input.socio = user.id;
+      if (input.estado !== undefined) {
+        return res.status(403).json({ message: 'No tenés permiso para cambiar el estado de la reserva' });
+      }
     }
     const merged = {
       fechaHoraInicio: input.fechaHoraInicio ?? reserva.fechaHoraInicio,
@@ -166,6 +174,9 @@ async function update(req: Request, res: Response) {
     const { start, end, socio, embarcacion } = await validateReservation(merged, id);
     const nextStatus =
       input.estado !== undefined ? validateStatus(input.estado) : reserva.estado;
+    if (nextStatus !== reserva.estado && reserva.estado !== EstadoReservaTravelLift.ACTIVA) {
+      return res.status(409).json({ message: 'Solo se puede cambiar el estado de una reserva activa' });
+    }
     em.assign(reserva, {
       fechaHoraInicio: start,
       fechaHoraFin: end,
@@ -176,7 +187,7 @@ async function update(req: Request, res: Response) {
     await em.flush();
     res.status(200).json({ message: 'ReservaTravelLift updated', data: reserva });
   } catch (error: any) {
-    res.status(error.name === 'NotFoundError' ? 404 : 400).json({ message: error.message });
+    sendHttpError(error, req, res, 'Reserva de Travel Lift no encontrada');
   }
 }
 
@@ -188,7 +199,7 @@ async function remove(req: Request, res: Response) {
     await em.removeAndFlush(reserva);
     res.status(200).json({ message: 'ReservaTravelLift removed' });
   } catch (error: any) {
-    res.status(error.name === 'NotFoundError' ? 404 : 500).json({ message: error.message });
+    sendHttpError(error, req, res, 'Reserva de Travel Lift no encontrada');
   }
 }
 
@@ -204,11 +215,14 @@ async function changeStatus(req: Request, res: Response, estado: EstadoReservaTr
     ) {
       return res.status(403).json({ message: 'Permisos insuficientes' });
     }
+    if (reserva.estado !== EstadoReservaTravelLift.ACTIVA) {
+      return res.status(409).json({ message: 'Solo se puede cambiar el estado de una reserva activa' });
+    }
     reserva.estado = estado;
     await em.flush();
     res.status(200).json({ message: `ReservaTravelLift ${estado.toLowerCase()}`, data: reserva });
   } catch (error: any) {
-    res.status(error.name === 'NotFoundError' ? 404 : 500).json({ message: error.message });
+    sendHttpError(error, req, res, 'Reserva de Travel Lift no encontrada');
   }
 }
 
@@ -229,7 +243,28 @@ async function findBySocio(req: Request, res: Response) {
     );
     res.status(200).json({ message: 'found reservasTravelLift for socio', data: reservas });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
+  }
+}
+
+async function findAvailability(req: Request, res: Response) {
+  try {
+    const reservas = await em.find(
+      ReservaTravelLift,
+      { estado: EstadoReservaTravelLift.ACTIVA },
+      { orderBy: { fechaHoraInicio: 'ASC' } }
+    );
+    res.status(200).json({
+      message: 'Disponibilidad del Travel Lift encontrada',
+      data: reservas.map(({ id, fechaHoraInicio, fechaHoraFin }) => ({
+        id,
+        fechaHoraInicio,
+        fechaHoraFin,
+        estado: EstadoReservaTravelLift.ACTIVA,
+      })),
+    });
+  } catch (error: any) {
+    sendHttpError(error, req, res);
   }
 }
 
@@ -243,4 +278,5 @@ export {
   cancel,
   finalizar,
   findBySocio,
+  findAvailability,
 };

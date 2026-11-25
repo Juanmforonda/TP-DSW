@@ -8,6 +8,7 @@ import { Embarcacion } from '../embarcacion/embarcacion.entity.js';
 import { Amarra, Estado as EstadoAmarra } from '../amarra/amarra.entity.js';
 import { Box, Estado as EstadoBox } from '../box/box.entity.js';
 import { validarFechas } from './reservaInfraestructura.rules.js';
+import { HttpError, sendHttpError } from '../shared/http-errors.js';
 
 const em = orm.em;
 
@@ -41,7 +42,7 @@ function validarXorUbicacion(amarraId: unknown, boxId: unknown) {
   const tieneBox = boxId !== null && boxId !== undefined;
 
   if (tieneAmarra === tieneBox) {
-    throw new Error('La reserva debe tener exactamente una ubicación: amarra o box');
+    throw new HttpError(400, 'La reserva debe tener exactamente una ubicación: amarra o box');
   }
 }
 
@@ -78,7 +79,7 @@ async function validarDisponibilidadInfraestructura(
   if (amarraId !== null) {
     const amarra = await em.findOneOrFail(Amarra, { id: amarraId });
     if (amarra.estado === EstadoAmarra.MANTENIMIENTO) {
-      throw new Error('La amarra seleccionada está en mantenimiento');
+      throw new HttpError(409, 'La amarra seleccionada está en mantenimiento');
     }
 
     const activaEnAmarra = await em.findOne(ReservaInfraestructura, {
@@ -87,14 +88,14 @@ async function validarDisponibilidadInfraestructura(
       ...(excluirReservaId ? { id: { $ne: excluirReservaId } } : {}),
     });
     if (activaEnAmarra) {
-      throw new Error('La amarra seleccionada ya tiene una reserva activa');
+      throw new HttpError(409, 'La amarra seleccionada ya tiene una reserva activa');
     }
   }
 
   if (boxId !== null) {
     const box = await em.findOneOrFail(Box, { id: boxId });
     if (box.estado === EstadoBox.MANTENIMIENTO) {
-      throw new Error('El box seleccionado está en mantenimiento');
+      throw new HttpError(409, 'El box seleccionado está en mantenimiento');
     }
 
     const activaEnBox = await em.findOne(ReservaInfraestructura, {
@@ -103,7 +104,7 @@ async function validarDisponibilidadInfraestructura(
       ...(excluirReservaId ? { id: { $ne: excluirReservaId } } : {}),
     });
     if (activaEnBox) {
-      throw new Error('El box seleccionado ya tiene una reserva activa');
+      throw new HttpError(409, 'El box seleccionado ya tiene una reserva activa');
     }
   }
 }
@@ -117,7 +118,7 @@ async function findAll(req: Request, res: Response) {
     );
     res.status(200).json({ message: 'found all reservasInfraestructura', data: reservas });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -134,7 +135,7 @@ async function findOne(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       return res.status(404).json({ message: 'Reserva de infraestructura no encontrada' });
     }
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res, 'Reserva de infraestructura no encontrada');
   }
 }
 
@@ -210,7 +211,7 @@ async function add(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       return res.status(404).json({ message: 'No existe la embarcación o infraestructura indicada' });
     }
-    res.status(400).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -248,7 +249,7 @@ async function update(req: Request, res: Response) {
           : null;
 
     if (reserva.id === undefined) {
-      return res.status(500).json({ message: 'La reserva no tiene un id válido' });
+      return sendHttpError(new Error('La reserva no tiene un id válido'), req, res);
     }
 
     validarXorUbicacion(amarraId, boxId);
@@ -334,7 +335,7 @@ async function update(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       return res.status(404).json({ message: 'Reserva o infraestructura no encontrada' });
     }
-    res.status(400).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -353,7 +354,7 @@ async function finalizar(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       return res.status(404).json({ message: 'Reserva de infraestructura no encontrada' });
     }
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -372,7 +373,7 @@ async function cancel(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       return res.status(404).json({ message: 'Reserva de infraestructura no encontrada' });
     }
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -394,7 +395,7 @@ async function remove(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       return res.status(404).json({ message: 'Reserva de infraestructura no encontrada' });
     }
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -408,7 +409,7 @@ async function findByEmbarcacion(req: Request, res: Response) {
     );
     res.status(200).json({ message: 'found reservas by embarcacion', data: reservas });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -422,7 +423,7 @@ async function findBySocio(req: Request, res: Response) {
     );
     res.status(200).json({ message: 'found reservas by socio', data: reservas });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 

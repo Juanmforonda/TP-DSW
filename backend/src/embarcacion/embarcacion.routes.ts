@@ -16,9 +16,9 @@ import { requireRole, requireSelf, setAuthenticatedId } from '../auth/auth.middl
 export const embarcacionRouter = Router();
 
 
-embarcacionRouter.get('/club', findEmbarcacionesClub);
-embarcacionRouter.get('/me', setAuthenticatedId('idSocio'), findBySocio);
-embarcacionRouter.get('/socio/:idSocio', requireSelf('idSocio'), findBySocio);
+embarcacionRouter.get('/club', requireRole('admin', 'socio'), findEmbarcacionesClub);
+embarcacionRouter.get('/me', requireRole('socio'), setAuthenticatedId('idSocio'), findBySocio);
+embarcacionRouter.get('/socio/:idSocio', requireRole('socio'), requireSelf('idSocio'), findBySocio);
 embarcacionRouter.get('/', requireRole('admin'), findAll);
 embarcacionRouter.get('/:id', requireRole('admin'), findOne);
 embarcacionRouter.post('/', requireRole('admin'), sanitizeEmbarcacionInput, add);

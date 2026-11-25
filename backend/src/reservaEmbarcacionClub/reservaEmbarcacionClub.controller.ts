@@ -3,6 +3,7 @@ import { orm } from '../shared/orm.js';
 import { NextFunction, Request, Response } from 'express';
 import { Embarcacion } from '../embarcacion/embarcacion.entity.js';
 import { AuthenticatedRequest } from '../auth/auth.middleware.js';
+import { HttpError, sendHttpError } from '../shared/http-errors.js';
 
 const em = orm.em;
 function sanitizeReservaEmbarcacionClubInput(
@@ -38,7 +39,7 @@ function sanitizeReservaEmbarcacionClubInput(
 async function validarDuracionYSolapamiento(em: any,inicio: Date, fin: Date,embarcacionId: number, excludeId?: number) {
 
   if (fin.getTime() - inicio.getTime() > 3 * 60 * 60 * 1000) {
-    throw { status: 400, message: 'La reserva no puede ser mayor a 3 horas' };
+    throw new HttpError(400, 'La reserva no puede ser mayor a 3 horas');
   }
 
   const where: any = {
@@ -51,10 +52,7 @@ async function validarDuracionYSolapamiento(em: any,inicio: Date, fin: Date,emba
 
   const solapada = await em.findOne(ReservaEmbarcacionClub, where);
   if (solapada) {
-    throw {
-      status: 409,
-      message: 'La embarcación ya tiene una reserva activa en ese horario',
-    };
+    throw new HttpError(409, 'La embarcación ya tiene una reserva activa en ese horario');
   }
 }
 
@@ -89,7 +87,7 @@ async function findAll(req: Request, res: Response) {
         data: reservasEmbarcacionClub,
       });
   } catch (error: any) {
-    res.status(500).send({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -108,32 +106,29 @@ async function findOne(req: Request, res: Response) {
         data: reservaEmbarcacionClub,
       });
   } catch (error: any) {
-    res.status(500).send({ message: error.message });
+    sendHttpError(error, req, res, 'Reserva de embarcación del club no encontrada');
   }
 }
 
 async function add(req: Request, res: Response) {
-  const user = (req as AuthenticatedRequest).user;
-  if (user.tipo === 'socio') {
-    req.body.sanitizedInput.socio = user.id;
-  }
+  try {
+    const user = (req as AuthenticatedRequest).user;
+    if (user.tipo === 'socio') {
+      req.body.sanitizedInput.socio = user.id;
+      req.body.sanitizedInput.estado = 'ACTIVA';
+    }
 
-  const embarcacionExists = await em.findOne(Embarcacion, {
-    id: req.body.sanitizedInput.embarcacion,
-  });
+    const embarcacionExists = await em.findOne(Embarcacion, {
+      id: req.body.sanitizedInput.embarcacion,
+    });
 
-  if (!embarcacionExists || embarcacionExists.socio !== null) {
-    return res
-      .status(400)
-      .send({
+    if (!embarcacionExists || embarcacionExists.socio !== null) {
+      return res.status(400).send({
         message:
           'Embarcación no encontrada o no corresponde a una embarcacion del club',
       });
-  }
+    }
 
-  
-
-  try {
     await validarDuracionYSolapamiento(
       em,
       new Date(req.body.sanitizedInput.fechaInicio),
@@ -152,7 +147,7 @@ async function add(req: Request, res: Response) {
         data: reservaEmbarcacionClub,
       });
   } catch (error: any) {
-    return res.status(400).send({ message: error.message });
+    return sendHttpError(error, req, res);
   }
 }
 
@@ -171,8 +166,21 @@ async function update(req: Request, res: Response) {
     ) {
       return res.status(403).json({ message: 'Permisos insuficientes' });
     }
+    if (user.tipo === 'socio' && reservaEmbarcacionClub.estado !== 'ACTIVA') {
+      return res.status(409).json({ message: 'Solo se pueden editar reservas activas' });
+    }
     if (user.tipo === 'socio') {
       req.body.sanitizedInput.socio = user.id;
+      if (req.body.sanitizedInput.estado !== undefined) {
+        return res.status(403).json({ message: 'No tenés permiso para cambiar el estado de la reserva' });
+      }
+    }
+    const estadosValidos = ['ACTIVA', 'CANCELADA', 'FINALIZADA'];
+    if (
+      req.body.sanitizedInput.estado !== undefined &&
+      !estadosValidos.includes(req.body.sanitizedInput.estado)
+    ) {
+      return res.status(400).json({ message: 'Estado de reserva inválido' });
     }
 
     if (req.body.sanitizedInput.embarcacion) {
@@ -203,7 +211,7 @@ async function update(req: Request, res: Response) {
         data: reservaEmbarcacionClub,
       });
   } catch (error: any) {
-    res.status(500).send({ message: error.message });
+    sendHttpError(error, req, res, 'Reserva de embarcación del club no encontrada');
   }
 }
 
@@ -217,7 +225,7 @@ async function remove(req: Request, res: Response) {
     await em.removeAndFlush(reservaEmbarcacionClub);
     res.status(200).json({ message: 'ReservaEmbarcacionClub removed' });
   } catch (error: any) {
-    res.status(500).send({ message: error.message });
+    sendHttpError(error, req, res, 'Reserva de embarcación del club no encontrada');
   }
 }
 
@@ -236,23 +244,40 @@ async function cancel (req: Request, res: Response) {
     ) {
       return res.status(403).json({ message: 'Permisos insuficientes' });
     }
+    if (reservaEmbarcacionClub.estado !== 'ACTIVA') {
+      return res.status(409).json({ message: 'Solo se pueden cancelar reservas activas' });
+    }
     reservaEmbarcacionClub.estado = 'CANCELADA';
     await em.flush();
     res.status(200).json({message: 'ReservaEmbarcacionClub cancelled', data: reservaEmbarcacionClub});
   } catch (error: any) {
-    res.status(500).send({ message: error.message });
+    sendHttpError(error, req, res, 'Reserva de embarcación del club no encontrada');
   }
 }
 
 async function finalizar (req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const reservaEmbarcacionClub = await em.findOneOrFail(ReservaEmbarcacionClub, {id});
+    const user = (req as AuthenticatedRequest).user;
+    const reservaEmbarcacionClub = await em.findOneOrFail(
+      ReservaEmbarcacionClub,
+      { id },
+      { populate: ['socio'] }
+    );
+    if (
+      user.tipo === 'socio' &&
+      String(reservaEmbarcacionClub.socio?.id) !== String(user.id)
+    ) {
+      return res.status(403).json({ message: 'Permisos insuficientes' });
+    }
+    if (reservaEmbarcacionClub.estado !== 'ACTIVA') {
+      return res.status(409).json({ message: 'Solo se pueden finalizar reservas activas' });
+    }
     reservaEmbarcacionClub.estado = 'FINALIZADA';
     await em.flush();
     res.status(200).json({message: 'ReservaEmbarcacionClub finalized', data: reservaEmbarcacionClub});
   } catch (error: any) {
-    res.status(500).send({ message: error.message });
+    sendHttpError(error, req, res, 'Reserva de embarcación del club no encontrada');
   }
 }
 
@@ -262,7 +287,7 @@ async function getReservasPorSocio(req: Request, res: Response) {
     const reservas = await em.find(ReservaEmbarcacionClub, {socio : idSocio}, {populate: ['embarcacion', 'socio']});
     res.status(200).json({message: 'found reservas for socio', data: reservas});
   } catch (error: any) {
-    res.status(500).send({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -272,7 +297,33 @@ async function getReservasPorEmbarcacion(req: Request, res: Response) {
     const reservas = await em.find(ReservaEmbarcacionClub, {embarcacion : idEmbarcacion}, {populate: ['embarcacion', 'socio']});
     res.status(200).json({message: 'found reservas for embarcacion', data: reservas});
   } catch (error: any) {
-    res.status(500).send({ message: error.message });
+    sendHttpError(error, req, res);
+  }
+}
+
+async function getDisponibilidadPorEmbarcacion(req: Request, res: Response) {
+  try {
+    const idEmbarcacion = Number.parseInt(req.params.idEmbarcacion, 10);
+    if (!Number.isInteger(idEmbarcacion) || idEmbarcacion <= 0) {
+      return res.status(400).json({ message: 'El identificador de embarcación no es válido' });
+    }
+
+    const reservas = await em.find(
+      ReservaEmbarcacionClub,
+      { embarcacion: idEmbarcacion, estado: 'ACTIVA' },
+      { orderBy: { fechaInicio: 'ASC' } }
+    );
+    return res.status(200).json({
+      message: 'Disponibilidad de la embarcación encontrada',
+      data: reservas.map(({ id, fechaInicio, fechaFin, estado }) => ({
+        id,
+        fechaInicio,
+        fechaFin,
+        estado,
+      })),
+    });
+  } catch (error: any) {
+    return sendHttpError(error, req, res);
   }
 }
 
@@ -285,6 +336,7 @@ export {
   remove,
   getReservasPorSocio,
   getReservasPorEmbarcacion,
+  getDisponibilidadPorEmbarcacion,
   cancel,
   finalizar
 };

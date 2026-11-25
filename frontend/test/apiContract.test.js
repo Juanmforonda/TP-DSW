@@ -72,6 +72,16 @@ describe('Prueba de contrato de módulos API vs Rutas de Backend', () => {
       administradoresApi.getAdministradores();
       expect(api.get).toHaveBeenCalledWith('/api/administradores');
     });
+
+    it('usa las rutas de disponibilidad con payload reducido para socios', () => {
+      reservasEmbarcacionClubApi.getDisponibilidadPorEmbarcacion(3);
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/reservasEmbarcacionClub/embarcacion/3/disponibilidad',
+      );
+
+      reservasTravelLiftApi.getDisponibilidadTravelLift();
+      expect(api.get).toHaveBeenCalledWith('/api/reservasTravelLift/disponibilidad');
+    });
   });
 
   describe('Validación global de endpoints de los módulos de API', () => {
