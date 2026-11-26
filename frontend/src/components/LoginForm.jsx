@@ -15,7 +15,6 @@ import {
 } from '@coreui/react';
 import { login } from '../api/auth.js';
 
-const API_URL = import.meta.env.VITE_API_URL ?? '';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -51,7 +50,7 @@ export default function LoginForm() {
       );
     } finally {
       setLoading(false);
-    }
+      }
   };
 
   return (

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-
 import LoginForm from '../src/components/LoginForm'
+import { loginUser } from '../src/api/auth.js';
 
 const mockNavigate = vi.fn()
 
@@ -15,6 +15,12 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
+
+vi.mock('../src/api/auth.js', () => ({
+  loginUser: vi.fn(),
+}));
+
+
 describe('Login integración', () => {
 
   beforeEach(() => {
@@ -24,16 +30,13 @@ describe('Login integración', () => {
 
   it('debe iniciar sesión como socio', async () => {
 
-    globalThis.fetch = vi.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            token: 'token-prueba',
-            tipo: 'socio',
-          })
-      })
-    )
+    loginUser.mockResolvedValue({
+      data: {
+        token: 'token-prueba',
+        tipo: 'socio',
+      },
+    });
+
 
     render(
       <MemoryRouter>
