@@ -17,10 +17,10 @@ export const cuotaMensualRouter = Router();
 const MP_ENABLED = process.env.MP_ENABLED === 'true';
 
 if (MP_ENABLED) {
-  cuotaMensualRouter.post('/:id/mercadopago/preferencia', crearPreferenciaMP);
+  cuotaMensualRouter.post('/:id/mercadopago/preferencia', requireRole('admin', 'socio'), crearPreferenciaMP);
 }
-cuotaMensualRouter.get('/me', setAuthenticatedId('id'), findBySocio);
-cuotaMensualRouter.get('/socio/:id', requireSelf('id'), findBySocio);
+cuotaMensualRouter.get('/me', requireRole('socio'), setAuthenticatedId('id'), findBySocio);
+cuotaMensualRouter.get('/socio/:id', requireRole('socio'), requireSelf('id'), findBySocio);
 cuotaMensualRouter.get('/', requireRole('admin'), findAll);
 cuotaMensualRouter.get('/:id', requireRole('admin'), findOne);
 cuotaMensualRouter.post('/generar', requireRole('admin'), generarCuotasDelMes);

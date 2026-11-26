@@ -13,9 +13,9 @@ import { requireRole, setAuthenticatedId } from '../auth/auth.middleware.js';
 
 export const socioRouter = Router();
 
-socioRouter.get('/me', setAuthenticatedId('id'), findOne);
-socioRouter.put('/me', setAuthenticatedId('id'), update);
-socioRouter.patch('/me/password', setAuthenticatedId('id'), cambiarPassword);
+socioRouter.get('/me', requireRole('socio'), setAuthenticatedId('id'), findOne);
+socioRouter.put('/me', requireRole('socio'), setAuthenticatedId('id'), update);
+socioRouter.patch('/me/password', requireRole('socio'), setAuthenticatedId('id'), cambiarPassword);
 
 socioRouter.get('/', requireRole('admin'), findAll);
 socioRouter.get('/:id', requireRole('admin'), findOne);

@@ -83,7 +83,10 @@ async function webhookMercadoPago(req: Request, res: Response) {
 
     res.status(200).send();
   } catch (error: any) {
-    console.error('Error en webhook de Mercado Pago:', error);
+    console.error('Error en webhook de Mercado Pago:', {
+      requestId: res.locals.requestId,
+      error,
+    });
     res.status(200).send(); // 200 igual, para que MP no reintente en loop
   }
 }

@@ -14,6 +14,7 @@ import {
   validarUbicacionExclusiva, 
   validarReactivacion
 } from './embarcacion.rules.js'
+import { HttpError, sendHttpError } from '../shared/http-errors.js';
 
 const em = orm.em;
 
@@ -48,7 +49,7 @@ async function findAll(req: Request, res: Response) {
     );
     res.status(200).json({ message: 'found all embarcaciones', data: embarcaciones });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -70,7 +71,7 @@ async function findOne(req: Request, res: Response) {
     );
     res.status(200).json({ message: 'found embarcacion', data: embarcacion });
   } catch (error: any) {
-    res.status(404).json({ message: 'Embarcación no encontrada' });
+    sendHttpError(error, req, res, 'Embarcación no encontrada');
   }
 }
 
@@ -149,7 +150,7 @@ async function add(req: Request, res: Response) {
         message: 'No se pudo crear la embarcación por conflicto de unicidad',
       });
     }
-    res.status(400).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -181,7 +182,7 @@ async function update(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       return res.status(404).json({ message: 'Embarcación no encontrada' });
     }
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -219,7 +220,7 @@ async function remove(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       return res.status(404).json({ message: 'Embarcación no encontrada' });
     }
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -250,18 +251,7 @@ async function reactivar(req: Request, res: Response) {
       });
     }
 
-    if (
-      error.message ===
-      'La embarcación ya está activa'
-    ) {
-      return res.status(400).json({
-        message: error.message
-      });
-    }
-
-    res.status(500).json({
-      message: error.message
-    });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -280,7 +270,7 @@ async function findBySocio(req: Request, res: Response) {
 
     res.status(200).json({ message: 'found embarcaciones by socio', data: embarcaciones });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -289,7 +279,7 @@ async function findEmbarcacionesClub(req: Request, res: Response) {
     const embarcaciones = await em.find(Embarcacion, { socio: null, fechaFin: null }, { populate: ['tipoEmbarcacion'] });
     res.status(200).json({ message: 'found embarcaciones without socio', data: embarcaciones });
   } catch (error: any) {
-    res.status(500).send({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -309,7 +299,7 @@ async function cambiarUbicacion(req: Request, res: Response) {
       );
 
       if (embarcacion.fechaFin) {
-        throw new Error('No se puede cambiar la ubicación de una embarcación dada de baja');
+        throw new HttpError(409, 'No se puede cambiar la ubicación de una embarcación dada de baja');
       }
 
       // 1. Cerrar la reserva activa actual (si existe)
@@ -343,7 +333,7 @@ async function cambiarUbicacion(req: Request, res: Response) {
         const amarraEntity = await em.findOneOrFail(Amarra, { id: Number(nuevaAmarraId) });
 
         if (amarraEntity.estado === EstadoAmarra.MANTENIMIENTO) {
-          throw new Error('La amarra seleccionada está en mantenimiento');
+          throw new HttpError(409, 'La amarra seleccionada está en mantenimiento');
         }
 
         const amarraOcupada = await em.findOne(ReservaInfraestructura, {
@@ -351,7 +341,7 @@ async function cambiarUbicacion(req: Request, res: Response) {
           estado: EstadoReservaInfraestructura.ACTIVA,
         });
         if (amarraOcupada) {
-          throw new Error('La amarra seleccionada ya tiene una reserva activa');
+          throw new HttpError(409, 'La amarra seleccionada ya tiene una reserva activa');
         }
 
         nuevaReserva.amarra = amarraEntity;
@@ -363,7 +353,7 @@ async function cambiarUbicacion(req: Request, res: Response) {
         const boxEntity = await em.findOneOrFail(Box, { id: Number(nuevoBoxId) });
 
         if (boxEntity.estado === EstadoBox.MANTENIMIENTO) {
-          throw new Error('El box seleccionado está en mantenimiento');
+          throw new HttpError(409, 'El box seleccionado está en mantenimiento');
         }
 
         const boxOcupado = await em.findOne(ReservaInfraestructura, {
@@ -371,7 +361,7 @@ async function cambiarUbicacion(req: Request, res: Response) {
           estado: EstadoReservaInfraestructura.ACTIVA,
         });
         if (boxOcupado) {
-          throw new Error('El box seleccionado ya tiene una reserva activa');
+          throw new HttpError(409, 'El box seleccionado ya tiene una reserva activa');
         }
 
         nuevaReserva.box = boxEntity;
@@ -393,7 +383,7 @@ async function cambiarUbicacion(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       return res.status(404).json({ message: 'La embarcación, amarra o box no existe' });
     }
-    res.status(409).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 

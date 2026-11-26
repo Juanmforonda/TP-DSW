@@ -19,18 +19,20 @@ import { RequestContext } from '@mikro-orm/mysql';
 import { authRouter } from './auth/auth.routes.js';
 import { webhookRouter } from './webhook/webhook.routes.js';
 import { requireAuth, requireRole } from './auth/auth.middleware.js';
+import { errorHandler, requestId } from './shared/http-errors.js';
+import { allowedOrigins } from './shared/allowed-origins.js';
+
+const isDevelopment =
+  process.env.NODE_ENV === 'development';
 
 const app = express();
 app.set('trust proxy', 1); //para que no detecte el proxy de Render como un cliente(y no haya problemas con el rate limit)
 
-const allowedOrigins = (
-  process.env.ALLOWED_ORIGINS ?? 'http://localhost:5173, http://localhost:5174'
-)
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-
 const port = process.env.PORT || 3000;
+
+if (isDevelopment) {
+  await syncSchema();
+}
 
 app.disable('x-powered-by');
 app.use(
@@ -38,6 +40,7 @@ app.use(
     crossOriginResourcePolicy: false,
   }),
 );
+app.use(requestId);
 app.use(
   cors({
     origin: allowedOrigins,
@@ -84,6 +87,7 @@ if (process.env.MP_ENABLED === 'true') {
 app.use((_, res) => {
   return res.status(404).send({ message: 'Resource not found' });
 });
+app.use(errorHandler);
 
 if (process.env.NODE_ENV !== 'production') {
   await syncSchema();

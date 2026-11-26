@@ -9,14 +9,20 @@ import {
 } from '@coreui/react';
 import { Link, NavLink } from 'react-router-dom';
 import { useState } from 'react';
-import { clearSession } from '../utils/storage';
+import { logout } from '../api/auth';
 import './DashboardNavbar.css';
 
 export function SocioNavbar({ socio }) {
   const [open, setOpen] = useState(false);
-  const handleLogout = () => {
-    clearSession(); 
-    window.location.href = '/';
+  
+  const handleLogout = async () => {
+    try {
+      await logout();
+      window.location.replace('/');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+      window.alert('No se pudo cerrar la sesión. Intentá nuevamente.');
+    }
   };
 
   const navItems = [

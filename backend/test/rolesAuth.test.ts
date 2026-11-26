@@ -43,6 +43,19 @@ describe('Autorización por rol', () => {
 
     expect(next).toHaveBeenCalledOnce();
   });
+
+  it.each(['admin', 'socio'] as const)(
+    'permite a %s acceder a una operación compartida',
+    (tipo) => {
+      const req = makeRequest({ id: 1, tipo });
+      const res = makeResponse();
+      const next = vi.fn();
+
+      requireRole('admin', 'socio')(req, res, next);
+
+      expect(next).toHaveBeenCalledOnce();
+    },
+  );
 });
 
 describe('Autorización de recursos propios', () => {

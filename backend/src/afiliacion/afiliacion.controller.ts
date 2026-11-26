@@ -3,6 +3,7 @@ import { orm } from '../shared/orm.js';
 import { Afiliacion } from './afiliacion.entity.js';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import { sendHttpError } from '../shared/http-errors.js';
 
 const em = orm.em;
 
@@ -27,7 +28,7 @@ async function findAll(req: Request, res: Response) {
     const afiliaciones = await em.find(Afiliacion, {}, { populate: ['socio'] }); 
     res.status(200).json({ message: 'Todas las afiliaciones encontradas', data: afiliaciones });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -40,7 +41,7 @@ async function findOne(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       res.status(404).json({ message: 'Afiliación no encontrada' });
     } else {
-      res.status(500).json({ message: error.message });
+      sendHttpError(error, req, res);
     }
   }
 }
@@ -60,7 +61,7 @@ async function add(req: Request, res: Response) {
     await em.flush();
     res.status(201).json({ message: 'Afiliación creada correctamente', data: afiliacion });
   } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    sendHttpError(error, req, res);
   }
 }
 
@@ -85,7 +86,7 @@ async function update(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       res.status(404).json({ message: 'Afiliación no encontrada' });
     } else {
-      res.status(500).json({ message: error.message });
+      sendHttpError(error, req, res);
     }
   }
 }
@@ -100,7 +101,7 @@ async function remove(req: Request, res: Response) {
     if (error.name === 'NotFoundError') {
       res.status(404).json({ message: 'Afiliación no encontrada' });
     } else {
-      res.status(500).json({ message: error.message });
+      sendHttpError(error, req, res);
     }
   }
 }

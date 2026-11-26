@@ -4,22 +4,17 @@ import { getAuthenticatedProfile } from '../api/auth';
 import { clearSession } from '../utils/storage';
 
 export function AuthGuard({ role }) {
-  const token = localStorage.getItem('token');
-  const [checking, setChecking] = useState(Boolean(token));
+  const [checking, setChecking] = useState(true);
   const [allowed, setAllowed] = useState(false);
+  const [authenticatedRole, setAuthenticatedRole] = useState(null);
 
   useEffect(() => {
-    if (!token) {
-      clearSession();
-      setChecking(false);
-      return;
-    }
-
     let activo = true;
     getAuthenticatedProfile()
       .then((res) => {
         if (!activo) return;
         const tipo = res.data?.data?.tipo;
+        setAuthenticatedRole(tipo);
         setAllowed(!role || tipo === role);
       })
       .catch(() => {
@@ -34,16 +29,12 @@ export function AuthGuard({ role }) {
     return () => {
       activo = false;
     };
-  }, [role, token]);
-
-  if (!token) {
-    clearSession();
-    return <Navigate to="/login" replace />;
-  }
+  }, [role]);
 
   if (checking) return null;
   if (!allowed) {
-    clearSession();
+    if (authenticatedRole === 'admin') return <Navigate to="/admin" replace />;
+    if (authenticatedRole === 'socio') return <Navigate to="/socio" replace />;
     return <Navigate to="/login" replace />;
   }
 
