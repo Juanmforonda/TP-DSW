@@ -56,6 +56,10 @@ export function clearSession() {
   SESSION_KEYS.forEach(removeItem);
 }
 
+export function clearLegacyToken() {
+  removeItem('token');
+}
+
 // Formato guardado: { v: 1, data: [ ...testimonios ] }
 // También acepta el formato anterior (un array directo).
 

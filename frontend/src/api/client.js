@@ -3,17 +3,10 @@ import { clearSession } from '../utils/storage';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? '/',
+  withCredentials: true,
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
+let redirectingToLogin = false;
 
 api.interceptors.response.use(
   (response) => response,
@@ -21,7 +14,8 @@ api.interceptors.response.use(
     const status = error.response?.status;
     if (status === 401) {
       clearSession();
-      if (window.location.pathname !== '/login') {
+      if (window.location.pathname !== '/login' && !redirectingToLogin) {
+        redirectingToLogin = true;
         window.location.replace('/login');
       }
     }

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LoginForm.css';
 import { LoadingState } from './LoadingState.jsx';
+import { clearSession } from '../utils/storage';
 import {
   CCard,
   CCardHeader,
@@ -12,6 +13,7 @@ import {
   CFormInput,
   CButton,
 } from '@coreui/react';
+import { login } from '../api/auth.js';
 
 const API_URL = import.meta.env.VITE_API_URL ?? '';
 
@@ -27,32 +29,26 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await login(email, password);
 
+      const data = res.data;
 
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión');
-
-      localStorage.setItem('token', data.token);
-      if (data.tipo === 'socio') {
-        setTimeout(() => {
-          navigate('/socio');
-        }, 100);
-      } else if (data.tipo === 'admin') {
-        setTimeout(() => {
-          navigate('/admin');
-        }, 100);
-      } else {
+      if (data.tipo !== 'socio' && data.tipo !== 'admin') {
         throw new Error('Tipo de usuario no válido');
       }
+
+      // Limpiar datos antiguos de localStorage,
+      clearSession();
+
+      if (data.tipo === 'socio') {
+        navigate('/socio');
+      } else {
+        navigate('/admin');
+      }
     } catch (err) {
-      console.error('❌ Error en login:', err);
-      setError(err.message);
+      setError(
+        err.response?.data?.message ?? err.message ?? 'Error al iniciar sesión',
+      );
     } finally {
       setLoading(false);
     }

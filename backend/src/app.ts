@@ -20,16 +20,10 @@ import { authRouter } from './auth/auth.routes.js';
 import { webhookRouter } from './webhook/webhook.routes.js';
 import { requireAuth, requireRole } from './auth/auth.middleware.js';
 import { errorHandler, requestId } from './shared/http-errors.js';
+import { allowedOrigins } from './shared/allowed-origins.js';
 
 const app = express();
 app.set('trust proxy', 1); //para que no detecte el proxy de Render como un cliente(y no haya problemas con el rate limit)
-
-const allowedOrigins = (
-  process.env.ALLOWED_ORIGINS ?? 'http://localhost:5173, http://localhost:5174'
-)
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
 
 const port = process.env.PORT || 3000;
 

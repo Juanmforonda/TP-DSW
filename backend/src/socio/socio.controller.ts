@@ -178,7 +178,7 @@ async function cambiarPassword(req: Request, res: Response) {
 
     const actualCoincide = await bcrypt.compare(actual, socio.password);
     if (!actualCoincide) {
-      return res.status(401).json({ message: 'La contraseña actual es incorrecta' });
+      return res.status(400).json({ message: 'La contraseña actual es incorrecta' });
     }
 
 
