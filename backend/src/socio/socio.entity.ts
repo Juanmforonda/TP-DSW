@@ -28,48 +28,61 @@ export class Socio extends BaseEntity {
   @IsNotEmpty({ message: 'El nombre es obligatorio' })
   nombre!: string;
 
+
   @Property()
   @IsString({ message: 'El apellido debe ser texto' })
   @IsNotEmpty({ message: 'El apellido es obligatorio' })
   apellido!: string;
+
 
   @Property()
   @IsNumberString({}, { message: 'El DNI debe contener solo números' })
   @Length(7, 10, { message: 'El DNI debe tener entre 7 y 10 dígitos' })
   dni!: string;
 
+
   @Property()
   @IsEmail({}, { message: 'El email debe tener un formato válido' })
   email!: string;
+
 
   @Property()
   @IsNumberString({}, { message: 'El teléfono debe contener solo números' })
   @Length(8, 15, { message: 'El teléfono debe tener entre 8 y 15 dígitos' })
   telefono!: string;
 
-  @Property()
+
+  // hidden: nunca se incluye en el JSON de las respuestas
+  @Property({ hidden: true })
   @IsOptional()
   @IsString()
   @Length(6, 100, { message: 'La contraseña debe tener al menos 6 caracteres' })
   password!: string;
 
+
   @OneToMany(() => Embarcacion, (embarcacion) => embarcacion.socio)
   embarcaciones = new Collection<Embarcacion>(this);
+
 
   @OneToMany(() => Afiliacion, (afiliacion) => afiliacion.socio)
   afiliaciones = new Collection<Afiliacion>(this);
 
+
   @OneToMany(() => CuotaMensual, (cuotaMensual) => cuotaMensual.socio)
   cuotasMensuales = new Collection<CuotaMensual>(this);
+
 
   @OneToMany(() => ReservaEmbarcacionClub, (reserva) => reserva.socio)
   reservasEmbarcacion = new Collection<ReservaEmbarcacionClub>(this);
 
+
   @OneToMany(() => ReservaInfraestructura, (reserva) => reserva.socio)
   reservasInfraestructura = new Collection<ReservaInfraestructura>(this);
 
+
   @OneToMany(() => ReservaTravelLift, (reserva) => reserva.socio)
   reservasTravelLift = new Collection<ReservaTravelLift>(this);
+
 
   @BeforeCreate()
   async hashPassword() {
