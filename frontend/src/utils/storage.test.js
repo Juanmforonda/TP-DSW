@@ -5,6 +5,7 @@ import {
   getUserTestimonials,
   saveUserTestimonials,
   readJSON,
+  clearLegacyToken,
 } from './storage.js';
 
 function crearStorageFalso() {
@@ -61,5 +62,15 @@ describe('storage', () => {
     expect(localStorage.getItem('socio')).toBeNull();
     expect(localStorage.getItem('tipo')).toBeNull();
     expect(getUserTestimonials()).toEqual([{ name: 'Luis' }]);
+  });
+
+  it('clearLegacyToken elimina el JWT antiguo sin borrar otros datos', () => {
+    localStorage.setItem('token', 'legacy-token');
+    localStorage.setItem('socio', '{"id":100}');
+
+    clearLegacyToken();
+
+    expect(localStorage.getItem('token')).toBeNull();
+    expect(localStorage.getItem('socio')).toBe('{"id":100}');
   });
 });

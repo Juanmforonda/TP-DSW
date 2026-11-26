@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LoginForm.css';
 import { LoadingState } from './LoadingState.jsx';
+import { clearSession } from '../utils/storage';
 import {
   CCard,
   CCardHeader,
@@ -12,7 +13,7 @@ import {
   CFormInput,
   CButton,
 } from '@coreui/react';
-import { loginUser } from '../api/auth.js';
+import { login } from '../api/auth.js';
 
 
 export default function LoginForm() {
@@ -27,32 +28,27 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const res = await loginUser(
-        email,
-        password
-      );
+      const res = await login(email, password);
 
       const data = res.data;
 
-      localStorage.setItem('token', data.token);
-      if (data.tipo === 'socio') {
-        setTimeout(() => {
-          navigate('/socio');
-        }, 100);
-      } else if (data.tipo === 'admin') {
-        setTimeout(() => {
-          navigate('/admin');
-        }, 100);
-      } else {
+      if (data.tipo !== 'socio' && data.tipo !== 'admin') {
         throw new Error('Tipo de usuario no válido');
+      }
+
+      // Limpiar datos antiguos de localStorage,
+      clearSession();
+
+      if (data.tipo === 'socio') {
+        navigate('/socio');
+      } else {
+        navigate('/admin');
       }
     } catch (err) {
       setError(
-        err.response?.data?.message ??
-        err.message ??
-        'Error al iniciar sesión'
+        err.response?.data?.message ?? err.message ?? 'Error al iniciar sesión',
       );
-      } finally {
+    } finally {
       setLoading(false);
       }
   };

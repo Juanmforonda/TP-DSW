@@ -147,7 +147,7 @@ async function cambiarPassword(req: Request, res: Response) {
         }
 
         if (!(await bcrypt.compare(actual, administrador.password))) {
-            return res.status(401).json({ message: 'La contraseña actual es incorrecta' });
+            return res.status(400).json({ message: 'La contraseña actual es incorrecta' });
         }
 
         if (await bcrypt.compare(nueva, administrador.password)) {

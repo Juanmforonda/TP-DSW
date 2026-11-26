@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { JWT_SECRET } from './auth.config.js';
+import { clearAuthCookie, getAuthToken } from './auth.cookie.js';
+import { isAllowedOrigin } from '../shared/allowed-origins.js';
 
 type Tipo = 'socio' | 'admin';
 
@@ -15,17 +17,33 @@ function isJwtPayload(value: string | JwtPayload): value is JwtPayload {
   return typeof value !== 'string';
 }
 
-export function requireAuth(
+function hasTrustedOrigin(req: Request) {
+  const safeMethod = ['GET', 'HEAD', 'OPTIONS'].includes(
+    req.method.toUpperCase(),
+  );
+  return safeMethod || isAllowedOrigin(req.header('Origin'));
+}
+
+export function requireTrustedOrigin(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
-  const authorization = req.header('Authorization');
-  const token = authorization?.startsWith('Bearer ')
-    ? authorization.slice('Bearer '.length).trim()
-    : '';
+  if (!hasTrustedOrigin(req)) {
+    return res.status(403).json({ message: 'Origen no permitido' });
+  }
 
+  return next();
+}
+
+export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  if (!hasTrustedOrigin(req)) {
+    return res.status(403).json({ message: 'Origen no permitido' });
+  }
+
+  const token = getAuthToken(req);
   if (!token) {
+    clearAuthCookie(res);
     return res.status(401).json({ message: 'Autenticación requerida' });
   }
 
@@ -37,6 +55,7 @@ export function requireAuth(
       (payload.tipo !== 'socio' && payload.tipo !== 'admin') ||
       (typeof payload.id !== 'string' && typeof payload.id !== 'number')
     ) {
+      clearAuthCookie(res);
       return res.status(401).json({ message: 'Token inválido' });
     }
 
@@ -47,6 +66,7 @@ export function requireAuth(
 
     return next();
   } catch (error) {
+    clearAuthCookie(res);
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(401).json({ message: 'Token expirado' });
     }
