@@ -58,13 +58,19 @@ DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=club_nautico
 DB_USER=root
-DB_PASSWORD=tu_password
+DB_PASSWORD=1234
 MP_ACCESS_TOKEN=TEST-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxx
-FRONTEND_URL=http://localhost:5173
+MP_WEBHOOK_SECRET=your-webhook-secret
+MP_ENABLED=false
+JWT_SECRET=replace-with-a-long-random-secret
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:5174
+AUTH_COOKIE_SAME_SITE=lax
+FRONTEND_URL=http://localhost:5173   
 BACKEND_URL=http://localhost:3000
+NODE_ENV=development
 ```
 
-`MP_ACCESS_TOKEN` solo es necesario para probar pagos con Mercado Pago. Para probar login, socios, embarcaciones, cuotas y reservas alcanza con configurar la conexión a MySQL.
+`MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET` y `MP_ENABLED=true`solo es necesario para probar pagos con Mercado Pago. Para probar login, socios, embarcaciones, cuotas y reservas alcanza con configurar la conexión a MySQL y JWT.
 
 ## Cargar datos de prueba
 
@@ -107,7 +113,7 @@ cd backend
 pnpm start:dev
 ```
 
-La API queda disponible en <http://localhost:3000>. El backend también actualiza el esquema al iniciar durante el desarrollo.
+La API queda disponible en <http://localhost:3000>(o en el puerto que hayas puesto en el BACKEND_URL del .env). El backend también actualiza el esquema al iniciar durante el desarrollo.
 
 ### Frontend
 
@@ -119,7 +125,7 @@ npm install
 npm run dev
 ```
 
-Abrir la URL que muestra Vite, normalmente <http://localhost:5173>.
+Abrir la URL que muestra Vite, normalmente <http://localhost:5173> (o en el puerto que hayas puesto en FRONTEND_URL del .env).
 
 ## Comprobación rápida
 
