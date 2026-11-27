@@ -52,6 +52,7 @@ async function getPayment(paymentId: string) {
 
 export async function validateAndApplyMercadoPago(
   paymentId: string,
+  expectedSocioId?: string | number,
 ): Promise<MercadoPagoPaymentResult> {
   const payment = await getPayment(paymentId);
   const cuotaId = parseCuotaId(payment.external_reference);
@@ -63,6 +64,13 @@ export async function validateAndApplyMercadoPago(
 
   if (!cuota) {
     throw new MercadoPagoValidationError('Cuota no encontrada');
+  }
+
+  if (
+    expectedSocioId !== undefined &&
+    String(cuota.socio.id) !== String(expectedSocioId)
+  ) {
+    throw new MercadoPagoValidationError('Pago no encontrado', 404);
   }
 
   if (payment.status !== 'approved') {
