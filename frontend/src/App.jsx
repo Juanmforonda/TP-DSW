@@ -107,12 +107,12 @@ export default function App() {
           </Route>
         </Route>
 
-        <Route path="/pago/exito" element={<PagoResultado tipo="exito" />} />
+        <Route path="/pago/exito" element={<PagoResultado />} />
         <Route
           path="/pago/pendiente"
-          element={<PagoResultado tipo="pendiente" />}
+          element={<PagoResultado />}
         />
-        <Route path="/pago/error" element={<PagoResultado tipo="error" />} />
+        <Route path="/pago/error" element={<PagoResultado />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

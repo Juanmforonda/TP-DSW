@@ -99,4 +99,25 @@ describe('Servicio de pagos de cuotas', () => {
     );
     expect(mocks.transactional).not.toHaveBeenCalled();
   });
+
+  it('no permite consultar un pago asociado a la cuota de otro socio', async () => {
+    const cuota = prepareCuota();
+    mocks.getPayment.mockResolvedValue({
+      id: 99,
+      status: 'pending',
+      external_reference: '12',
+    });
+    mocks.findOne.mockResolvedValue(cuota);
+
+    await expect(
+      validateAndApplyMercadoPago('99', 8),
+    ).rejects.toEqual(
+      expect.objectContaining({
+        name: 'MercadoPagoValidationError',
+        statusCode: 404,
+        message: 'Pago no encontrado',
+      } satisfies Partial<MercadoPagoValidationError>),
+    );
+    expect(mocks.transactional).not.toHaveBeenCalled();
+  });
 });

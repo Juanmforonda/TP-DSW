@@ -12,6 +12,7 @@ import { AuthenticatedRequest } from '../auth/auth.middleware.js';
 import {
   MercadoPagoValidationError,
   registerManualCashPayment,
+  validateAndApplyMercadoPago,
 } from './cuotaMensual.payment.service.js';
 import { sendHttpError } from '../shared/http-errors.js';
 const em = orm.em;
@@ -195,6 +196,42 @@ async function crearPreferenciaMP(req: Request, res: Response) {
   }
 }
 
+async function consultarEstadoPagoMP(req: Request, res: Response) {
+  const paymentId = req.body?.paymentId;
+  if (typeof paymentId !== 'string') {
+    return res.status(400).json({ message: 'Identificador de pago inválido' });
+  }
+
+  try {
+    const user = (req as AuthenticatedRequest).user;
+    const { payment } = await validateAndApplyMercadoPago(
+      paymentId,
+      user.id,
+    );
+
+    switch (payment.status) {
+      case 'approved':
+        return res.status(200).json({ data: { estado: 'approved' } });
+      case 'pending':
+      case 'in_process':
+      case 'authorized':
+        return res.status(200).json({ data: { estado: 'pending' } });
+      case 'rejected':
+      case 'cancelled':
+        return res.status(200).json({ data: { estado: 'rejected' } });
+      default:
+        return res
+          .status(502)
+          .json({ message: 'Mercado Pago devolvió un estado de pago no reconocido' });
+    }
+  } catch (error: any) {
+    if (error instanceof MercadoPagoValidationError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+    return sendHttpError(error, req, res);
+  }
+}
+
 async function registrarPago(req: Request, res: Response){ //para registrar pago manual (en efectivo, por ej)
 
   try {
@@ -307,4 +344,4 @@ async function findBySocio(req: Request, res: Response) {
 }
 
 
-export { sanitizeCuotaMensualInput, findAll, findOne, update, remove, findBySocio, generarCuotasDelMes, registrarPago, crearPreferenciaMP };
+export { sanitizeCuotaMensualInput, findAll, findOne, update, remove, findBySocio, generarCuotasDelMes, registrarPago, crearPreferenciaMP, consultarEstadoPagoMP };

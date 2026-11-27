@@ -9,6 +9,7 @@ import {
   generarCuotasDelMes,
   registrarPago,
   crearPreferenciaMP,
+  consultarEstadoPagoMP,
 } from './cuotaMensual.controller.js';
 import { requireRole, requireSelf, setAuthenticatedId } from '../auth/auth.middleware.js';
 
@@ -18,6 +19,7 @@ const MP_ENABLED = process.env.MP_ENABLED === 'true';
 
 if (MP_ENABLED) {
   cuotaMensualRouter.post('/:id/mercadopago/preferencia', requireRole('admin', 'socio'), crearPreferenciaMP);
+  cuotaMensualRouter.post('/mercadopago/estado', requireRole('socio'), consultarEstadoPagoMP);
 }
 cuotaMensualRouter.get('/me', requireRole('socio'), setAuthenticatedId('id'), findBySocio);
 cuotaMensualRouter.get('/socio/:id', requireRole('socio'), requireSelf('id'), findBySocio);
